@@ -1,0 +1,447 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      name="description"
+      content="Портфолио Мари Алекс: я создаю айдентику, кампании и цифровое направление для брендов."
+    />
+    <title>Мари — бренд &amp; креативный дизайнер</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Dela+Gothic+One&family=Inter:wght@400;500;600;700;800;900&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="./styles.css?v=20260912-06" />
+  </head>
+  <body>
+    <svg class="liquid-filter-defs" aria-hidden="true" focusable="false">
+      <filter id="liquid-glass-refraction" x="-20%" y="-20%" width="140%" height="140%" color-interpolation-filters="sRGB">
+        <feTurbulence type="fractalNoise" baseFrequency="0.012 0.038" numOctaves="2" seed="12" result="grain" />
+        <feDisplacementMap in="SourceGraphic" in2="grain" scale="4" xChannelSelector="R" yChannelSelector="G" result="refracted" />
+        <feGaussianBlur in="refracted" stdDeviation="0.16" result="softened" />
+        <feComponentTransfer in="softened">
+          <feFuncR type="linear" slope="1.04" intercept="0.01" />
+          <feFuncG type="linear" slope="1.04" intercept="0.01" />
+          <feFuncB type="linear" slope="1.06" intercept="0.01" />
+        </feComponentTransfer>
+      </filter>
+    </svg>
+    <main class="site">
+      <section class="screen" id="top" aria-label="Портфолио Мари">
+        <header class="screen-header">
+          <div class="brand-small">
+            <a href="#top" aria-label="Главный экран">
+              <h1 class="brand-title">Мари</h1>
+            </a>
+            <p class="brand-subtitle">бренд &amp; креативный дизайнер</p>
+          </div>
+
+          <div class="nav-menu" data-cases-menu>
+            <nav class="screen-nav" aria-label="Основная навигация">
+              <button
+                class="cases-menu-trigger"
+                type="button"
+                aria-expanded="false"
+                aria-controls="cases-popover"
+                data-cases-menu-trigger
+              >
+                Кейсы
+              </button>
+              <a href="#process">Процесс работы</a>
+              <a href="#contact">Контакт</a>
+            </nav>
+
+            <div class="cases-popover" id="cases-popover" data-cases-popover hidden>
+              <ul aria-label="Направления работ">
+                <li>Айдентика</li>
+                <li>Мерч</li>
+                <li>Иллюстрации</li>
+                <li>Соцсети</li>
+              </ul>
+            </div>
+          </div>
+        </header>
+
+        <div class="center-logo" aria-hidden="true">
+          <img src="./assets/mari-logo.svg" alt="" />
+        </div>
+
+        <section class="paired-carousel" data-carousel aria-label="Парная карусель компаний и кейсов">
+          <div class="ring ring-left"></div>
+          <div class="ring ring-right"></div>
+
+          <div class="orbit-lane orbit-lane-left" data-company-orbit role="group" aria-label="Компании"></div>
+          <div class="orbit-lane orbit-lane-right" data-case-orbit role="group" aria-label="Кейсы"></div>
+
+          <div class="liquid-lens" data-liquid-lens aria-hidden="true">
+            <div class="lens-lane" data-company-lens></div>
+            <div class="lens-lane" data-case-lens></div>
+          </div>
+
+          <article class="spotlight glass" data-spotlight>
+            <p class="spotlight-label">выбранная пара</p>
+            <h2 data-case-title>Система айдентики</h2>
+            <p data-case-copy>
+              Я связываю бренд и кейс в одну историю: от идеи до носителей.
+            </p>
+            <div class="spotlight-meta">
+              <span data-company-name>Компания</span>
+              <span data-case-type>Кейс</span>
+              <span data-case-count>0 материалов</span>
+            </div>
+            <button
+              class="black-button"
+              type="button"
+              aria-controls="case-dialog"
+              aria-haspopup="dialog"
+              data-case-dialog-open
+            >
+              Смотреть кейс
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M7 17 17 7M9 7h8v8" />
+              </svg>
+            </button>
+          </article>
+        </section>
+
+        <div class="screen-actions" aria-label="Быстрые действия">
+          <a class="scroll-down" href="#process" aria-label="Перейти к процессу">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M12 4v16M5 13l7 7 7-7" />
+            </svg>
+          </a>
+        </div>
+      </section>
+
+      <section class="panel" id="cases" hidden>
+        <div class="panel-heading reveal">
+          <p>Выбранные работы</p>
+          <h2>Черновые кейсы для будущей замены</h2>
+          <span>Сейчас это сгенерированные примеры. Потом сюда вставим мои реальные проекты.</span>
+        </div>
+        <div class="case-grid">
+          <article class="case-card glass reveal">
+            <img src="./assets/case-card-aurora.png" alt="Кейс Aurora" />
+            <div>
+              <h3>Aurora</h3>
+              <p>Айдентика, упаковка</p>
+            </div>
+          </article>
+          <article class="case-card glass reveal">
+            <img src="./assets/case-noire.png" alt="Кейс Noire" />
+            <div>
+              <h3>Noire</h3>
+              <p>Редакционная айдентика</p>
+            </div>
+          </article>
+          <article class="case-card glass reveal">
+            <img src="./assets/case-cult.png" alt="Кейс Cult" />
+            <div>
+              <h3>Cult</h3>
+              <p>Кампания и арт-дирекшн</p>
+            </div>
+          </article>
+          <article class="case-card glass reveal">
+            <img src="./assets/case-forma.png" alt="Кейс Forma" />
+            <div>
+              <h3>Forma</h3>
+              <p>Цифровой бренд</p>
+            </div>
+          </article>
+          <article class="case-card glass reveal">
+            <img src="./assets/case-kinto.png" alt="Кейс Kinto" />
+            <div>
+              <h3>Kinto</h3>
+              <p>Система упаковки</p>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section class="panel process" id="process">
+        <div class="panel-heading reveal">
+          <p>Как я работаю</p>
+          <h2>Процесс работы</h2>
+        </div>
+        <div class="process-carousel reveal" data-process-carousel>
+          <div class="step-stack" data-process-stack aria-label="Этапы процесса работы">
+            <article class="step glass is-active" data-process-step data-process-index="0" data-stack-slot="0">
+              <button
+                class="step-select"
+                type="button"
+                aria-label="Показать этап 01: Исследование"
+                aria-pressed="true"
+                data-process-step-select
+              ></button>
+              <span class="step-number" aria-hidden="true">01</span>
+              <div class="step-copy">
+                <h3>Исследование</h3>
+                <p>Я разбираю смыслы, аудиторию, визуальные референсы и культурный контекст.</p>
+              </div>
+            </article>
+            <article class="step glass" data-process-step data-process-index="1" data-stack-slot="1">
+              <button
+                class="step-select"
+                type="button"
+                aria-label="Показать этап 02: Система"
+                aria-pressed="false"
+                data-process-step-select
+              ></button>
+              <span class="step-number" aria-hidden="true">02</span>
+              <div class="step-copy">
+                <h3>Система</h3>
+                <p>Я собираю логику логотипа, типографику, цвет, композицию и правила образа.</p>
+              </div>
+            </article>
+            <article class="step glass" data-process-step data-process-index="2" data-stack-slot="2">
+              <button
+                class="step-select"
+                type="button"
+                aria-label="Показать этап 03: Материалы"
+                aria-pressed="false"
+                data-process-step-select
+              ></button>
+              <span class="step-number" aria-hidden="true">03</span>
+              <div class="step-copy">
+                <h3>Материалы</h3>
+                <p>Я готовлю упаковку, цифровые носители, презентации, анимационное направление и шаблоны.</p>
+              </div>
+            </article>
+            <article class="step glass" data-process-step data-process-index="3" data-stack-slot="3">
+              <button
+                class="step-select"
+                type="button"
+                aria-label="Показать этап 04: Запуск"
+                aria-pressed="false"
+                data-process-step-select
+              ></button>
+              <span class="step-number" aria-hidden="true">04</span>
+              <div class="step-copy">
+                <h3>Запуск</h3>
+                <p>Я передаю систему, веду арт-супервизию и поддерживаю следующую кампанию.</p>
+              </div>
+            </article>
+          </div>
+
+        </div>
+      </section>
+
+      <section class="panel skills" id="skills">
+        <div class="panel-heading reveal">
+          <p>Дизайн-стек</p>
+          <h2>Мои скиллы</h2>
+        </div>
+        <div class="skill-grid">
+          <article class="skill-card glass reveal">
+            <span class="skill-mark"><img src="./assets/icon-figma-official.svg" alt="" /></span>
+            <div>
+              <h3>Figma</h3>
+              <p>интерфейсы, дизайн-системы, прототипы</p>
+            </div>
+          </article>
+          <article class="skill-card glass reveal">
+            <span class="skill-mark"><img src="./assets/icon-photoshop.svg" alt="" /></span>
+            <div>
+              <h3>Photoshop</h3>
+              <p>ретушь, коллажи, визуалы кампаний</p>
+            </div>
+          </article>
+          <article class="skill-card glass reveal">
+            <span class="skill-mark"><img src="./assets/icon-illustrator-official.svg" alt="" /></span>
+            <div>
+              <h3>Illustrator</h3>
+              <p>логотипы, вектор, графические системы</p>
+            </div>
+          </article>
+          <article class="skill-card glass reveal">
+            <span class="skill-mark"><img class="skill-icon-rounded" src="./assets/icon-procreate.png" alt="" /></span>
+            <div>
+              <h3>ProCreate</h3>
+              <p>скетчи, иллюстрации, быстрые эскизы</p>
+            </div>
+          </article>
+          <article class="skill-card glass reveal">
+            <span class="skill-mark"><img src="./assets/icon-chatgpt.png" alt="" /></span>
+            <div>
+              <h3>ChatGPT</h3>
+              <p>идеи, структура, тексты, быстрые варианты</p>
+            </div>
+          </article>
+          <article class="skill-card glass reveal">
+            <span class="skill-mark"><img class="skill-icon-rounded" src="./assets/icon-kling.png" alt="" /></span>
+            <div>
+              <h3>Kling AI</h3>
+              <p>видео, движение, визуальные эксперименты</p>
+            </div>
+          </article>
+          <article class="skill-card glass reveal">
+            <span class="skill-mark"><img src="./assets/icon-gemini.svg" alt="" /></span>
+            <div>
+              <h3>Gemini</h3>
+              <p>референсы, анализ, визуальные направления</p>
+            </div>
+          </article>
+          <article class="skill-card glass reveal">
+            <span class="skill-mark"><img class="skill-icon-rounded" src="./assets/icon-recraft.png" alt="" /></span>
+            <div>
+              <h3>Recraft.ai</h3>
+              <p>AI-графика, вектор, быстрые бренд-визуалы</p>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section class="contact glass reveal" id="contact">
+        <div
+          class="contact-photo-placeholder"
+          role="img"
+          aria-label="Место для будущей фотографии Мари"
+        ></div>
+
+        <div class="contact-content">
+          <h2>
+            <span>Соберу бренд, который</span>
+            <span class="contact-title-line">
+              хочется
+              <span class="contact-decorated-word"
+                >ра<span class="contact-letter-anchor contact-eyes-anchor"
+                  >сс<img
+                    class="contact-title-decor contact-eyes"
+                    src="./assets/contact-eyes.svg"
+                    alt=""
+                    aria-hidden="true"
+                    draggable="false"
+                  /></span
+                >матрив<span class="contact-letter-anchor contact-loupe-anchor"
+                  >ат<img
+                    class="contact-title-decor contact-loupe"
+                    src="./assets/contact-loupe.svg"
+                    alt=""
+                    aria-hidden="true"
+                    draggable="false"
+                  /></span
+                >ь.</span
+              >
+            </span>
+          </h2>
+          <p class="contact-copy">
+            Есть существующий проект или создаете с 0? Давайте обсудим,<br />
+            как он должен выглядеть!
+          </p>
+          <div class="contact-actions">
+            <a href="https://t.me/alexmari_a" class="contact-button">Написать в Telegram</a>
+            <a href="mailto:" class="contact-button">Написать на почту</a>
+          </div>
+        </div>
+      </section>
+
+      <footer class="site-footer glass">
+        <span>2026 Все права защищены</span>
+        <a href="#" aria-label="Политика конфиденциальности">Политика конфиденциальности</a>
+        <span>
+          Сайт разработан
+          <a href="https://alkislovdev.ru/" target="_blank" rel="noopener">alkislovdev</a>
+        </span>
+      </footer>
+    </main>
+
+    <dialog
+      class="case-dialog"
+      id="case-dialog"
+      aria-labelledby="case-dialog-title"
+      aria-describedby="case-dialog-copy"
+      data-case-dialog
+    >
+      <article class="case-dialog-card">
+        <button
+          class="case-dialog-close"
+          type="button"
+          aria-label="Закрыть кейс"
+          data-case-dialog-close
+        >
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="m6 6 12 12M18 6 6 18" />
+          </svg>
+        </button>
+
+        <div class="case-dialog-stage">
+          <span class="case-dialog-counter" data-case-dialog-counter>01 / 10</span>
+          <span class="case-dialog-orbit" aria-hidden="true"></span>
+          <span class="case-dialog-lens" aria-hidden="true"></span>
+          <span class="case-dialog-object case-dialog-object--company">
+            <img
+              class="case-dialog-object-image"
+              src="./assets/company-meren-coffee.png"
+              alt="Визуал бренда МеренКофе"
+              data-case-dialog-company-image
+            />
+          </span>
+          <span class="case-dialog-object case-dialog-object--case">
+            <img
+              class="case-dialog-object-image"
+              src="./assets/case-meren-coffee.png"
+              alt="Визуал кейса МеренКофе"
+              data-case-dialog-case-image
+            />
+          </span>
+        </div>
+
+        <div class="case-dialog-details">
+          <div class="case-dialog-intro">
+            <p class="case-dialog-label">выбранный кейс</p>
+            <h2 id="case-dialog-title" data-case-dialog-title>МеренКофе</h2>
+            <p class="case-dialog-kind" data-case-dialog-kind>кофейный бренд</p>
+            <p id="case-dialog-copy" class="case-dialog-copy" data-case-dialog-copy>
+              Я собираю знак, упаковку, визуалы и правила кампании.
+            </p>
+          </div>
+
+          <dl class="case-dialog-meta">
+            <div>
+              <dt>Компания</dt>
+              <dd data-case-dialog-company>МеренКофе</dd>
+            </div>
+            <div>
+              <dt>Направление</dt>
+              <dd data-case-dialog-type>айдентика / упаковка</dd>
+            </div>
+            <div>
+              <dt>Объём</dt>
+              <dd data-case-dialog-count>24 материала</dd>
+            </div>
+          </dl>
+
+          <nav class="case-dialog-navigation" aria-label="Другие кейсы">
+            <button class="case-dialog-nav-button" type="button" data-case-dialog-prev>
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="m15 18-6-6 6-6" />
+              </svg>
+              <span>
+                <small>Предыдущий</small>
+                <strong data-case-dialog-prev-title>Vera</strong>
+              </span>
+            </button>
+            <button
+              class="case-dialog-nav-button case-dialog-nav-button--next"
+              type="button"
+              data-case-dialog-next
+            >
+              <span>
+                <small>Следующий</small>
+                <strong data-case-dialog-next-title>Noire</strong>
+              </span>
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="m9 18 6-6-6-6" />
+              </svg>
+            </button>
+          </nav>
+        </div>
+      </article>
+    </dialog>
+
+    <script src="./script.js?v=20260912-04"></script>
+  </body>
+</html>
