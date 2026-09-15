@@ -429,10 +429,11 @@ class LiquidGlassLens {
         clipPath = "inset(50% 0 50% 0)";
       } else if (sourceTop < lensRect.top && sourceBottom <= lensRect.bottom) {
         const visibleFraction = clamp((lensRect.top - sourceTop) / transformedSize, 0, 1);
-        clipPath = `inset(0 0 ${((1 - visibleFraction) * 100).toFixed(2)}% 0)`;
+        // Only cut at the lens edge; leave room for the card's outer shadow.
+        clipPath = `inset(-200% -200% ${((1 - visibleFraction) * 100).toFixed(2)}% -200%)`;
       } else if (sourceTop >= lensRect.top && sourceBottom > lensRect.bottom) {
         const hiddenFraction = clamp((lensRect.bottom - sourceTop) / transformedSize, 0, 1);
-        clipPath = `inset(${(hiddenFraction * 100).toFixed(2)}% 0 0 0)`;
+        clipPath = `inset(${(hiddenFraction * 100).toFixed(2)}% -200% -200% -200%)`;
       } else {
         clipPath = "inset(50% 0 50% 0)";
       }
@@ -1225,5 +1226,46 @@ if (processCarousel && processSteps.length) {
 
   setActiveProcessStep(0);
 }
+
+(() => {
+  const skills = document.querySelector("[data-skills]");
+  if (!skills) return;
+
+  const buttons = Array.from(skills.querySelectorAll("[data-skill-select]"));
+  const image = skills.querySelector("[data-skill-image]");
+  const title = skills.querySelector("[data-skill-title]");
+  const category = skills.querySelector("[data-skill-category-label]");
+  const taskList = skills.querySelector("[data-skill-tasks]");
+  if (!buttons.length || !image || !title || !category || !taskList) return;
+
+  const selectSkill = (button) => {
+    const buttonImage = button.querySelector("img");
+    if (!buttonImage) return;
+
+    let tasks;
+    try {
+      tasks = JSON.parse(button.dataset.skillTasks || "[]");
+    } catch {
+      return;
+    }
+    if (!Array.isArray(tasks) || !tasks.every((task) => typeof task === "string")) return;
+
+    image.src = buttonImage.src;
+    image.alt = buttonImage.alt;
+    title.textContent = button.dataset.skillName;
+    category.textContent = button.dataset.skillCategory;
+    taskList.replaceChildren(...tasks.map((task) => {
+      const item = document.createElement("li");
+      item.textContent = task;
+      return item;
+    }));
+    buttons.forEach((candidate) => {
+      candidate.setAttribute("aria-pressed", String(candidate === button));
+    });
+  };
+
+  buttons.forEach((button) => button.addEventListener("click", () => selectSkill(button)));
+  selectSkill(buttons.find((button) => button.getAttribute("aria-pressed") === "true") || buttons[0]);
+})();
 
 renderPair(0, { animate: false });

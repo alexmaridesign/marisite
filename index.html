@@ -14,7 +14,7 @@
       href="https://fonts.googleapis.com/css2?family=Dela+Gothic+One&family=Inter:wght@400;500;600;700;800;900&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="./styles.css?v=20260912-06" />
+    <link rel="stylesheet" href="./styles.css?v=20260915-02" />
   </head>
   <body>
     <svg class="liquid-filter-defs" aria-hidden="true" focusable="false">
@@ -77,8 +77,10 @@
           <div class="orbit-lane orbit-lane-right" data-case-orbit role="group" aria-label="Кейсы"></div>
 
           <div class="liquid-lens" data-liquid-lens aria-hidden="true">
-            <div class="lens-lane" data-company-lens></div>
-            <div class="lens-lane" data-case-lens></div>
+            <div class="liquid-lens-surface">
+              <div class="lens-lane" data-company-lens></div>
+              <div class="lens-lane" data-case-lens></div>
+            </div>
           </div>
 
           <article class="spotlight glass" data-spotlight>
@@ -229,69 +231,74 @@
         </div>
       </section>
 
-      <section class="panel skills" id="skills">
-        <div class="panel-heading reveal">
-          <p>Дизайн-стек</p>
-          <h2>Мои скиллы</h2>
+      <section class="panel skills" id="skills" data-skills aria-labelledby="skills-heading">
+        <header class="skills-heading">
+          <div>
+            <p class="skills-kicker">Дизайн-стек</p>
+            <h2 id="skills-heading">Мои скиллы</h2>
+          </div>
+          <p class="skills-intro">От первой идеи<br />до визуальной системы.</p>
+        </header>
+
+        <div class="skills-workspace">
+          <div class="skill-stage">
+            <div class="skill-canvas" aria-hidden="true">
+              <div class="skill-art">
+                <img src="./assets/icon-figma-official.svg" alt="" width="74" height="74" data-skill-image />
+              </div>
+              <span class="skill-canvas-label">В моём наборе</span>
+            </div>
+            <div class="skill-details" id="skill-details" aria-live="polite" aria-atomic="true">
+              <p class="skill-category" data-skill-category-label>Дизайн</p>
+              <h3 class="skill-title" data-skill-title>Figma</h3>
+              <ul class="skill-tasks" data-skill-tasks>
+                <li>Интерфейсы</li>
+                <li>Дизайн-системы</li>
+                <li>Прототипы</li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="skill-dock" role="group" aria-label="Выбрать инструмент">
+            <button class="skill-tool" type="button" data-skill-select data-skill-name="Figma" data-skill-category="Дизайн" data-skill-tasks='["Интерфейсы", "Дизайн-системы", "Прототипы"]' aria-pressed="true" aria-controls="skill-details">
+              <img src="./assets/icon-figma-official.svg" alt="" width="31" height="31" />
+              <span>Figma</span>
+            </button>
+            <button class="skill-tool" type="button" data-skill-select data-skill-name="Photoshop" data-skill-category="Дизайн" data-skill-tasks='["Ретушь", "Коллажи", "Визуалы кампаний"]' aria-pressed="false" aria-controls="skill-details">
+              <img src="./assets/icon-photoshop.svg" alt="" width="31" height="31" />
+              <span>Photoshop</span>
+            </button>
+            <button class="skill-tool" type="button" data-skill-select data-skill-name="Illustrator" data-skill-category="Дизайн" data-skill-tasks='["Логотипы", "Вектор", "Графические системы"]' aria-pressed="false" aria-controls="skill-details">
+              <img src="./assets/icon-illustrator-official.svg" alt="" width="31" height="31" />
+              <span>Illustrator</span>
+            </button>
+            <button class="skill-tool" type="button" data-skill-select data-skill-name="Procreate" data-skill-category="Дизайн" data-skill-tasks='["Скетчи", "Иллюстрации", "Быстрые эскизы"]' aria-pressed="false" aria-controls="skill-details">
+              <img src="./assets/icon-procreate.png" alt="" width="31" height="31" />
+              <span>Procreate</span>
+            </button>
+            <button class="skill-tool" type="button" data-skill-select data-skill-name="ChatGPT" data-skill-category="AI-инструменты" data-skill-tasks='["Идеи", "Структура", "Тексты", "Быстрые варианты"]' aria-pressed="false" aria-controls="skill-details">
+              <img src="./assets/icon-chatgpt.png" alt="" width="31" height="31" />
+              <span>ChatGPT</span>
+            </button>
+            <button class="skill-tool" type="button" data-skill-select data-skill-name="Kling AI" data-skill-category="AI-инструменты" data-skill-tasks='["Видео", "Движение", "Визуальные эксперименты"]' aria-pressed="false" aria-controls="skill-details">
+              <img src="./assets/icon-kling.png" alt="" width="31" height="31" />
+              <span>Kling AI</span>
+            </button>
+            <button class="skill-tool" type="button" data-skill-select data-skill-name="Gemini" data-skill-category="AI-инструменты" data-skill-tasks='["Референсы", "Анализ", "Визуальные направления"]' aria-pressed="false" aria-controls="skill-details">
+              <img src="./assets/icon-gemini.svg" alt="" width="31" height="31" />
+              <span>Gemini</span>
+            </button>
+            <button class="skill-tool" type="button" data-skill-select data-skill-name="Recraft.ai" data-skill-category="AI-инструменты" data-skill-tasks='["AI-графика", "Вектор", "Быстрые бренд-визуалы"]' aria-pressed="false" aria-controls="skill-details">
+              <img src="./assets/icon-recraft.png" alt="" width="31" height="31" />
+              <span>Recraft.ai</span>
+            </button>
+          </div>
         </div>
-        <div class="skill-grid">
-          <article class="skill-card glass reveal">
-            <span class="skill-mark"><img src="./assets/icon-figma-official.svg" alt="" /></span>
-            <div>
-              <h3>Figma</h3>
-              <p>интерфейсы, дизайн-системы, прототипы</p>
-            </div>
-          </article>
-          <article class="skill-card glass reveal">
-            <span class="skill-mark"><img src="./assets/icon-photoshop.svg" alt="" /></span>
-            <div>
-              <h3>Photoshop</h3>
-              <p>ретушь, коллажи, визуалы кампаний</p>
-            </div>
-          </article>
-          <article class="skill-card glass reveal">
-            <span class="skill-mark"><img src="./assets/icon-illustrator-official.svg" alt="" /></span>
-            <div>
-              <h3>Illustrator</h3>
-              <p>логотипы, вектор, графические системы</p>
-            </div>
-          </article>
-          <article class="skill-card glass reveal">
-            <span class="skill-mark"><img class="skill-icon-rounded" src="./assets/icon-procreate.png" alt="" /></span>
-            <div>
-              <h3>ProCreate</h3>
-              <p>скетчи, иллюстрации, быстрые эскизы</p>
-            </div>
-          </article>
-          <article class="skill-card glass reveal">
-            <span class="skill-mark"><img src="./assets/icon-chatgpt.png" alt="" /></span>
-            <div>
-              <h3>ChatGPT</h3>
-              <p>идеи, структура, тексты, быстрые варианты</p>
-            </div>
-          </article>
-          <article class="skill-card glass reveal">
-            <span class="skill-mark"><img class="skill-icon-rounded" src="./assets/icon-kling.png" alt="" /></span>
-            <div>
-              <h3>Kling AI</h3>
-              <p>видео, движение, визуальные эксперименты</p>
-            </div>
-          </article>
-          <article class="skill-card glass reveal">
-            <span class="skill-mark"><img src="./assets/icon-gemini.svg" alt="" /></span>
-            <div>
-              <h3>Gemini</h3>
-              <p>референсы, анализ, визуальные направления</p>
-            </div>
-          </article>
-          <article class="skill-card glass reveal">
-            <span class="skill-mark"><img class="skill-icon-rounded" src="./assets/icon-recraft.png" alt="" /></span>
-            <div>
-              <h3>Recraft.ai</h3>
-              <p>AI-графика, вектор, быстрые бренд-визуалы</p>
-            </div>
-          </article>
-        </div>
+
+        <footer class="skills-footer">
+          <span>Дизайн + AI-инструменты</span>
+          <span>Выберите инструмент ↗</span>
+        </footer>
       </section>
 
       <section class="contact glass reveal" id="contact">
@@ -442,6 +449,6 @@
       </article>
     </dialog>
 
-    <script src="./script.js?v=20260912-04"></script>
+    <script src="./script.js?v=20260915-02"></script>
   </body>
 </html>
