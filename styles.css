@@ -1658,6 +1658,7 @@ body.case-dialog-is-open {
   --skill-shadow: #36386924;
   background: #828ac4;
   border-radius: 28px;
+  box-shadow: 0 18px 48px rgba(40, 34, 24, 0.16);
   color: var(--skill-ink);
   padding: clamp(22px, 5vw, 38px);
 }
