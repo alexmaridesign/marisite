@@ -652,12 +652,12 @@ class OrbitalPicker {
       { passive: false },
     );
     this.surface?.addEventListener("keydown", (event) => {
-      if (event.key !== "ArrowLeft" && event.key !== "ArrowRight") return;
+      if (!["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown"].includes(event.key)) return;
       const laneIndex = this.lanes.findIndex((lane) => lane.root.contains(event.target));
       if (laneIndex < 0) return;
 
       event.preventDefault();
-      const direction = event.key === "ArrowRight" ? 1 : -1;
+      const direction = event.key === "ArrowRight" || event.key === "ArrowUp" ? 1 : -1;
       const currentIndex = this.targetAngle === null ? this.nearestIndex() : this.selectedIndex;
       const nextIndex = (currentIndex + direction + this.values.length) % this.values.length;
       this.select(nextIndex);
@@ -772,7 +772,8 @@ class OrbitalPicker {
       startIndex: this.targetAngle === null ? this.nearestIndex() : this.selectedIndex,
       pixelsPerStep: clamp(this.surface.clientWidth * 0.24, 88, 160),
       tapIndex: pointerNode ? Number(pointerNode.dataset.index) : null,
-      horizontal: false,
+      allowVertical: Boolean(event.target.closest(".orbit-lane")),
+      axis: null,
     };
   }
 
@@ -782,15 +783,16 @@ class OrbitalPicker {
 
     const deltaX = event.clientX - gesture.startX;
     const deltaY = event.clientY - gesture.startY;
-    if (!gesture.horizontal) {
+    if (!gesture.axis) {
       if (Math.hypot(deltaX, deltaY) < 10) return;
       this.suppressPointerClick = true;
-      // Decide once. Vertical/diagonal movement belongs to native page scrolling.
-      if (Math.abs(deltaX) < Math.abs(deltaY) * 1.2) {
+      const vertical = Math.abs(deltaY) > Math.abs(deltaX);
+      // The side lanes own vertical swipes; the middle still scrolls the page.
+      if (vertical && !gesture.allowVertical) {
         this.resetGesture();
         return;
       }
-      gesture.horizontal = true;
+      gesture.axis = vertical ? "y" : "x";
       this.pauseAutoByUser();
       this.targetAngle = null;
       this.velocity = 0;
@@ -800,7 +802,8 @@ class OrbitalPicker {
 
     if (event.cancelable) event.preventDefault();
     // One gesture previews at most one neighbouring case, with no release inertia.
-    this.angle = gesture.startAngle + clamp(deltaX / gesture.pixelsPerStep, -1, 1) * this.step;
+    const delta = gesture.axis === "y" ? deltaY : deltaX;
+    this.angle = gesture.startAngle + clamp(delta / gesture.pixelsPerStep, -1, 1) * this.step;
     this.update();
   }
 
@@ -817,17 +820,17 @@ class OrbitalPicker {
     const gesture = this.resetGesture();
     if (!gesture) return;
     this.suppressPointerClick = true;
-    if (gesture.horizontal) this.select(gesture.startIndex);
+    if (gesture.axis) this.select(gesture.startIndex);
   }
 
   onPointerUp(event) {
     if (event.pointerId !== this.gesture?.pointerId) return;
     const gesture = this.resetGesture();
 
-    if (gesture.horizontal) {
-      const deltaX = event.clientX - gesture.startX;
+    if (gesture.axis) {
+      const delta = gesture.axis === "y" ? event.clientY - gesture.startY : event.clientX - gesture.startX;
       const threshold = Math.max(32, gesture.pixelsPerStep * 0.28);
-      const direction = Math.abs(deltaX) >= threshold ? (deltaX < 0 ? 1 : -1) : 0;
+      const direction = Math.abs(delta) >= threshold ? (delta < 0 ? 1 : -1) : 0;
       this.select((gesture.startIndex + direction + this.values.length) % this.values.length);
     } else if (Number.isInteger(gesture.tapIndex)) {
       this.suppressPointerClick = true;

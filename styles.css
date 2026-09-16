@@ -879,11 +879,22 @@ body.case-dialog-is-open {
 .orbit-lane {
   height: var(--orbit-size);
   position: absolute;
-  touch-action: pan-y pinch-zoom;
+  touch-action: pinch-zoom;
   top: 55%;
   transform: translateY(-50%);
   width: var(--orbit-size);
   z-index: 5;
+}
+
+.orbit-lane::before {
+  /* Keep gaps and the enlarged glass cards inside the same swipe area. */
+  content: "";
+  inset: 0 calc(var(--active-offset) * -0.5) 0 0;
+  position: absolute;
+}
+
+.orbit-lane-right::before {
+  inset: 0 0 0 calc(var(--active-offset) * -0.5);
 }
 
 .orbit-lane-left {
@@ -2266,12 +2277,12 @@ body.case-dialog-is-open {
     width: clamp(130px, 21vw, 150px);
   }
 
-  .side,
-  .ring {
+  .side {
     display: none;
   }
 
-  .orbit-lane {
+  .orbit-lane,
+  .ring {
     /* Give small cards room vertically without moving them toward the panel. */
     height: calc(var(--orbit-size) * 1.25);
     top: 54%;
@@ -2609,7 +2620,8 @@ body.case-dialog-is-open {
     width: 120px;
   }
 
-  .orbit-lane {
+  .orbit-lane,
+  .ring {
     top: 56%;
   }
 
@@ -2838,12 +2850,14 @@ body.case-dialog-is-open {
   }
 
   .orbit-lane,
+  .ring,
   .liquid-lens,
   .spotlight {
     top: 69%;
   }
 
-  .orbit-lane {
+  .orbit-lane,
+  .ring {
     height: calc(var(--orbit-size) * 1.25);
   }
 
