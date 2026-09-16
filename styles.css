@@ -2210,7 +2210,7 @@ body.case-dialog-is-open {
   }
 
   .site {
-    padding: 0;
+    padding: 0 0 calc(32px + env(safe-area-inset-bottom, 0px));
   }
 
   .screen {
@@ -2339,6 +2339,11 @@ body.case-dialog-is-open {
   .contact,
   .site-footer {
     padding: 34px 18px;
+  }
+
+  .site-footer {
+    margin: 18px 14px 0;
+    padding: 22px 18px;
   }
 
   .contact {
