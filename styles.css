@@ -854,24 +854,24 @@ body.case-dialog-is-open {
 }
 
 .ring {
-  border: 1px solid rgba(23, 22, 20, 0.12);
-  border-radius: 50%;
+  fill: none;
   height: var(--orbit-size);
+  overflow: visible;
   pointer-events: none;
   position: absolute;
+  stroke: rgba(23, 22, 20, 0.12);
+  stroke-width: 1px;
   top: 55%;
   width: var(--orbit-size);
   z-index: 1;
 }
 
 .ring-left {
-  clip-path: inset(0 0 0 50%);
   left: calc(50% - var(--active-offset));
   transform: translate(-104%, -50%);
 }
 
 .ring-right {
-  clip-path: inset(0 50% 0 0);
   left: calc(50% + var(--active-offset));
   transform: translate(4%, -50%);
 }

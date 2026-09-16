@@ -239,7 +239,7 @@ function nearestEquivalentAngle(target, current) {
   return current + normalizeAngle(target - current);
 }
 
-function setNodePosition(node, angle, lane, index, isActive, { stickToRing = false, centerDrop: alignedCenterDrop, focusX } = {}) {
+function getOrbitPosition(angle, lane, { stickToRing = false, centerDrop: alignedCenterDrop, focusX } = {}) {
   const viewportWidth = window.innerWidth;
   const radius = stickToRing && viewportWidth > 820 ? 50 : viewportWidth <= 520 ? 44 : 48;
   const activeAngle = lane === "right" ? Math.PI : 0;
@@ -258,6 +258,13 @@ function setNodePosition(node, angle, lane, index, isActive, { stickToRing = fal
   const alignedPull = Number.isFinite(focusX) ? focusX - (50 + direction * radius) : direction * centerPull;
   const x = 50 + Math.cos(angle) * radius + alignedPull * focusEase;
   const y = 50 + Math.sin(angle) * radius + centerDrop * focusEase;
+
+  return { x, y, focus, focusEase };
+}
+
+function setNodePosition(node, angle, lane, index, isActive, positionOptions = {}) {
+  const { x, y, focus, focusEase } = getOrbitPosition(angle, lane, positionOptions);
+  const viewportWidth = window.innerWidth;
   const depth = 0.45 + focus * 0.55;
   const minScale = viewportWidth <= 520 ? 0.34 : viewportWidth <= 820 ? 0.38 : 0.42;
   const maxScale = viewportWidth <= 520 ? 0.72 : viewportWidth <= 820 ? 0.8 : 0.86;
@@ -838,6 +845,24 @@ class OrbitalPicker {
     }
   }
 
+  updateRing(lane, positionOptions) {
+    if (!lane.ringPath) return;
+
+    const geometryKey = `${window.innerWidth}:${positionOptions.centerDrop}:${positionOptions.focusX}`;
+    if (lane.ringGeometryKey === geometryKey) return;
+
+    // Trace the visible half of the actual card route, including the pull
+    // toward the glass slot. Rebuild only when the layout changes.
+    const points = Array.from({ length: 181 }, (_, index) => {
+      const baseAngle = -Math.PI / 2 + (index / 180) * Math.PI;
+      const angle = lane.mirror ? Math.PI - baseAngle : baseAngle;
+      const { x, y } = getOrbitPosition(angle, lane.id, positionOptions);
+      return `${index === 0 ? "M" : "L"}${x.toFixed(3)},${y.toFixed(3)}`;
+    });
+    lane.ringPath.setAttribute("d", points.join(" "));
+    lane.ringGeometryKey = geometryKey;
+  }
+
   update() {
     const nextVisualIndex = this.nearestIndex();
     if (nextVisualIndex !== this.visualIndex) {
@@ -856,6 +881,15 @@ class OrbitalPicker {
       const lensCenter = frame.lensRect.top + frame.lensRect.height / 2;
       return ((lensCenter - laneCenter) / frame.laneRect.height) * 100;
     });
+    const lanePositions = this.lanes.map((lane, laneIndex) => {
+      const frame = lensLaneFrames[laneIndex];
+      const position = {
+        centerDrop: lensCenterDrops[laneIndex],
+        focusX: frame ? ((frame.slotCenter - frame.laneRect.left) / frame.laneRect.width) * 100 : undefined,
+      };
+      this.updateRing(lane, position);
+      return position;
+    });
     const sourceBaseSizes = this.nodes.map((nodes) => nodes[0]?.offsetHeight || 0);
 
     this.values.forEach((_, index) => {
@@ -865,12 +899,7 @@ class OrbitalPicker {
       this.lanes.forEach((lane, laneIndex) => {
         const orbitAngle = lane.mirror ? Math.PI - baseAngle : baseAngle;
         const node = this.nodes[laneIndex][index];
-        const state = setNodePosition(node, orbitAngle, lane.id, index, isActive, {
-          centerDrop: lensCenterDrops[laneIndex],
-          focusX: lensLaneFrames[laneIndex]
-            ? ((lensLaneFrames[laneIndex].slotCenter - lensLaneFrames[laneIndex].laneRect.left) / lensLaneFrames[laneIndex].laneRect.width) * 100
-            : undefined,
-        });
+        const state = setNodePosition(node, orbitAngle, lane.id, index, isActive, lanePositions[laneIndex]);
         const lensNode = this.lensNodes[laneIndex]?.[index];
         this.lens?.maskSourceNode(node, state, lensLaneFrames[laneIndex], sourceBaseSizes[laneIndex]);
         node.classList.toggle("is-active", isActive);
@@ -949,6 +978,7 @@ const orbitPicker = new OrbitalPicker({
     {
       id: "left",
       root: companyOrbit,
+      ringPath: document.querySelector(".ring-left path"),
       lensRoot: companyLensLayer,
       renderItem: createCompanyNode,
       renderLensItem: createCompanyLensNode,
@@ -957,6 +987,7 @@ const orbitPicker = new OrbitalPicker({
     {
       id: "right",
       root: caseOrbit,
+      ringPath: document.querySelector(".ring-right path"),
       lensRoot: caseLensLayer,
       renderItem: createCaseNode,
       renderLensItem: createCaseLensNode,
