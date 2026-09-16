@@ -173,7 +173,7 @@ const caseDialogNextTitle = document.querySelector("[data-case-dialog-next-title
 let renderedPairIndex = -1;
 let activeCaseDialogIndex = 0;
 let caseDialogReturnFocus = null;
-let caseDialogAutoWasPaused = { company: false, case: false };
+let caseDialogAutoWasPaused = false;
 let caseDialogSelectionChanged = false;
 
 function createCompanyNode(pair, index) {
@@ -331,12 +331,9 @@ function openCaseDialog(opener) {
   if (!caseDialog || caseDialog.open) return;
 
   caseDialogReturnFocus = opener;
-  caseDialogAutoWasPaused = {
-    company: companyPicker.autoPausedByUser,
-    case: casePicker.autoPausedByUser,
-  };
+  caseDialogAutoWasPaused = orbitPicker.autoPausedByUser;
   caseDialogSelectionChanged = false;
-  pauseOrbitalAutoplay();
+  orbitPicker.pauseAutoByUser();
   renderCaseDialog(renderedPairIndex < 0 ? 0 : renderedPairIndex);
 
   const scrollbarGap = Math.max(0, window.innerWidth - document.documentElement.clientWidth);
@@ -355,7 +352,7 @@ function stepCaseDialog(direction) {
   const nextIndex = normalizePairIndex(activeCaseDialogIndex + direction);
   caseDialogSelectionChanged = true;
   renderCaseDialog(nextIndex);
-  casePicker.select(nextIndex);
+  orbitPicker.select(nextIndex);
 }
 
 class LiquidGlassLens {
@@ -544,7 +541,7 @@ class LiquidGlassLens {
 }
 
 class OrbitalPicker {
-  constructor({ surface, values, selectedIndex = 0, lanes, lens, onChange, onPreview, onInteract }) {
+  constructor({ surface, values, selectedIndex = 0, lanes, lens, onChange, onPreview }) {
     this.surface = surface;
     this.values = values;
     this.selectedIndex = selectedIndex;
@@ -553,24 +550,14 @@ class OrbitalPicker {
     this.lens = lens;
     this.onChange = onChange;
     this.onPreview = onPreview;
-    this.onInteract = onInteract;
     this.step = (Math.PI * 2) / values.length;
     this.angle = this.angleForIndex(selectedIndex);
     this.targetAngle = this.angle;
     this.velocity = 0;
-    this.dragging = false;
-    this.pointerMoved = false;
-    this.activePointerId = null;
-    this.pointerStartX = 0;
-    this.pointerStartY = 0;
-    this.lastX = 0;
-    this.lastY = 0;
-    this.lastMoveTime = performance.now();
+    this.gesture = null;
     this.lastFrameTime = performance.now();
     this.snapAfter = 0;
-    this.suppressClickUntil = 0;
-    this.pointerCaptureTarget = null;
-    this.pointerDownIndex = null;
+    this.suppressPointerClick = false;
     this.autoSpeed = reduceMotion ? 0 : 0.00115;
     this.autoPausedByUser = false;
     this.autoInViewport = true;
@@ -598,10 +585,7 @@ class OrbitalPicker {
 
       this.values.forEach((value, index) => {
         const node = lane.renderItem(value, index);
-        node.addEventListener("click", (event) => {
-          if (event.detail > 0 && performance.now() < this.suppressClickUntil) return;
-          this.select(index);
-        });
+        node.addEventListener("click", () => this.select(index));
         lane.root.append(node);
         this.nodes[laneIndex][index] = node;
 
@@ -626,25 +610,39 @@ class OrbitalPicker {
 
   bind() {
     this.surface?.addEventListener("pointerdown", (event) => this.onPointerDown(event));
-    this.surface?.addEventListener("pointermove", (event) => {
-      this.lens?.trackPointer(event);
-      this.onPointerMove(event);
+    this.surface?.addEventListener("pointermove", (event) => this.lens?.trackPointer(event));
+    window.addEventListener("pointermove", (event) => this.onPointerMove(event), { passive: false });
+    window.addEventListener("pointerup", (event) => this.onPointerUp(event));
+    window.addEventListener("pointercancel", (event) => {
+      if (event.pointerId === this.gesture?.pointerId) this.cancelGesture();
     });
-    this.surface?.addEventListener("pointerup", (event) => this.onPointerUp(event));
-    this.surface?.addEventListener("pointercancel", (event) => this.onPointerUp(event, { cancelled: true }));
+    window.addEventListener("pointerdown", (event) => {
+      if (event.pointerType === "touch" && !event.isPrimary) this.cancelGesture();
+    });
+    this.surface?.addEventListener("lostpointercapture", (event) => {
+      // Ignore a child handing its implicit touch capture to the shared surface.
+      if (event.target === this.surface && event.pointerId === this.gesture?.pointerId) this.cancelGesture();
+    });
+    window.addEventListener("blur", () => this.cancelGesture());
+    window.addEventListener("resize", () => this.cancelGesture());
+    this.surface?.addEventListener("dragstart", (event) => event.preventDefault());
+    this.surface?.addEventListener("click", (event) => {
+      // Block the click generated after a swipe, including swipes over the CTA.
+      // A new pointerdown clears suppression; keyboard activation stays available.
+      if (!this.suppressPointerClick || event.detail === 0) return;
+      event.preventDefault();
+      event.stopPropagation();
+    }, true);
     this.surface?.addEventListener("pointerleave", () => this.lens?.resetPointer());
     this.surface?.addEventListener(
       "wheel",
       (event) => {
-        if (event.ctrlKey) return;
-
-        const axisDelta = Math.abs(event.deltaX) > Math.abs(event.deltaY) ? event.deltaX : event.deltaY;
-        if (!axisDelta) return;
+        if (event.ctrlKey || this.gesture || Math.abs(event.deltaX) <= Math.abs(event.deltaY)) return;
 
         event.preventDefault();
         this.pauseAutoByUser();
         const deltaUnit = event.deltaMode === 1 ? 16 : event.deltaMode === 2 ? window.innerHeight : 1;
-        const delta = axisDelta * deltaUnit * 0.00045;
+        const delta = -event.deltaX * deltaUnit * 0.00045;
         this.targetAngle = null;
         this.angle += delta;
         this.velocity = clamp(this.velocity + delta * 0.16, -0.032, 0.032);
@@ -655,12 +653,15 @@ class OrbitalPicker {
     );
     this.surface?.addEventListener("keydown", (event) => {
       if (event.key !== "ArrowLeft" && event.key !== "ArrowRight") return;
+      const laneIndex = this.lanes.findIndex((lane) => lane.root.contains(event.target));
+      if (laneIndex < 0) return;
 
       event.preventDefault();
       const direction = event.key === "ArrowRight" ? 1 : -1;
-      const nextIndex = (this.nearestIndex() + direction + this.values.length) % this.values.length;
+      const currentIndex = this.targetAngle === null ? this.nearestIndex() : this.selectedIndex;
+      const nextIndex = (currentIndex + direction + this.values.length) % this.values.length;
       this.select(nextIndex);
-      requestAnimationFrame(() => this.nodes[0]?.[nextIndex]?.focus({ preventScroll: true }));
+      requestAnimationFrame(() => this.nodes[laneIndex]?.[nextIndex]?.focus({ preventScroll: true }));
     });
   }
 
@@ -706,7 +707,6 @@ class OrbitalPicker {
 
   pauseAutoByUser() {
     this.autoPausedByUser = true;
-    this.onInteract?.(this);
   }
 
   setAutoInViewport(isVisible) {
@@ -722,23 +722,12 @@ class OrbitalPicker {
     this.onChange?.(this.values[index], index);
   }
 
-  onPointerDown(event) {
-    if (this.activePointerId !== null) return;
+  nodeAtPointer(event) {
+    if (event.target.closest("[data-spotlight], a, button:not(.orbit-node)")) return null;
 
-    this.pauseAutoByUser();
-    this.dragging = true;
-    this.pointerMoved = false;
-    this.activePointerId = event.pointerId;
-    this.targetAngle = null;
-    this.velocity = 0;
-    this.pointerStartX = event.clientX;
-    this.pointerStartY = event.clientY;
-    this.lastX = event.clientX;
-    this.lastY = event.clientY;
-    this.lastMoveTime = performance.now();
     const directNode = event.target.closest?.(".orbit-node");
     const hitSlop = event.pointerType === "touch" ? 12 : 3;
-    const pointerNode = this.nodes
+    return this.nodes
       .flat()
       .filter((node) => {
         const rect = node.getBoundingClientRect();
@@ -768,64 +757,82 @@ class OrbitalPicker {
 
         return firstDistance - secondDistance;
       })[0] ?? (directNode && this.surface.contains(directNode) ? directNode : null);
-    this.pointerDownIndex = pointerNode ? Number(pointerNode.dataset.index) : null;
-    this.pointerCaptureTarget = pointerNode ?? this.surface;
-    this.pointerCaptureTarget.setPointerCapture?.(event.pointerId);
+  }
+
+  onPointerDown(event) {
+    if (!event.isPrimary || event.button !== 0 || this.gesture) return;
+
+    this.suppressPointerClick = false;
+    const pointerNode = this.nodeAtPointer(event);
+    this.gesture = {
+      pointerId: event.pointerId,
+      startX: event.clientX,
+      startY: event.clientY,
+      startAngle: this.angle,
+      startIndex: this.targetAngle === null ? this.nearestIndex() : this.selectedIndex,
+      pixelsPerStep: clamp(this.surface.clientWidth * 0.24, 88, 160),
+      tapIndex: pointerNode ? Number(pointerNode.dataset.index) : null,
+      horizontal: false,
+    };
   }
 
   onPointerMove(event) {
-    if (!this.dragging || event.pointerId !== this.activePointerId) return;
+    const gesture = this.gesture;
+    if (!gesture || event.pointerId !== gesture.pointerId) return;
 
-    const now = performance.now();
-    const deltaX = event.clientX - this.lastX;
-    const deltaY = event.clientY - this.lastY;
-    const elapsed = Math.max(8, now - this.lastMoveTime);
-    const deltaAngle = deltaX * 0.0032 + deltaY * 0.0006;
-
-    if (Math.hypot(event.clientX - this.pointerStartX, event.clientY - this.pointerStartY) > 4) {
-      this.pointerMoved = true;
+    const deltaX = event.clientX - gesture.startX;
+    const deltaY = event.clientY - gesture.startY;
+    if (!gesture.horizontal) {
+      if (Math.hypot(deltaX, deltaY) < 10) return;
+      this.suppressPointerClick = true;
+      // Decide once. Vertical/diagonal movement belongs to native page scrolling.
+      if (Math.abs(deltaX) < Math.abs(deltaY) * 1.2) {
+        this.resetGesture();
+        return;
+      }
+      gesture.horizontal = true;
+      this.pauseAutoByUser();
+      this.targetAngle = null;
+      this.velocity = 0;
+      this.snapAfter = 0;
+      this.surface.setPointerCapture(event.pointerId);
     }
 
-    this.angle += deltaAngle;
-    this.velocity = clamp(deltaAngle / (elapsed / 16.67), -0.055, 0.055);
-    this.lastX = event.clientX;
-    this.lastY = event.clientY;
-    this.lastMoveTime = now;
+    if (event.cancelable) event.preventDefault();
+    // One gesture previews at most one neighbouring case, with no release inertia.
+    this.angle = gesture.startAngle + clamp(deltaX / gesture.pixelsPerStep, -1, 1) * this.step;
     this.update();
   }
 
-  onPointerUp(event, { cancelled = false } = {}) {
-    if (!this.dragging || event.pointerId !== this.activePointerId) return;
-
-    const tappedIndex = this.pointerDownIndex;
-    this.pointerDownIndex = null;
-    this.dragging = false;
-    this.activePointerId = null;
-    if (this.pointerCaptureTarget?.hasPointerCapture?.(event.pointerId)) {
-      this.pointerCaptureTarget.releasePointerCapture(event.pointerId);
+  resetGesture() {
+    const gesture = this.gesture;
+    this.gesture = null;
+    if (gesture && this.surface.hasPointerCapture(gesture.pointerId)) {
+      this.surface.releasePointerCapture(gesture.pointerId);
     }
-    this.pointerCaptureTarget = null;
+    return gesture;
+  }
 
-    if (cancelled) {
-      this.velocity = 0;
-      this.snapToNearest();
-      return;
+  cancelGesture() {
+    const gesture = this.resetGesture();
+    if (!gesture) return;
+    this.suppressPointerClick = true;
+    if (gesture.horizontal) this.select(gesture.startIndex);
+  }
+
+  onPointerUp(event) {
+    if (event.pointerId !== this.gesture?.pointerId) return;
+    const gesture = this.resetGesture();
+
+    if (gesture.horizontal) {
+      const deltaX = event.clientX - gesture.startX;
+      const threshold = Math.max(32, gesture.pixelsPerStep * 0.28);
+      const direction = Math.abs(deltaX) >= threshold ? (deltaX < 0 ? 1 : -1) : 0;
+      this.select((gesture.startIndex + direction + this.values.length) % this.values.length);
+    } else if (Number.isInteger(gesture.tapIndex)) {
+      this.suppressPointerClick = true;
+      this.select(gesture.tapIndex);
     }
-
-    if (this.pointerMoved) {
-      this.suppressClickUntil = performance.now() + 260;
-    } else if (Number.isInteger(tappedIndex)) {
-      this.suppressClickUntil = performance.now() + 260;
-      this.select(tappedIndex);
-      return;
-    }
-
-    if (reduceMotion || Math.abs(this.velocity) < 0.01) {
-      this.snapToNearest();
-      return;
-    }
-
-    this.snapAfter = performance.now() + 320;
   }
 
   update() {
@@ -890,7 +897,7 @@ class OrbitalPicker {
     const delta = Math.min(2, (now - this.lastFrameTime) / 16.67 || 1);
     this.lastFrameTime = now;
 
-    if (!this.dragging) {
+    if (!this.gesture) {
       if (this.targetAngle !== null) {
         const diff = this.targetAngle - this.angle;
         this.angle += diff * Math.min(1, 0.09 * delta);
@@ -930,26 +937,8 @@ const liquidLens = new LiquidGlassLens({
   blurAmount: 14,
 });
 
-let companyPicker;
-let casePicker;
-let synchronizingOrbitPickers = false;
-
-function pauseOrbitalAutoplay() {
-  if (companyPicker) companyPicker.autoPausedByUser = true;
-  if (casePicker) casePicker.autoPausedByUser = true;
-}
-
-function synchronizeOrbitPicker(targetPicker, index) {
-  renderPair(index % pairs.length);
-  if (!targetPicker || synchronizingOrbitPickers) return;
-
-  synchronizingOrbitPickers = true;
-  targetPicker.select(index, { immediate: true });
-  synchronizingOrbitPickers = false;
-}
-
-companyPicker = new OrbitalPicker({
-  surface: companyOrbit,
+const orbitPicker = new OrbitalPicker({
+  surface: carousel,
   values: orbitPairs,
   selectedIndex: 0,
   lens: liquidLens,
@@ -962,20 +951,6 @@ companyPicker = new OrbitalPicker({
       renderLensItem: createCompanyLensNode,
       decorations: ORBIT_DECORATIONS.left,
     },
-  ],
-  onChange: (_, index) => synchronizeOrbitPicker(casePicker, index),
-  onPreview: (_, index) => {
-    if (companyPicker.autoPausedByUser) renderPair(index % pairs.length);
-  },
-  onInteract: pauseOrbitalAutoplay,
-});
-
-casePicker = new OrbitalPicker({
-  surface: caseOrbit,
-  values: orbitPairs,
-  selectedIndex: 0,
-  lens: liquidLens,
-  lanes: [
     {
       id: "right",
       root: caseOrbit,
@@ -986,9 +961,8 @@ casePicker = new OrbitalPicker({
       mirror: true,
     },
   ],
-  onChange: (_, index) => synchronizeOrbitPicker(companyPicker, index),
+  onChange: (_, index) => renderPair(index % pairs.length),
   onPreview: (_, index) => renderPair(index % pairs.length),
-  onInteract: pauseOrbitalAutoplay,
 });
 
 const topSection = document.querySelector("#top");
@@ -996,8 +970,7 @@ if (topSection) {
   const autoObserver = new IntersectionObserver(
     ([entry]) => {
       const isVisible = entry.isIntersecting && entry.intersectionRatio > 0.68;
-      companyPicker.setAutoInViewport(isVisible);
-      casePicker.setAutoInViewport(isVisible);
+      orbitPicker.setAutoInViewport(isVisible);
     },
     { threshold: [0, 0.28, 0.68, 0.9] },
   );
@@ -1008,9 +981,9 @@ if (topSection) {
 document.querySelectorAll("[data-step]").forEach((button) => {
   button.addEventListener("click", () => {
     const direction = Number(button.dataset.step);
-    const activeIndex = casePicker.nearestIndex();
+    const activeIndex = orbitPicker.nearestIndex();
     const nextIndex = (activeIndex + direction + orbitPairs.length) % orbitPairs.length;
-    casePicker.select(nextIndex);
+    orbitPicker.select(nextIndex);
   });
 });
 
@@ -1047,10 +1020,6 @@ if (casesMenuRoot && casesMenuTrigger && casesPopover) {
 }
 
 if (caseDialogOpenButton && caseDialog && caseDialogCloseButton) {
-  caseDialogOpenButton.addEventListener("pointerdown", (event) => {
-    event.stopPropagation();
-  });
-
   caseDialogOpenButton.addEventListener("click", (event) => {
     openCaseDialog(event.currentTarget);
   });
@@ -1074,8 +1043,7 @@ if (caseDialogOpenButton && caseDialog && caseDialogCloseButton) {
     document.documentElement.classList.remove("case-dialog-is-open");
     document.body.classList.remove("case-dialog-is-open");
     document.body.style.removeProperty("--case-dialog-scrollbar-gap");
-    companyPicker.autoPausedByUser = caseDialogSelectionChanged || caseDialogAutoWasPaused.company;
-    casePicker.autoPausedByUser = caseDialogSelectionChanged || caseDialogAutoWasPaused.case;
+    orbitPicker.autoPausedByUser = caseDialogSelectionChanged || caseDialogAutoWasPaused;
     caseDialogReturnFocus?.focus({ preventScroll: true });
     caseDialogReturnFocus = null;
   });
