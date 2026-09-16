@@ -2271,6 +2271,8 @@ body.case-dialog-is-open {
   }
 
   .orbit-lane {
+    /* Give small cards room vertically without moving them toward the panel. */
+    height: calc(var(--orbit-size) * 1.25);
     top: 54%;
   }
 
@@ -2280,6 +2282,7 @@ body.case-dialog-is-open {
   }
 
   .orbit-node {
+    border-radius: 22%;
     height: clamp(74px, 15vw, 120px);
     width: clamp(74px, 15vw, 120px);
   }
@@ -2835,11 +2838,16 @@ body.case-dialog-is-open {
     top: 69%;
   }
 
+  .orbit-lane {
+    height: calc(var(--orbit-size) * 1.25);
+  }
+
   .liquid-lens {
     width: min(370px, 94vw);
   }
 
   .orbit-node {
+    border-radius: 22%;
     height: 68px;
     width: 68px;
   }
