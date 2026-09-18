@@ -2415,10 +2415,11 @@ body.case-dialog-is-open {
   }
 
   .step {
+    --step-tab-width: clamp(20px, 5vw, 26px);
     border-radius: 22px;
     height: 366px;
     padding: clamp(28px, 6vw, 38px);
-    width: 76%;
+    width: calc(96% - var(--step-tab-width) * 5);
   }
 
   .step[data-stack-slot="0"] {
@@ -2428,37 +2429,37 @@ body.case-dialog-is-open {
 
   .step[data-stack-slot="1"] {
     --step-rotation: -0.9deg;
-    --step-shift: 6%;
+    --step-shift: var(--step-tab-width);
     --step-depth: 5px;
   }
 
   .step[data-stack-slot="2"] {
     --step-rotation: -0.3deg;
-    --step-shift: 12%;
+    --step-shift: calc(var(--step-tab-width) * 2);
     --step-depth: 10px;
   }
 
   .step[data-stack-slot="3"] {
     --step-rotation: 0.3deg;
-    --step-shift: 18%;
+    --step-shift: calc(var(--step-tab-width) * 3);
     --step-depth: 14px;
   }
 
   .step[data-stack-slot="4"] {
     --step-rotation: 0.9deg;
-    --step-shift: 24%;
+    --step-shift: calc(var(--step-tab-width) * 4);
     --step-depth: 19px;
   }
 
   .step[data-stack-slot="5"] {
     --step-rotation: 1.5deg;
-    --step-shift: 30%;
+    --step-shift: calc(var(--step-tab-width) * 5);
     --step-depth: 24px;
   }
 
   .step:not(.is-active) .step-copy {
     bottom: 20px;
-    right: 3%;
+    right: calc(var(--step-tab-width) / 2 - 2px);
     top: 70px;
   }
 
@@ -2468,7 +2469,7 @@ body.case-dialog-is-open {
 
   .step:not(.is-active) .step-number {
     font-size: clamp(12px, 2.8vw, 18px);
-    right: 3%;
+    right: calc(var(--step-tab-width) / 2 - 2px);
     top: 30px;
   }
 
