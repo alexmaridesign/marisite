@@ -1456,7 +1456,7 @@ body.case-dialog-is-open {
 }
 
 .step-stack {
-  height: clamp(400px, 34vw, 490px);
+  height: clamp(460px, 39vw, 550px);
   isolation: isolate;
   position: relative;
   touch-action: pan-y pinch-zoom;
@@ -1532,24 +1532,38 @@ body.case-dialog-is-open {
 .step[data-stack-slot="0"] {
   --step-rotation: -4deg;
   --step-shift: 0%;
-  z-index: 4;
+  z-index: 6;
 }
 
 .step[data-stack-slot="1"] {
-  --step-rotation: -1deg;
-  --step-shift: 40%;
-  --step-depth: 12px;
-  z-index: 3;
+  --step-rotation: -2.2deg;
+  --step-shift: 24%;
+  --step-depth: 7px;
+  z-index: 5;
 }
 
 .step[data-stack-slot="2"] {
-  --step-rotation: 2deg;
-  --step-shift: 80%;
-  --step-depth: 24px;
-  z-index: 2;
+  --step-rotation: -0.4deg;
+  --step-shift: 48%;
+  --step-depth: 14px;
+  z-index: 4;
 }
 
 .step[data-stack-slot="3"] {
+  --step-rotation: 1.4deg;
+  --step-shift: 72%;
+  --step-depth: 22px;
+  z-index: 3;
+}
+
+.step[data-stack-slot="4"] {
+  --step-rotation: 3.2deg;
+  --step-shift: 96%;
+  --step-depth: 29px;
+  z-index: 2;
+}
+
+.step[data-stack-slot="5"] {
   --step-rotation: 5deg;
   --step-shift: 120%;
   --step-depth: 36px;
@@ -1559,7 +1573,7 @@ body.case-dialog-is-open {
 .step:not(.is-active) .step-number {
   font-size: clamp(28px, 3vw, 42px);
   position: absolute;
-  right: 20%;
+  right: 12%;
   top: clamp(24px, 2.6vw, 38px);
   transform: translateX(50%);
 }
@@ -1568,7 +1582,7 @@ body.case-dialog-is-open {
   bottom: 28px;
   margin: 0;
   position: absolute;
-  right: 20%;
+  right: 12%;
   top: 104px;
   transform: translateX(50%);
   width: auto;
@@ -1576,7 +1590,7 @@ body.case-dialog-is-open {
 
 .step:not(.is-active) h3 {
   color: rgba(122, 99, 177, 0.58);
-  font-size: clamp(22px, 2.1vw, 34px);
+  font-size: clamp(20px, 1.8vw, 28px);
   letter-spacing: 0.01em;
   line-height: 1.05;
   margin: 0;
@@ -2397,12 +2411,12 @@ body.case-dialog-is-open {
   }
 
   .step-stack {
-    height: 375px;
+    height: 423px;
   }
 
   .step {
     border-radius: 22px;
-    height: 318px;
+    height: 366px;
     padding: clamp(28px, 6vw, 38px);
     width: 76%;
   }
@@ -2413,18 +2427,30 @@ body.case-dialog-is-open {
   }
 
   .step[data-stack-slot="1"] {
-    --step-rotation: -0.5deg;
-    --step-shift: 10%;
-    --step-depth: 8px;
+    --step-rotation: -0.9deg;
+    --step-shift: 6%;
+    --step-depth: 5px;
   }
 
   .step[data-stack-slot="2"] {
-    --step-rotation: 0.5deg;
-    --step-shift: 20%;
-    --step-depth: 16px;
+    --step-rotation: -0.3deg;
+    --step-shift: 12%;
+    --step-depth: 10px;
   }
 
   .step[data-stack-slot="3"] {
+    --step-rotation: 0.3deg;
+    --step-shift: 18%;
+    --step-depth: 14px;
+  }
+
+  .step[data-stack-slot="4"] {
+    --step-rotation: 0.9deg;
+    --step-shift: 24%;
+    --step-depth: 19px;
+  }
+
+  .step[data-stack-slot="5"] {
     --step-rotation: 1.5deg;
     --step-shift: 30%;
     --step-depth: 24px;
@@ -2432,7 +2458,7 @@ body.case-dialog-is-open {
 
   .step:not(.is-active) .step-copy {
     bottom: 20px;
-    right: 5%;
+    right: 3%;
     top: 70px;
   }
 
@@ -2442,7 +2468,7 @@ body.case-dialog-is-open {
 
   .step:not(.is-active) .step-number {
     font-size: clamp(12px, 2.8vw, 18px);
-    right: 5%;
+    right: 3%;
     top: 30px;
   }
 
@@ -2533,11 +2559,11 @@ body.case-dialog-is-open {
   }
 
   .step-stack {
-    height: 340px;
+    height: 404px;
   }
 
   .step {
-    height: 286px;
+    height: 350px;
     padding: 20px;
   }
 
