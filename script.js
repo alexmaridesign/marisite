@@ -1083,150 +1083,55 @@ if (caseDialogOpenButton && caseDialog && caseDialogCloseButton) {
   });
 }
 
-const processCarousel = document.querySelector("[data-process-carousel]");
-const processSteps = Array.from(document.querySelectorAll("[data-process-step]"));
+const processStack = document.querySelector("[data-process-stack]");
 
-if (processCarousel && processSteps.length) {
-  const processStack = processCarousel.querySelector("[data-process-stack]");
-  const processStepButtons = processSteps.map((step) => step.querySelector("[data-process-step-select]"));
-  let activeProcessIndex = 0;
-  let processDrag = null;
-  let suppressProcessClick = false;
+if (processStack) {
+  const steps = Array.from(processStack.querySelectorAll("[data-process-step]"));
+  const buttons = steps.map((step) => step.querySelector("[data-process-step-select]"));
+  let activeIndex = -1;
 
-  const resetProcessDrag = () => {
-    const drag = processDrag;
-    processDrag = null;
-    processStack?.classList.remove("is-dragging");
-    drag?.card.style.removeProperty("--step-drag-x");
-    drag?.card.style.removeProperty("--step-drag-rotation");
-    if (drag && processStack?.hasPointerCapture(drag.pointerId)) {
-      processStack.releasePointerCapture(drag.pointerId);
-    }
+  const setActiveStep = (nextIndex) => {
+    activeIndex = nextIndex;
+    processStack.dataset.activeIndex = String(activeIndex);
+
+    steps.forEach((step, index) => {
+      const isActive = index === activeIndex;
+      // The final handoff card stays open underneath the accordion.
+      const isFinal = step.classList.contains("step--final");
+      const isExpanded = isActive || isFinal;
+      const panel = step.querySelector(".step-panel");
+      step.classList.toggle("is-active", isActive);
+      if (isFinal) {
+        buttons[index].setAttribute("aria-pressed", String(activeIndex === -1));
+      } else {
+        buttons[index].setAttribute("aria-expanded", String(isExpanded));
+      }
+      panel.setAttribute("aria-hidden", String(!isExpanded));
+      panel.inert = !isExpanded;
+    });
   };
 
-  const setActiveProcessStep = (nextIndex, { focus = null } = {}) => {
-    const hadCardFocus = processStepButtons.includes(document.activeElement);
-    resetProcessDrag();
-    activeProcessIndex = (nextIndex + processSteps.length) % processSteps.length;
-    processStack?.setAttribute("data-active-index", String(activeProcessIndex));
-
-    processSteps.forEach((step, index) => {
-      const isActive = index === activeProcessIndex;
-      const selectButton = processStepButtons[index];
-
-      // Slots describe depth in the deck, not the permanent step number.
-      step.dataset.stackSlot = String((index - activeProcessIndex + processSteps.length) % processSteps.length);
-      step.classList.toggle("is-active", isActive);
-      step.classList.toggle("is-under", !isActive);
-      selectButton?.setAttribute("aria-pressed", String(isActive));
-      if (selectButton) selectButton.tabIndex = isActive ? 0 : -1;
+  buttons.forEach((button, index) => {
+    button.addEventListener("click", () => {
+      const isFinal = steps[index].classList.contains("step--final");
+      setActiveStep(isFinal || activeIndex === index ? -1 : index);
     });
 
-    if (focus === "card" || (focus === null && hadCardFocus)) {
-      processStepButtons[activeProcessIndex]?.focus({ preventScroll: true });
-    }
-  };
-
-  const handleProcessNavigation = (event, index, focus) => {
-    let nextIndex = null;
-
-    if (event.key === "ArrowRight") nextIndex = index + 1;
-    if (event.key === "ArrowLeft") nextIndex = index - 1;
-    if (event.key === "Home") nextIndex = 0;
-    if (event.key === "End") nextIndex = processSteps.length - 1;
-    if (nextIndex === null) return;
-
-    event.preventDefault();
-    setActiveProcessStep(nextIndex, { focus });
-  };
-
-  processStepButtons.forEach((button, index) => {
-    button?.addEventListener("click", () => setActiveProcessStep(index));
-    button?.addEventListener("keydown", (event) => handleProcessNavigation(event, index, "card"));
+    button.addEventListener("keydown", (event) => {
+      let nextIndex = null;
+      if (event.key === "ArrowDown") nextIndex = (index + 1) % buttons.length;
+      if (event.key === "ArrowUp") nextIndex = (index - 1 + buttons.length) % buttons.length;
+      if (event.key === "Home") nextIndex = 0;
+      if (event.key === "End") nextIndex = buttons.length - 1;
+      if (nextIndex === null) return;
+      event.preventDefault();
+      buttons[nextIndex].focus();
+    });
   });
 
-  processStack?.addEventListener("pointerdown", (event) => {
-    if (!event.isPrimary || event.button !== 0 || !event.target.closest("[data-process-step]")) return;
-    resetProcessDrag();
-    suppressProcessClick = false;
-    const card = processSteps[activeProcessIndex];
-    processDrag = {
-      pointerId: event.pointerId,
-      card,
-      width: card.offsetWidth,
-      startX: event.clientX,
-      startY: event.clientY,
-      horizontal: false,
-    };
-  });
-
-  // A second finger anywhere on the page leaves pinch/scroll to the browser.
-  window.addEventListener("pointerdown", (event) => {
-    if (processDrag && !event.isPrimary && event.pointerType === "touch") {
-      suppressProcessClick = true;
-      resetProcessDrag();
-    }
-  });
-
-  window.addEventListener("pointermove", (event) => {
-    const drag = processDrag;
-    if (!drag || event.pointerId !== drag.pointerId) return;
-    const deltaX = event.clientX - drag.startX;
-    const deltaY = event.clientY - drag.startY;
-
-    if (!drag.horizontal) {
-      if (Math.hypot(deltaX, deltaY) < 10) return;
-      suppressProcessClick = true;
-      if (Math.abs(deltaY) >= Math.abs(deltaX)) {
-        resetProcessDrag();
-        return;
-      }
-      drag.horizontal = true;
-      processStack.setPointerCapture(drag.pointerId);
-      processStack.classList.add("is-dragging");
-    }
-
-    if (event.cancelable) event.preventDefault();
-    drag.card.style.setProperty("--step-drag-x", `${deltaX}px`);
-    drag.card.style.setProperty("--step-drag-rotation", `${Math.max(-12, Math.min(12, deltaX / drag.width * 12))}deg`);
-  }, { passive: false });
-
-  window.addEventListener("pointerup", (event) => {
-    const drag = processDrag;
-    if (!drag || event.pointerId !== drag.pointerId) return;
-    const deltaX = event.clientX - drag.startX;
-    const threshold = Math.max(32, Math.min(80, drag.width * 0.18));
-    const direction = drag.horizontal && Math.abs(deltaX) >= threshold
-      ? (deltaX < 0 ? 1 : -1)
-      : 0;
-    resetProcessDrag();
-    if (direction) setActiveProcessStep(activeProcessIndex + direction);
-  });
-
-  const cancelProcessDrag = (event) => {
-    if (processDrag?.pointerId !== event.pointerId) return;
-    suppressProcessClick = true;
-    resetProcessDrag();
-  };
-  window.addEventListener("pointercancel", cancelProcessDrag);
-  processStack?.addEventListener("lostpointercapture", (event) => {
-    // Ignore a child button releasing its implicit touch capture to the stack.
-    if (event.target === processStack) cancelProcessDrag(event);
-  });
-  window.addEventListener("resize", () => {
-    if (processDrag) suppressProcessClick = true;
-    resetProcessDrag();
-  });
-
-  processStack?.addEventListener("click", (event) => {
-    // Keyboard clicks have detail 0; the next pointerdown clears suppression.
-    if (!suppressProcessClick || event.detail === 0) return;
-    event.preventDefault();
-    event.stopPropagation();
-    suppressProcessClick = false;
-  }, true);
-
-  setActiveProcessStep(0);
+  setActiveStep(-1);
+  processStack.classList.add("is-ready");
+  requestAnimationFrame(() => processStack.classList.add("is-animated"));
 }
 
 (() => {

@@ -34,7 +34,7 @@
       href="https://fonts.googleapis.com/css2?family=Dela+Gothic+One&family=Inter:wght@400;500;600;700;800;900&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="./styles.css?v=20260918-02" />
+    <link rel="stylesheet" href="./styles.css?v=20260921-02" />
   </head>
   <body>
     <svg class="liquid-filter-defs" aria-hidden="true" focusable="false">
@@ -188,98 +188,150 @@
       </section>
 
       <section class="panel process" id="process">
+        <div class="process-keychain" aria-hidden="true">
+          <img src="./assets/process-keychain.png" alt="" width="2244" height="2804" loading="lazy" decoding="async" />
+        </div>
         <div class="panel-heading reveal">
-          <p>Как я работаю</p>
+          <p>поэтапно</p>
           <h2>Процесс работы</h2>
         </div>
-        <div class="process-carousel reveal" data-process-carousel>
+        <div class="process-accordion reveal">
           <div class="step-stack" data-process-stack aria-label="Этапы процесса работы">
-            <article class="step glass is-active" data-process-step data-process-index="0" data-stack-slot="0">
-              <button
-                class="step-select"
-                type="button"
-                aria-label="Показать этап 01: Знакомство"
-                aria-pressed="true"
-                data-process-step-select
-              ></button>
-              <span class="step-number" aria-hidden="true">01</span>
-              <div class="step-copy">
-                <h3>Знакомство</h3>
-                <p>Заполните бриф или свяжитесь со мной в Telegram / по почте. Обсудим вашу задачу и определим, чем я могу быть полезна.</p>
+            <article class="step" data-process-step>
+              <h3 class="step-heading">
+                <button
+                  class="step-select"
+                  type="button"
+                  id="process-step-1"
+                  aria-expanded="false"
+                  aria-controls="process-panel-1"
+                  data-process-step-select
+                >
+                  <span class="step-number">01</span>
+                  <span class="step-title">Знакомство</span>
+                </button>
+              </h3>
+              <div class="step-panel" id="process-panel-1" role="region" aria-labelledby="process-step-1">
+                <div class="step-panel-clip">
+                  <div class="step-copy">
+                    <p>Заполните бриф или свяжитесь со мной в Telegram / по почте.</p>
+                  </div>
+                </div>
               </div>
             </article>
-            <article class="step glass" data-process-step data-process-index="1" data-stack-slot="1">
-              <button
-                class="step-select"
-                type="button"
-                aria-label="Показать этап 02: Обсуждение"
-                aria-pressed="false"
-                data-process-step-select
-              ></button>
-              <span class="step-number" aria-hidden="true">02</span>
-              <div class="step-copy">
-                <h3>Обсуждение</h3>
-                <p>Проведём видеовстречу, чтобы обсудить детали проекта, сроки, формат работы и стоимость.</p>
+            <article class="step" data-process-step>
+              <h3 class="step-heading">
+                <button
+                  class="step-select"
+                  type="button"
+                  id="process-step-2"
+                  aria-expanded="false"
+                  aria-controls="process-panel-2"
+                  data-process-step-select
+                >
+                  <span class="step-number">02</span>
+                  <span class="step-title">Обсуждение</span>
+                </button>
+              </h3>
+              <div class="step-panel" id="process-panel-2" role="region" aria-labelledby="process-step-2">
+                <div class="step-panel-clip">
+                  <div class="step-copy">
+                    <p>Проведём видеовстречу, чтобы обсудить детали проекта, сроки, формат работы и стоимость.</p>
+                  </div>
+                </div>
               </div>
             </article>
-            <article class="step glass" data-process-step data-process-index="2" data-stack-slot="2">
-              <button
-                class="step-select"
-                type="button"
-                aria-label="Показать этап 03: Предоплата"
-                aria-pressed="false"
-                data-process-step-select
-              ></button>
-              <span class="step-number" aria-hidden="true">03</span>
-              <div class="step-copy">
-                <h3>Предоплата</h3>
-                <p>После согласования условий фиксируем договорённости и начинаем работу после внесения предоплаты.</p>
+            <article class="step" data-process-step>
+              <h3 class="step-heading">
+                <button
+                  class="step-select"
+                  type="button"
+                  id="process-step-3"
+                  aria-expanded="false"
+                  aria-controls="process-panel-3"
+                  data-process-step-select
+                >
+                  <span class="step-number">03</span>
+                  <span class="step-title">Предоплата</span>
+                </button>
+              </h3>
+              <div class="step-panel" id="process-panel-3" role="region" aria-labelledby="process-step-3">
+                <div class="step-panel-clip">
+                  <div class="step-copy">
+                    <p>После согласования условий фиксируем договорённости и начинаем работу после внесения предоплаты.</p>
+                  </div>
+                </div>
               </div>
             </article>
-            <article class="step glass" data-process-step data-process-index="3" data-stack-slot="3">
-              <button
-                class="step-select"
-                type="button"
-                aria-label="Показать этап 04: Разработка"
-                aria-pressed="false"
-                data-process-step-select
-              ></button>
-              <span class="step-number" aria-hidden="true">04</span>
-              <div class="step-copy">
-                <h3>Разработка</h3>
-                <p>Разрабатываю дизайн и представляю первый вариант на созвоне. После обсуждения вносим первую итерацию правок.</p>
+            <article class="step" data-process-step>
+              <h3 class="step-heading">
+                <button
+                  class="step-select"
+                  type="button"
+                  id="process-step-4"
+                  aria-expanded="false"
+                  aria-controls="process-panel-4"
+                  data-process-step-select
+                >
+                  <span class="step-number">04</span>
+                  <span class="step-title">Разработка</span>
+                </button>
+              </h3>
+              <div class="step-panel" id="process-panel-4" role="region" aria-labelledby="process-step-4">
+                <div class="step-panel-clip">
+                  <div class="step-copy">
+                    <p>Разрабатываю дизайн и представляю первый вариант. После обсуждения вносим первую итерацию правок.</p>
+                  </div>
+                </div>
               </div>
             </article>
-            <article class="step glass" data-process-step data-process-index="4" data-stack-slot="4">
-              <button
-                class="step-select"
-                type="button"
-                aria-label="Показать этап 05: Финальные правки"
-                aria-pressed="false"
-                data-process-step-select
-              ></button>
-              <span class="step-number" aria-hidden="true">05</span>
-              <div class="step-copy">
-                <h3>Финальные правки</h3>
-                <p>При необходимости проводим дополнительный созвон и вносим вторую итерацию правок, чтобы довести проект до финального результата.</p>
+            <article class="step" data-process-step>
+              <h3 class="step-heading">
+                <button
+                  class="step-select"
+                  type="button"
+                  id="process-step-5"
+                  aria-expanded="false"
+                  aria-controls="process-panel-5"
+                  data-process-step-select
+                >
+                  <span class="step-number">05</span>
+                  <span class="step-title">Финальные правки</span>
+                </button>
+              </h3>
+              <div class="step-panel" id="process-panel-5" role="region" aria-labelledby="process-step-5">
+                <div class="step-panel-clip">
+                  <div class="step-copy">
+                    <p>При необходимости проводим дополнительный созвон и вносим вторую итерацию правок, чтобы довести проект до финального результата.</p>
+                  </div>
+                </div>
               </div>
             </article>
-            <article class="step glass" data-process-step data-process-index="5" data-stack-slot="5">
-              <button
-                class="step-select"
-                type="button"
-                aria-label="Показать этап 06: Передача"
-                aria-pressed="false"
-                data-process-step-select
-              ></button>
-              <span class="step-number" aria-hidden="true">06</span>
-              <div class="step-copy">
-                <h3>Передача</h3>
-                <p>Передаю готовые файлы и исходники в необходимых форматах. Проект завершён — можно запускать его в работу.</p>
+            <article class="step step--final" data-process-step>
+              <h3 class="step-heading">
+                <button
+                  class="step-select"
+                  type="button"
+                  id="process-step-6"
+                  aria-pressed="true"
+                  aria-label="06 Передача — свернуть предыдущие этапы"
+                  aria-controls="process-panel-1 process-panel-2 process-panel-3 process-panel-4 process-panel-5"
+                  data-process-step-select
+                >
+                  <span class="step-number">06</span>
+                  <span class="step-title">Передача</span>
+                </button>
+              </h3>
+              <div class="step-panel" id="process-panel-6" role="region" aria-labelledby="process-step-6">
+                <div class="step-panel-clip">
+                  <div class="step-copy">
+                    <p>Передаю готовые файлы и исходники в необходимых форматах. Проект завершён — можно запускать его в работу.</p>
+                  </div>
+                  <span class="step-logo" aria-hidden="true"></span>
+                </div>
               </div>
             </article>
           </div>
-
         </div>
       </section>
 
@@ -501,6 +553,6 @@
       </article>
     </dialog>
 
-    <script src="./script.js?v=20260916-06"></script>
+    <script src="./script.js?v=20260921-01"></script>
   </body>
 </html>
