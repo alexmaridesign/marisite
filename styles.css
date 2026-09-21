@@ -1357,10 +1357,10 @@ body.case-dialog-is-open {
   align-items: center;
   display: flex;
   flex-direction: column;
-  gap: 26px;
+  gap: 14px;
   justify-content: center;
   left: -24px;
-  margin: 0 auto 44px;
+  margin: 0 auto 24px;
   position: relative;
   text-align: center;
 }
@@ -1374,9 +1374,9 @@ body.case-dialog-is-open {
     0 18px 48px rgba(40, 34, 24, 0.16),
     inset 0 1px 0 rgba(255, 255, 255, 0.92),
     inset 0 -20px 46px rgba(135, 148, 235, 0.08);
-  max-width: 1560px;
+  max-width: 1380px;
   overflow: hidden;
-  padding: 62px 54px 52px;
+  padding: 36px 54px 24px;
 }
 
 .process-keychain {
@@ -1385,9 +1385,9 @@ body.case-dialog-is-open {
   pointer-events: none;
   position: absolute;
   right: 7.8%;
-  top: 8px;
+  top: -1px;
   user-select: none;
-  width: 24.2%;
+  width: 18%;
 }
 
 /* Frame the artwork inside the transparent margins of the supplied PNG. */
@@ -1491,7 +1491,7 @@ body.case-dialog-is-open {
   --step-overlap: var(--step-radius);
   --step-copy-inset: 21.667cqi;
   isolation: isolate;
-  padding-top: 16px;
+  padding-top: 10px;
 }
 
 .step {
@@ -1572,8 +1572,8 @@ body.case-dialog-is-open {
 }
 
 .step-copy {
-  min-height: max(180px, 40.667cqi);
-  padding: 0 7.333cqi 9cqi var(--step-copy-inset);
+  min-height: max(140px, 30cqi);
+  padding: 0 7.333cqi 6cqi var(--step-copy-inset);
 }
 
 .step p {
@@ -1595,32 +1595,32 @@ body.case-dialog-is-open {
 .step--final .step-copy {
   min-height: 0;
   padding-bottom: 0;
-  padding-top: 5.333cqi;
+  padding-top: 3cqi;
 }
 
 .step-logo {
   aspect-ratio: 4 / 3;
   background: #dedfff;
   display: block;
-  margin: 19cqi 0 7cqi 8cqi;
+  margin: 6cqi 0 4cqi 8cqi;
   mask: url("./assets/mari-logo.svg") center / contain no-repeat;
   -webkit-mask: url("./assets/mari-logo.svg") center / contain no-repeat;
-  width: 41cqi;
+  width: 28cqi;
 }
 
 @media (max-width: 1000px) {
   .panel.process {
     border-radius: 32px;
-    padding: 40px 24px;
+    padding: 30px 24px 24px;
   }
 
   .process .panel-heading {
     align-items: flex-start;
-    gap: 22px;
+    gap: 16px;
     left: 0;
-    margin-bottom: 36px;
-    min-height: 300px;
-    padding-right: 230px;
+    margin-bottom: 24px;
+    min-height: 230px;
+    padding-right: 185px;
     text-align: left;
   }
 
@@ -1632,7 +1632,7 @@ body.case-dialog-is-open {
 
   .process-keychain {
     right: 28px;
-    width: 200px;
+    width: 160px;
   }
 
   .process-accordion {
@@ -2442,10 +2442,10 @@ body.case-dialog-is-open {
   }
 
   .process .panel-heading {
-    gap: 18px;
-    margin-bottom: 20px;
-    min-height: 220px;
-    padding-right: clamp(110px, 30vw, 150px);
+    gap: 14px;
+    margin-bottom: 16px;
+    min-height: 170px;
+    padding-right: clamp(90px, 26vw, 120px);
   }
 
   .process .panel-heading p {
@@ -2456,8 +2456,7 @@ body.case-dialog-is-open {
 
   .process-keychain {
     right: 12px;
-    top: 6px;
-    width: clamp(110px, 30vw, 150px);
+    width: clamp(90px, 26vw, 120px);
   }
 
   .paired-carousel {
