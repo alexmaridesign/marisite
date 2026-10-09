@@ -11,7 +11,7 @@ const pairs = [
     companyArtwork: true,
     title: "МеренКофе",
     short: "МеренКофе",
-    copy: "Я собираю знак, упаковку, визуалы и правила кампании.",
+    copy: "Я\u00a0собираю знак, упаковку, визуалы и\u00a0правила кампании.",
   },
   {
     company: "Mirai",
@@ -43,7 +43,7 @@ const pairs = [
     image: "./assets/case-forma.png",
     title: "Forma",
     short: "Forma",
-    copy: "Я задаю интерфейсные правила, анимацию и презентационный набор.",
+    copy: "Я\u00a0задаю интерфейсные правила, анимацию и\u00a0презентационный набор.",
   },
   {
     company: "Kinto",
@@ -53,7 +53,7 @@ const pairs = [
     image: "./assets/case-kinto.png",
     title: "Kinto",
     short: "Kinto",
-    copy: "Я соединяю знак, материал, тиснение и серию носителей.",
+    copy: "Я\u00a0соединяю знак, материал, тиснение и\u00a0серию носителей.",
   },
   {
     company: "Sofacinic",
@@ -65,7 +65,7 @@ const pairs = [
     companyArtwork: true,
     title: "Luma",
     short: "Luma",
-    copy: "Я проектирую визуальный язык, лендинг и digital-носители.",
+    copy: "Я\u00a0проектирую визуальный язык, лендинг и\u00a0digital-носители.",
   },
   {
     company: "Pinhead",
@@ -77,7 +77,7 @@ const pairs = [
     companyArtwork: true,
     title: "Pinhead",
     short: "Pinhead",
-    copy: "Футболка с принтом Forever Sexy Forever Busy.",
+    copy: "Футболка с\u00a0принтом Forever Sexy Forever Busy.",
   },
   {
     company: "Sensa",
@@ -87,7 +87,7 @@ const pairs = [
     image: "./assets/case-kinto.png",
     title: "Sensa",
     short: "Sensa",
-    copy: "Я веду упаковку, фотостиль и визуальную систему запуска.",
+    copy: "Я\u00a0веду упаковку, фотостиль и\u00a0визуальную систему запуска.",
   },
   {
     company: "Motto",
@@ -97,7 +97,7 @@ const pairs = [
     image: "./assets/case-noire.png",
     title: "Motto",
     short: "Motto",
-    copy: "Я строю редакционную сетку, типографику и промо-набор.",
+    copy: "Я\u00a0строю редакционную сетку, типографику и\u00a0промо-набор.",
   },
   {
     company: "Vera",
@@ -107,7 +107,7 @@ const pairs = [
     image: "./assets/case-cult.png",
     title: "Vera",
     short: "Vera",
-    copy: "Я собираю постеры, визуальную идею и серию кампейн-материалов.",
+    copy: "Я\u00a0собираю постеры, визуальную идею и\u00a0серию кампейн-материалов.",
   },
 ];
 

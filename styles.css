@@ -25,6 +25,15 @@ body {
   overflow-x: hidden;
 }
 
+.step-copy p,
+.pricing-details p,
+.pricing-caption,
+.pricing-footer p > span:last-child,
+[data-case-copy],
+[data-case-dialog-copy] {
+  text-wrap: pretty;
+}
+
 a,
 button {
   color: inherit;
