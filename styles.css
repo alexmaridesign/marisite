@@ -2663,19 +2663,29 @@ body.case-dialog-is-open {
 }
 
 @media (min-width: 821px) {
+  .contact {
+    align-items: stretch;
+  }
+
+  .contact-photo {
+    height: 100%;
+  }
+
   .contact-content {
     align-self: stretch;
     display: grid;
     grid-template-rows: auto 1fr auto;
-    row-gap: 24px;
+    row-gap: clamp(12px, 1.4vw, 20px);
   }
 
   .contact h2 {
+    font-size: clamp(32px, 3.3vw, 48px);
     margin-bottom: 0;
   }
 
   .contact .contact-copy {
     align-self: center;
+    font-size: clamp(14px, 1.25vw, 18px);
     margin-bottom: 0;
   }
 
@@ -2704,7 +2714,7 @@ body.case-dialog-is-open {
 
   .contact {
     gap: clamp(30px, 4vw, 46px);
-    grid-template-columns: clamp(180px, 20vw, 230px) minmax(0, 1fr);
+    grid-template-columns: 240px minmax(0, 1fr);
   }
 }
 
