@@ -1504,7 +1504,7 @@ body.case-dialog-is-open {
 .pricing-details {
   display: grid;
   gap: 24px 48px;
-  grid-template-columns: minmax(0, 1fr) minmax(210px, 0.75fr);
+  grid-template-columns: minmax(0, 1fr);
   padding: 0 80px 28px calc(68px + clamp(12px, 2vw, 26px));
 }
 
