@@ -72,7 +72,7 @@ const pairs = [
     label: "креативная студия",
     type: "мерч",
     count: "1 материал",
-    caseImage: "./assets/case-pinhead.png",
+    caseImage: "./assets/case-pinhead.png?v=20261010-01",
     companyImage: "./assets/company-pinhead.png",
     companyArtwork: true,
     title: "Pinhead",
@@ -1240,6 +1240,7 @@ if (processStack) {
   const buttons = Array.from(contact.querySelectorAll(".contact-button"));
 
   const hide = () => {
+    document.documentElement.classList.remove("is-contact-magnifying");
     contact.classList.remove("is-magnifying");
     cursor?.classList.remove("is-visible");
     pointer = null;
@@ -1300,6 +1301,8 @@ if (processStack) {
 
   const track = (event) => {
     if (event.pointerType !== "mouse" || !mouseAvailable.matches) return hide();
+    // Hide the native pointer before the next animation frame, including overlays.
+    document.documentElement.classList.add("is-contact-magnifying");
     pointer = { x: event.clientX, y: event.clientY };
     schedule();
   };

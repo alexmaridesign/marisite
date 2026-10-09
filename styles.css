@@ -1,6 +1,7 @@
 :root {
   --cream: #f6f2e5;
   --paper: #fbfaf6;
+  --section-paper: #f8f8ff;
   --ink: #171614;
   --muted: #756f64;
   --line: rgba(23, 22, 20, 0.13);
@@ -527,6 +528,8 @@ body.case-dialog-is-open {
   gap: clamp(19px, 1.8vw, 24px);
   left: 0;
   padding: clamp(28px, 4.2vh, 40px) clamp(18px, 3.2vw, 48px) 0;
+  /* Let orbit cards receive input through the empty header area. */
+  pointer-events: none;
   position: absolute;
   right: 0;
   top: calc(50% - min(var(--hero-stage-half), 50%));
@@ -545,6 +548,7 @@ body.case-dialog-is-open {
 
 .brand-small > a {
   display: block;
+  pointer-events: auto;
 }
 
 .brand-title {
@@ -586,6 +590,7 @@ body.case-dialog-is-open {
   grid-template-columns: 0.8fr 0.65fr 1.5fr 1fr;
   min-height: 52px;
   padding: 0 10px;
+  pointer-events: auto;
   width: 100%;
 }
 
@@ -632,6 +637,7 @@ body.case-dialog-is-open {
   color: #828ac4;
   left: 0;
   padding: 24px 28px;
+  pointer-events: auto;
   position: absolute;
   top: calc(100% + 12px);
   width: min(204px, calc(100vw - 48px));
@@ -1373,7 +1379,7 @@ body.case-dialog-is-open {
 }
 
 .panel.pricing {
-  background: #f8f8ff;
+  background: var(--section-paper);
   border: 1px solid rgba(255, 255, 255, 0.92);
   border-radius: clamp(28px, 3.2vw, 44px);
   box-shadow: 0 18px 48px rgba(67, 75, 130, 0.1);
@@ -1699,7 +1705,7 @@ body.case-dialog-is-open {
 .panel.process {
   --process-accent: #828ac4;
   aspect-ratio: 888 / 469;
-  background: #f8f8ff;
+  background: var(--section-paper);
   border: 1px solid rgba(255, 255, 255, 0.82);
   border-radius: clamp(28px, 3vw, 44px);
   box-shadow: 0 18px 48px rgba(40, 34, 24, 0.12), inset 0 1px 0 #fff;
@@ -1897,7 +1903,7 @@ body.case-dialog-is-open {
 
 .step {
   color: var(--step-accent);
-  filter: drop-shadow(0 -2px 4px rgba(88, 96, 164, 0.22)) drop-shadow(2px 2px 3px rgba(88, 96, 164, 0.12));
+  filter: drop-shadow(0 -2px 4px rgba(88, 96, 164, 0.16)) drop-shadow(2px 2px 3px rgba(88, 96, 164, 0.08));
   position: relative;
   width: 100%;
   pointer-events: none;
@@ -2154,7 +2160,7 @@ body.case-dialog-is-open {
 }
 
 .panel.skills {
-  --skill-paper: #f8f8ff;
+  --skill-paper: var(--section-paper);
   --skill-ink: #23243b;
   --skill-muted: #63647b;
   --skill-stroke: #dedff0;
@@ -2429,6 +2435,7 @@ body.case-dialog-is-open {
 
 .contact {
   align-items: center;
+  background: var(--section-paper);
   display: grid;
   gap: clamp(42px, 5%, 64px);
   grid-template-columns: clamp(220px, 24%, 300px) minmax(0, 1fr);
@@ -2498,9 +2505,18 @@ body.case-dialog-is-open {
   width: 0.95em;
 }
 
+.is-contact-magnifying,
+.is-contact-magnifying *,
 .contact.is-magnifying,
-.contact.is-magnifying * {
-  cursor: none;
+.contact.is-magnifying *,
+.contact-cursor,
+.contact-cursor * {
+  cursor: none !important;
+}
+
+.contact-cursor,
+.contact-cursor * {
+  pointer-events: none;
 }
 
 .contact.is-magnifying .contact-loupe,
@@ -2533,7 +2549,7 @@ body.case-dialog-is-open {
     20.98% 66.28%, 20.98% 59.45%, 14.29% 59.45%, 14.29% 52.02%,
     7.14% 52.02%, 7.14% 22.3%, 14.29% 22.3%, 14.29% 14.86%,
     21.43% 14.86%);
-  background: #fff;
+  background: var(--section-paper);
   height: 100%;
   overflow: hidden;
   width: 100%;
@@ -2604,6 +2620,7 @@ body.case-dialog-is-open {
 
 .site-footer {
   align-items: center;
+  background: var(--section-paper);
   border-radius: clamp(18px, 2.4vw, 34px);
   color: rgba(23, 22, 20, 0.58);
   display: flex;
