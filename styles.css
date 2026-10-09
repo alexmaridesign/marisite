@@ -2058,9 +2058,9 @@ body.case-dialog-is-open {
   .process .panel-heading {
     display: flex;
     align-items: center;
+    margin: 0 auto;
     min-height: 230px;
-    padding-left: clamp(16px, 3.8vw, 32px);
-    padding-right: 42%;
+    width: min(100%, 436px);
   }
 
   .process .panel-heading h2 {
@@ -2142,6 +2142,12 @@ body.case-dialog-is-open {
   .step-stack.is-ready .step--final .step-card { padding-bottom: 0; }
 }
 
+@media (min-width: 431px) and (max-width: 900px) {
+  .process-keychain {
+    right: 9%;
+  }
+}
+
 @media (max-width: 430px) {
   .process .panel-heading {
     align-items: flex-end;
@@ -2151,7 +2157,7 @@ body.case-dialog-is-open {
 
   .process .panel-heading h2 {
     font-size: clamp(38px, 11vw, 48px);
-    text-align: right;
+    text-align: left;
     width: 100%;
   }
 }
