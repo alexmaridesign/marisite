@@ -14,24 +14,26 @@ const pairs = [
     copy: "Я собираю знак, упаковку, визуалы и правила кампании.",
   },
   {
-    company: "Noire",
-    label: "редакционный бренд",
-    type: "редакционная айдентика",
-    count: "18 материалов",
-    image: "./assets/case-noire.png",
-    title: "Noire",
-    short: "Noire",
-    copy: "Я выстраиваю сетку, типографику, печатные и цифровые носители.",
+    company: "Mirai",
+    label: "логотип",
+    type: "логотип",
+    count: "1 логотип",
+    companyImage: "./assets/company-mirai.png",
+    companyArtwork: true,
+    title: "Mirai",
+    short: "Mirai",
+    copy: "Логотип Mirai.",
   },
   {
-    company: "Cult",
-    label: "музыкальная платформа",
-    type: "кампания / арт-дирекшн",
-    count: "31 материал",
-    image: "./assets/case-cult.png",
-    title: "Cult",
-    short: "Cult",
-    copy: "Я веду наружку, соцсети и драматургию запуска.",
+    company: "Round",
+    label: "логотип",
+    type: "логотип",
+    count: "1 логотип",
+    companyImage: "./assets/company-round.png",
+    companyArtwork: true,
+    title: "Round",
+    short: "Round",
+    copy: "Логотип Round.",
   },
   {
     company: "Forma",
@@ -68,14 +70,14 @@ const pairs = [
   {
     company: "Pinhead",
     label: "креативная студия",
-    type: "кампания / навигация",
-    count: "27 материалов",
-    image: "./assets/case-forma.png",
+    type: "мерч",
+    count: "1 материал",
+    caseImage: "./assets/case-pinhead.png",
     companyImage: "./assets/company-pinhead.png",
     companyArtwork: true,
-    title: "Atlas",
-    short: "Atlas",
-    copy: "Я собираю кампанию, знаки, модульную сетку и городские носители.",
+    title: "Pinhead",
+    short: "Pinhead",
+    copy: "Футболка с принтом Forever Sexy Forever Busy.",
   },
   {
     company: "Sensa",
@@ -200,7 +202,9 @@ function createCaseNode(pair, index) {
   button.className = "orbit-node case-node";
   button.dataset.index = String(index);
   button.setAttribute("aria-label", `Кейс ${pair.title}`);
-  button.innerHTML = `<img src="${pair.caseImage ?? pair.image}" alt="" />`;
+  const image = pair.caseImage ?? pair.image;
+  button.hidden = !image;
+  if (image) button.innerHTML = `<img src="${image}" alt="" />`;
   return button;
 }
 
@@ -208,7 +212,9 @@ function createCaseLensNode(pair, index) {
   const node = document.createElement("div");
   node.className = "orbit-node case-node lens-node";
   node.dataset.index = String(index);
-  node.innerHTML = `<img src="${pair.caseImage ?? pair.image}" alt="" />`;
+  const image = pair.caseImage ?? pair.image;
+  node.hidden = !image;
+  if (image) node.innerHTML = `<img src="${image}" alt="" />`;
   return node;
 }
 
@@ -325,9 +331,14 @@ function renderCaseDialog(index) {
   caseDialogCompanyImage.src = companyImage;
   caseDialogCompanyImage.alt = `Визуал бренда ${pair.company}`;
   caseDialogCompanyImage.dataset.caseDialogCrop = caseDialogImageCrop.get(companyImage) ?? "none";
-  caseDialogCaseImage.src = caseImage;
-  caseDialogCaseImage.alt = `Визуал кейса ${pair.title}`;
-  caseDialogCaseImage.dataset.caseDialogCrop = caseDialogImageCrop.get(caseImage) ?? "none";
+  caseDialogCaseImage.parentElement.hidden = !caseImage;
+  if (caseImage) {
+    caseDialogCaseImage.src = caseImage;
+    caseDialogCaseImage.alt = `Визуал кейса ${pair.title}`;
+    caseDialogCaseImage.dataset.caseDialogCrop = caseDialogImageCrop.get(caseImage) ?? "none";
+  } else {
+    caseDialogCaseImage.removeAttribute("src");
+  }
   caseDialogPrevTitle.textContent = previousPair.title;
   caseDialogNextTitle.textContent = nextPair.title;
   caseDialogPrevButton.setAttribute("aria-label", `Предыдущий кейс: ${previousPair.title}`);
@@ -1112,12 +1123,17 @@ if (processStack) {
   };
 
   buttons.forEach((button, index) => {
+    steps[index].style.setProperty("--step-index", String(index));
     button.addEventListener("click", () => {
       const isFinal = steps[index].classList.contains("step--final");
       setActiveStep(isFinal || activeIndex === index ? -1 : index);
     });
 
     button.addEventListener("keydown", (event) => {
+      if (event.key === "Escape") {
+        setActiveStep(-1);
+        return;
+      }
       let nextIndex = null;
       if (event.key === "ArrowDown") nextIndex = (index + 1) % buttons.length;
       if (event.key === "ArrowUp") nextIndex = (index - 1 + buttons.length) % buttons.length;
@@ -1173,6 +1189,101 @@ if (processStack) {
 
   buttons.forEach((button) => button.addEventListener("click", () => selectSkill(button)));
   selectSkill(buttons.find((button) => button.getAttribute("aria-pressed") === "true") || buttons[0]);
+})();
+
+(() => {
+  const contact = document.querySelector("#contact");
+  const decoration = contact?.querySelector(".contact-loupe");
+  if (!contact || !decoration) return;
+
+  const mouseAvailable = window.matchMedia("(any-hover: hover) and (any-pointer: fine)");
+  const zoom = 1.8;
+  // The pointer sits at the centre of the glass, not at the handle.
+  const centre = { x: 24 * 1.19, y: 22.7 * 1.19 };
+  let cursor;
+  let copy;
+  let copiedButtons = [];
+  let pointer;
+  let frame = 0;
+  const buttons = Array.from(contact.querySelectorAll(".contact-button"));
+
+  const hide = () => {
+    contact.classList.remove("is-magnifying");
+    cursor?.classList.remove("is-visible");
+    pointer = null;
+    cancelAnimationFrame(frame);
+    frame = 0;
+  };
+
+  const createCursor = () => {
+    cursor = document.createElement("div");
+    cursor.className = "contact-cursor";
+    cursor.setAttribute("aria-hidden", "true");
+    cursor.inert = true;
+
+    const view = document.createElement("div");
+    view.className = "contact-cursor-view";
+    copy = contact.cloneNode(true);
+    copy.classList.remove("reveal", "is-visible", "is-magnifying");
+    copy.removeAttribute("id");
+    copy.querySelectorAll("[id]").forEach((element) => element.removeAttribute("id"));
+    copy.querySelectorAll("img").forEach((image) => { image.loading = "eager"; });
+    copiedButtons = Array.from(copy.querySelectorAll(".contact-button"));
+    view.append(copy);
+
+    const rim = decoration.cloneNode();
+    rim.className = "contact-cursor-frame";
+    cursor.append(view, rim);
+    document.body.append(cursor);
+  };
+
+  const render = () => {
+    frame = 0;
+    if (!pointer || !mouseAvailable.matches) return hide();
+    const target = document.elementFromPoint(pointer.x, pointer.y);
+    if (!target || !contact.contains(target)) return hide();
+    if (!cursor) createCursor();
+
+    const rect = contact.getBoundingClientRect();
+    const x = pointer.x - rect.left;
+    const y = pointer.y - rect.top;
+    copy.style.width = `${rect.width}px`;
+    copy.style.height = `${rect.height}px`;
+    copy.style.transform = `translate(${centre.x - x * zoom}px, ${centre.y - y * zoom}px) scale(${zoom})`;
+    cursor.style.transform = `translate3d(${pointer.x - centre.x}px, ${pointer.y - centre.y}px, 0)`;
+    buttons.forEach((button, index) => {
+      copiedButtons[index].classList.toggle("is-hovered", button.contains(target));
+    });
+    contact.classList.add("is-magnifying");
+    cursor.classList.add("is-visible");
+    // Keep the sampling point aligned while the section's reveal is moving.
+    if (contact.getAnimations().some((animation) => animation.playState === "running")) {
+      frame = requestAnimationFrame(render);
+    }
+  };
+
+  const schedule = () => {
+    if (pointer && !frame) frame = requestAnimationFrame(render);
+  };
+
+  const track = (event) => {
+    if (event.pointerType !== "mouse" || !mouseAvailable.matches) return hide();
+    pointer = { x: event.clientX, y: event.clientY };
+    schedule();
+  };
+
+  contact.addEventListener("pointerenter", track);
+  contact.addEventListener("pointermove", track);
+  contact.addEventListener("pointerleave", hide);
+  contact.addEventListener("pointercancel", hide);
+  window.addEventListener("scroll", schedule, { passive: true });
+  window.addEventListener("resize", schedule);
+  window.addEventListener("blur", hide);
+  document.addEventListener("visibilitychange", hide);
+  document.addEventListener("keydown", hide);
+  mouseAvailable.addEventListener("change", hide);
+  new ResizeObserver(schedule).observe(contact);
+  document.fonts.ready.then(schedule);
 })();
 
 renderPair(0, { animate: false });

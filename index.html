@@ -34,7 +34,7 @@
       href="https://fonts.googleapis.com/css2?family=Dela+Gothic+One&family=Inter:wght@400;500;600;700;800;900&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="./styles.css?v=20260921-04" />
+    <link rel="stylesheet" href="./styles.css?v=20261009-10" />
   </head>
   <body>
     <svg class="liquid-filter-defs" aria-hidden="true" focusable="false">
@@ -70,6 +70,7 @@
               >
                 Кейсы
               </button>
+              <a href="#pricing">Цены</a>
               <a href="#process">Процесс работы</a>
               <a href="#contact">Контакт</a>
             </nav>
@@ -134,7 +135,7 @@
         </section>
 
         <div class="screen-actions" aria-label="Быстрые действия">
-          <a class="scroll-down" href="#process" aria-label="Перейти к процессу">
+          <a class="scroll-down" href="#pricing" aria-label="Перейти к услугам и стоимости">
             <svg viewBox="0 0 24 24" aria-hidden="true">
               <path d="M12 4v16M5 13l7 7 7-7" />
             </svg>
@@ -187,147 +188,312 @@
         </div>
       </section>
 
+      <section class="panel pricing" id="pricing" aria-labelledby="pricing-heading">
+        <header class="pricing-heading">
+          <div>
+            <p class="pricing-kicker">От идеи до запуска</p>
+            <h2 id="pricing-heading">Услуги<br /> и стоимость</h2>
+          </div>
+        </header>
+
+        <!-- Suggested starting prices for this layout; confirm before publishing. -->
+        <div class="pricing-list">
+          <details class="pricing-service">
+            <summary>
+              <span class="pricing-number" aria-hidden="true">01</span>
+              <span class="pricing-name">Брендинг и айдентика<span class="pricing-caption">От первого знака до целой системы</span></span>
+              <span class="pricing-price"><span>от</span> 20 000 ₽</span>
+              <span class="pricing-toggle" aria-hidden="true"></span>
+            </summary>
+            <div class="pricing-details">
+              <p>Нахожу характер бренда и собираю его визуальный язык: логотип, палитру, шрифты и графику. Правила использования оформляю в понятное руководство.</p>
+              <dl class="pricing-options" aria-label="Услуги по брендингу и айдентике">
+                <div><dt>Логотип</dt><dd>от 20 000 ₽</dd></div>
+                <div><dt>Айдентика</dt><dd>от 55 000 ₽</dd></div>
+                <div><dt>Брендбук</dt><dd>от 75 000 ₽</dd></div>
+              </dl>
+            </div>
+          </details>
+
+          <details class="pricing-service">
+            <summary>
+              <span class="pricing-number" aria-hidden="true">02</span>
+              <span class="pricing-name">Упаковка и мерч<span class="pricing-caption">Дизайн, который можно взять в руки</span></span>
+              <span class="pricing-price"><span>от</span> 12 000 ₽</span>
+              <span class="pricing-toggle" aria-hidden="true"></span>
+            </summary>
+            <div class="pricing-details">
+              <p>Переношу стиль бренда на упаковку, этикетки и фирменные вещи. Подготавливаю макеты для производства; стоимость указана за дизайн одного носителя, без печати и изготовления.</p>
+              <dl class="pricing-options" aria-label="Услуги по упаковке и мерчу">
+                <div><dt>Дизайн упаковки</dt><dd>от 25 000 ₽</dd></div>
+                <div><dt>Этикетка</dt><dd>от 15 000 ₽</dd></div>
+                <div><dt>Дизайн мерча</dt><dd>от 12 000 ₽</dd></div>
+              </dl>
+            </div>
+          </details>
+
+          <details class="pricing-service">
+            <summary>
+              <span class="pricing-number" aria-hidden="true">03</span>
+              <span class="pricing-name">Реклама и маркетинг<span class="pricing-caption">Визуальные материалы, которые говорят за бренд</span></span>
+              <span class="pricing-price"><span>от</span> 10 000 ₽</span>
+              <span class="pricing-toggle" aria-hidden="true"></span>
+            </summary>
+            <div class="pricing-details">
+              <p>Создаю визуалы для кампаний, рекламные макеты и презентации. Адаптирую идею под нужные форматы; количество материалов согласуем под вашу задачу.</p>
+              <dl class="pricing-options" aria-label="Услуги по рекламе и маркетингу">
+                <div><dt>Визуал кампании</dt><dd>от 20 000 ₽</dd></div>
+                <div><dt>Рекламный макет</dt><dd>от 10 000 ₽</dd></div>
+                <div><dt>Дизайн презентации</dt><dd>от 20 000 ₽</dd></div>
+              </dl>
+            </div>
+          </details>
+
+          <details class="pricing-service">
+            <summary>
+              <span class="pricing-number" aria-hidden="true">04</span>
+              <span class="pricing-name">Digital-дизайн и соцсети<span class="pricing-caption">Сайты и контент с вашим характером</span></span>
+              <span class="pricing-price"><span>от</span> 12 000 ₽</span>
+              <span class="pricing-toggle" aria-hidden="true"></span>
+            </summary>
+            <div class="pricing-details">
+              <p>Продумываю сайты от структуры и макета до адаптивной вёрстки, оформляю соцсети. Цены на дизайн и вёрстку указаны отдельно для лендинга; сложные функции оценим по задаче.</p>
+              <dl class="pricing-options" aria-label="Услуги по digital-дизайну и соцсетям">
+                <div><dt>Дизайн сайта</dt><dd>от 40 000 ₽</dd></div>
+                <div><dt>Вёрстка сайта</dt><dd>от 30 000 ₽</dd></div>
+                <div><dt>Оформление соцсетей</dt><dd>от 12 000 ₽</dd></div>
+              </dl>
+            </div>
+          </details>
+
+          <details class="pricing-service">
+            <summary>
+              <span class="pricing-number" aria-hidden="true">05</span>
+              <span class="pricing-name">Иллюстрация и дополнительная графика<span class="pricing-caption">Детали, которые делают вас узнаваемыми</span></span>
+              <span class="pricing-price"><span>от</span> 6 000 ₽</span>
+              <span class="pricing-toggle" aria-hidden="true"></span>
+            </summary>
+            <div class="pricing-details">
+              <p>Рисую иллюстрации, иконки и паттерны под стиль вашего проекта. Стоимость зависит от детализации и количества элементов — объём определим до старта.</p>
+              <dl class="pricing-options" aria-label="Услуги по иллюстрации и графике">
+                <div><dt>Иллюстрация</dt><dd>от 10 000 ₽</dd></div>
+                <div><dt>Набор иконок</dt><dd>от 6 000 ₽</dd></div>
+                <div><dt>Фирменный паттерн</dt><dd>от 12 000 ₽</dd></div>
+              </dl>
+            </div>
+          </details>
+        </div>
+
+        <footer class="pricing-footer">
+          <p>
+            <span class="pricing-note-marker" aria-hidden="true">*</span>
+            <span>Цены — ориентир для старта.<br /> Точную стоимость и состав работы согласуем после знакомства с задачей.</span>
+          </p>
+          <a class="pricing-cta" href="#contact">
+            Обсудить проект
+          </a>
+        </footer>
+      </section>
+
       <section class="panel process" id="process">
         <div class="process-keychain" aria-hidden="true">
-          <img src="./assets/process-keychain.png" alt="" width="2244" height="2804" loading="lazy" decoding="async" />
+          <svg class="process-keychain-art" viewBox="218 0 863 1447" focusable="false">
+            <defs>
+              <image id="process-keychain-image" href="./assets/process-keychain.png" width="1408" height="1759" />
+              <!-- Separate only unobscured links; preserve the original artwork and overlapping joints. -->
+              <clipPath id="process-keychain-base">
+                <path d="M0 0H1408V960H750V1759H0Z" />
+              </clipPath>
+              <clipPath id="process-keychain-figma"><path d="M750 950H970V1128H750Z" /></clipPath>
+              <clipPath id="process-keychain-procreate"><path d="M750 1119H970V1288H750Z" /></clipPath>
+              <clipPath id="process-keychain-tilda"><path d="M750 1278H930V1455H750Z" /></clipPath>
+              <mask id="process-keychain-metal" maskUnits="userSpaceOnUse" x="0" y="0" width="1408" height="1759" style="mask-type: alpha">
+                <use href="#process-keychain-image" />
+              </mask>
+              <linearGradient id="process-keychain-light">
+                <stop offset="0" stop-color="#fff" stop-opacity="0" />
+                <stop offset="0.5" stop-color="#fff" stop-opacity="0.48" />
+                <stop offset="1" stop-color="#fff" stop-opacity="0" />
+              </linearGradient>
+            </defs>
+            <g class="process-keychain-swing">
+              <use href="#process-keychain-image" clip-path="url(#process-keychain-base)" />
+              <g class="process-keychain-link" style="--joint: 863px 954px; --delay: -0.8s">
+                <use href="#process-keychain-image" clip-path="url(#process-keychain-figma)" />
+                <g class="process-keychain-link" style="--joint: 866px 1124px; --delay: -1.4s">
+                  <use href="#process-keychain-image" clip-path="url(#process-keychain-procreate)" />
+                  <g class="process-keychain-link" style="--joint: 838px 1283px; --delay: -2s">
+                    <use href="#process-keychain-image" clip-path="url(#process-keychain-tilda)" />
+                  </g>
+                </g>
+              </g>
+              <g clip-path="url(#process-keychain-base)">
+                <g mask="url(#process-keychain-metal)">
+                  <path class="process-keychain-sheen" d="M-500 0H-240L360 1759H100Z" fill="url(#process-keychain-light)" stroke="none" />
+                </g>
+              </g>
+              <path class="process-keychain-glint" d="m818 311 3 14 14 3-14 3-3 14-3-14-14-3 14-3Z" />
+              <path class="process-keychain-glint" style="--delay: -2.5s" d="m1010 607 3 12 12 3-12 3-3 12-3-12-12-3 12-3Z" />
+              <path class="process-keychain-glint" style="--delay: -4.2s" d="m399 1228 3 13 13 3-13 3-3 13-3-13-13-3 13-3Z" />
+            </g>
+          </svg>
+        </div>
+        <div class="process-star" aria-hidden="true">
+          <img src="./assets/process-star.png" alt="" width="135" height="135" loading="lazy" decoding="async" />
         </div>
         <div class="panel-heading reveal">
-          <p>поэтапно</p>
           <h2>Процесс работы</h2>
         </div>
         <div class="process-accordion reveal">
           <div class="step-stack" data-process-stack aria-label="Этапы процесса работы">
             <article class="step" data-process-step>
-              <h3 class="step-heading">
-                <button
-                  class="step-select"
-                  type="button"
-                  id="process-step-1"
-                  aria-expanded="false"
-                  aria-controls="process-panel-1"
-                  data-process-step-select
-                >
-                  <span class="step-number">01</span>
-                  <span class="step-title">Знакомство</span>
-                </button>
-              </h3>
-              <div class="step-panel" id="process-panel-1" role="region" aria-labelledby="process-step-1">
-                <div class="step-panel-clip">
-                  <div class="step-copy">
-                    <p>Заполните бриф или свяжитесь со мной в Telegram / по почте.</p>
+              <div class="step-card">
+                <h3 class="step-heading">
+                  <button
+                    class="step-select"
+                    type="button"
+                    id="process-step-1"
+                    aria-expanded="false"
+                    aria-controls="process-panel-1"
+                    data-process-step-select
+                  >
+                    <span class="step-number">01</span>
+                    <span class="step-title">Знакомство</span>
+                  </button>
+                </h3>
+                <div class="step-panel" id="process-panel-1" role="region" aria-labelledby="process-step-1">
+                  <div class="step-panel-clip">
+                    <div class="step-copy">
+                      <p>Заполните бриф или свяжитесь со мной в Telegram / по почте.</p>
+                    </div>
+                    <span class="step-logo" aria-hidden="true"></span>
                   </div>
                 </div>
               </div>
             </article>
             <article class="step" data-process-step>
-              <h3 class="step-heading">
-                <button
-                  class="step-select"
-                  type="button"
-                  id="process-step-2"
-                  aria-expanded="false"
-                  aria-controls="process-panel-2"
-                  data-process-step-select
-                >
-                  <span class="step-number">02</span>
-                  <span class="step-title">Обсуждение</span>
-                </button>
-              </h3>
-              <div class="step-panel" id="process-panel-2" role="region" aria-labelledby="process-step-2">
-                <div class="step-panel-clip">
-                  <div class="step-copy">
-                    <p>Проведём видеовстречу, чтобы обсудить детали проекта, сроки, формат работы и стоимость.</p>
+              <div class="step-card">
+                <h3 class="step-heading">
+                  <button
+                    class="step-select"
+                    type="button"
+                    id="process-step-2"
+                    aria-expanded="false"
+                    aria-controls="process-panel-2"
+                    data-process-step-select
+                  >
+                    <span class="step-number">02</span>
+                    <span class="step-title">Обсуждение</span>
+                  </button>
+                </h3>
+                <div class="step-panel" id="process-panel-2" role="region" aria-labelledby="process-step-2">
+                  <div class="step-panel-clip">
+                    <div class="step-copy">
+                      <p>Проведём видеовстречу, чтобы обсудить детали проекта, сроки, формат работы и стоимость.</p>
+                    </div>
+                    <span class="step-logo" aria-hidden="true"></span>
                   </div>
                 </div>
               </div>
             </article>
             <article class="step" data-process-step>
-              <h3 class="step-heading">
-                <button
-                  class="step-select"
-                  type="button"
-                  id="process-step-3"
-                  aria-expanded="false"
-                  aria-controls="process-panel-3"
-                  data-process-step-select
-                >
-                  <span class="step-number">03</span>
-                  <span class="step-title">Предоплата</span>
-                </button>
-              </h3>
-              <div class="step-panel" id="process-panel-3" role="region" aria-labelledby="process-step-3">
-                <div class="step-panel-clip">
-                  <div class="step-copy">
-                    <p>После согласования условий фиксируем договорённости и начинаем работу после внесения предоплаты.</p>
+              <div class="step-card">
+                <h3 class="step-heading">
+                  <button
+                    class="step-select"
+                    type="button"
+                    id="process-step-3"
+                    aria-expanded="false"
+                    aria-controls="process-panel-3"
+                    data-process-step-select
+                  >
+                    <span class="step-number">03</span>
+                    <span class="step-title">Предоплата</span>
+                  </button>
+                </h3>
+                <div class="step-panel" id="process-panel-3" role="region" aria-labelledby="process-step-3">
+                  <div class="step-panel-clip">
+                    <div class="step-copy">
+                      <p>После согласования условий фиксируем договорённости и начинаем работу после внесения предоплаты.</p>
+                    </div>
+                    <span class="step-logo" aria-hidden="true"></span>
                   </div>
                 </div>
               </div>
             </article>
             <article class="step" data-process-step>
-              <h3 class="step-heading">
-                <button
-                  class="step-select"
-                  type="button"
-                  id="process-step-4"
-                  aria-expanded="false"
-                  aria-controls="process-panel-4"
-                  data-process-step-select
-                >
-                  <span class="step-number">04</span>
-                  <span class="step-title">Разработка</span>
-                </button>
-              </h3>
-              <div class="step-panel" id="process-panel-4" role="region" aria-labelledby="process-step-4">
-                <div class="step-panel-clip">
-                  <div class="step-copy">
-                    <p>Разрабатываю дизайн и представляю первый вариант. После обсуждения вносим первую итерацию правок.</p>
+              <div class="step-card">
+                <h3 class="step-heading">
+                  <button
+                    class="step-select"
+                    type="button"
+                    id="process-step-4"
+                    aria-expanded="false"
+                    aria-controls="process-panel-4"
+                    data-process-step-select
+                  >
+                    <span class="step-number">04</span>
+                    <span class="step-title">Разработка</span>
+                  </button>
+                </h3>
+                <div class="step-panel" id="process-panel-4" role="region" aria-labelledby="process-step-4">
+                  <div class="step-panel-clip">
+                    <div class="step-copy">
+                      <p>Разрабатываю дизайн и представляю первый вариант. После обсуждения вносим первую итерацию правок.</p>
+                    </div>
+                    <span class="step-logo" aria-hidden="true"></span>
                   </div>
                 </div>
               </div>
             </article>
             <article class="step" data-process-step>
-              <h3 class="step-heading">
-                <button
-                  class="step-select"
-                  type="button"
-                  id="process-step-5"
-                  aria-expanded="false"
-                  aria-controls="process-panel-5"
-                  data-process-step-select
-                >
-                  <span class="step-number">05</span>
-                  <span class="step-title">Финальные правки</span>
-                </button>
-              </h3>
-              <div class="step-panel" id="process-panel-5" role="region" aria-labelledby="process-step-5">
-                <div class="step-panel-clip">
-                  <div class="step-copy">
-                    <p>При необходимости проводим дополнительный созвон и вносим вторую итерацию правок, чтобы довести проект до финального результата.</p>
+              <div class="step-card">
+                <h3 class="step-heading">
+                  <button
+                    class="step-select"
+                    type="button"
+                    id="process-step-5"
+                    aria-expanded="false"
+                    aria-controls="process-panel-5"
+                    data-process-step-select
+                  >
+                    <span class="step-number">05</span>
+                    <span class="step-title">Финальные правки</span>
+                  </button>
+                </h3>
+                <div class="step-panel" id="process-panel-5" role="region" aria-labelledby="process-step-5">
+                  <div class="step-panel-clip">
+                    <div class="step-copy">
+                      <p>При необходимости проводим дополнительный созвон и вносим вторую итерацию правок, чтобы довести проект до финального результата.</p>
+                    </div>
+                    <span class="step-logo" aria-hidden="true"></span>
                   </div>
                 </div>
               </div>
             </article>
             <article class="step step--final" data-process-step>
-              <h3 class="step-heading">
-                <button
-                  class="step-select"
-                  type="button"
-                  id="process-step-6"
-                  aria-pressed="true"
-                  aria-label="06 Передача — свернуть предыдущие этапы"
-                  aria-controls="process-panel-1 process-panel-2 process-panel-3 process-panel-4 process-panel-5"
-                  data-process-step-select
-                >
-                  <span class="step-number">06</span>
-                  <span class="step-title">Передача</span>
-                </button>
-              </h3>
-              <div class="step-panel" id="process-panel-6" role="region" aria-labelledby="process-step-6">
-                <div class="step-panel-clip">
-                  <div class="step-copy">
-                    <p>Передаю готовые файлы и исходники в необходимых форматах. Проект завершён — можно запускать его в работу.</p>
+              <div class="step-card">
+                <h3 class="step-heading">
+                  <button
+                    class="step-select"
+                    type="button"
+                    id="process-step-6"
+                    aria-pressed="true"
+                    aria-label="06 Передача — свернуть предыдущие этапы"
+                    aria-controls="process-panel-1 process-panel-2 process-panel-3 process-panel-4 process-panel-5"
+                    data-process-step-select
+                  >
+                    <span class="step-number">06</span>
+                    <span class="step-title">Передача</span>
+                  </button>
+                </h3>
+                <div class="step-panel" id="process-panel-6" role="region" aria-labelledby="process-step-6">
+                  <div class="step-panel-clip">
+                    <div class="step-copy">
+                      <p>Передаю готовые файлы и исходники в необходимых форматах. Проект завершён — можно запускать его в работу.</p>
+                    </div>
+                    <span class="step-logo" aria-hidden="true"></span>
                   </div>
-                  <span class="step-logo" aria-hidden="true"></span>
                 </div>
               </div>
             </article>
@@ -406,11 +572,15 @@
       </section>
 
       <section class="contact glass reveal" id="contact">
-        <div
-          class="contact-photo-placeholder"
-          role="img"
-          aria-label="Место для будущей фотографии Мари"
-        ></div>
+        <img
+          class="contact-photo"
+          src="./assets/mari-portrait.jpg"
+          alt="Мари Алекс"
+          width="2048"
+          height="2560"
+          loading="lazy"
+          decoding="async"
+        />
 
         <div class="contact-content">
           <h2>
@@ -553,6 +723,6 @@
       </article>
     </dialog>
 
-    <script src="./script.js?v=20260921-01"></script>
+    <script src="./script.js?v=20261009-08"></script>
   </body>
 </html>
