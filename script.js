@@ -133,16 +133,25 @@ const ORBIT_DECORATIONS = {
   ],
 };
 
-const revealObserver = new IntersectionObserver(
-  (entries) => {
-    entries.forEach((entry) => {
-      if (entry.isIntersecting) entry.target.classList.add("is-visible");
-    });
-  },
-  { threshold: 0.18 },
-);
+const revealItems = document.querySelectorAll(".reveal");
 
-document.querySelectorAll(".reveal").forEach((item) => revealObserver.observe(item));
+if (!reduceMotion && "IntersectionObserver" in window) {
+  document.documentElement.classList.add("motion-ready");
+  const revealObserver = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting) return;
+        entry.target.classList.add("is-visible");
+        revealObserver.unobserve(entry.target);
+      });
+    },
+    { threshold: 0.12, rootMargin: "0px 0px -32px 0px" },
+  );
+
+  revealItems.forEach((item) => revealObserver.observe(item));
+} else {
+  revealItems.forEach((item) => item.classList.add("is-visible"));
+}
 
 const carousel = document.querySelector("[data-carousel]");
 const companyOrbit = document.querySelector("[data-company-orbit]");
@@ -1100,6 +1109,8 @@ if (processStack) {
   const steps = Array.from(processStack.querySelectorAll("[data-process-step]"));
   const buttons = steps.map((step) => step.querySelector("[data-process-step-select]"));
   let activeIndex = -1;
+  let hasInteracted = false;
+  let processEntryObserver;
 
   const setActiveStep = (nextIndex) => {
     activeIndex = nextIndex;
@@ -1122,16 +1133,22 @@ if (processStack) {
     });
   };
 
+  const selectStepByUser = (nextIndex) => {
+    hasInteracted = true;
+    processEntryObserver?.disconnect();
+    setActiveStep(nextIndex);
+  };
+
   buttons.forEach((button, index) => {
     steps[index].style.setProperty("--step-index", String(index));
     button.addEventListener("click", () => {
       const isFinal = steps[index].classList.contains("step--final");
-      setActiveStep(isFinal || activeIndex === index ? -1 : index);
+      selectStepByUser(isFinal || activeIndex === index ? -1 : index);
     });
 
     button.addEventListener("keydown", (event) => {
       if (event.key === "Escape") {
-        setActiveStep(-1);
+        selectStepByUser(-1);
         return;
       }
       let nextIndex = null;
@@ -1147,7 +1164,22 @@ if (processStack) {
 
   setActiveStep(-1);
   processStack.classList.add("is-ready");
-  requestAnimationFrame(() => processStack.classList.add("is-animated"));
+  requestAnimationFrame(() => {
+    processStack.classList.add("is-animated");
+    if (!("IntersectionObserver" in window)) {
+      if (!hasInteracted) setActiveStep(0);
+      return;
+    }
+
+    processEntryObserver = new IntersectionObserver((entries) => {
+      if (!entries.some((entry) => entry.isIntersecting)) return;
+      if (!hasInteracted) setActiveStep(0);
+      processEntryObserver.disconnect();
+    }, { threshold: 0.6, rootMargin: "0px 0px -10% 0px" });
+
+    // The stack has zero height on desktop; observe its first visible header.
+    processEntryObserver.observe(buttons[0]);
+  });
 }
 
 (() => {

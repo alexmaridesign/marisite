@@ -1895,6 +1895,7 @@ body.case-dialog-is-open {
   --step-radius: 6cqi;
   --step-peek: 16cqi;
   --step-card-height: 96cqi;
+  --step-heading-inset: 3.667cqi;
   --step-copy-inset: 21.667cqi;
   isolation: isolate;
   position: relative;
@@ -1944,7 +1945,7 @@ body.case-dialog-is-open {
 
 .step.is-active {
   color: #fff;
-  transform: translate(102%, min(0cqi, calc(36cqi - var(--step-index) * var(--step-peek))));
+  transform: translate(calc(100% - var(--step-copy-inset) + var(--step-heading-inset)), min(0cqi, calc(36cqi - var(--step-index) * var(--step-peek))));
 }
 
 .step-heading {
@@ -1959,7 +1960,7 @@ body.case-dialog-is-open {
   gap: 6cqi;
   grid-template-columns: 12cqi minmax(0, 1fr);
   min-height: var(--step-peek);
-  padding: 3.667cqi 4cqi 3.333cqi 3.667cqi;
+  padding: 3.667cqi 4cqi 3.333cqi var(--step-heading-inset);
   position: relative;
   text-align: left;
   width: 100%;
@@ -2609,17 +2610,18 @@ body.case-dialog-is-open {
   text-decoration-color: var(--violet);
 }
 
-.reveal {
+.motion-ready .reveal {
   opacity: 0;
-  transform: translateY(26px);
+  translate: 0 30px;
   transition:
-    opacity 620ms ease,
-    transform 620ms ease;
+    opacity 700ms ease,
+    translate 800ms cubic-bezier(0.22, 1, 0.36, 1);
+  transition-delay: var(--reveal-delay, 0ms);
 }
 
-.reveal.is-visible {
+.motion-ready .reveal.is-visible {
   opacity: 1;
-  transform: translateY(0);
+  translate: 0 0;
 }
 
 @media (min-width: 821px) {

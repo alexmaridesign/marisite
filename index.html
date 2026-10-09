@@ -34,7 +34,7 @@
       href="https://fonts.googleapis.com/css2?family=Dela+Gothic+One&family=Inter:wght@400;500;600;700;800;900&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="./styles.css?v=20261009-11" />
+    <link rel="stylesheet" href="./styles.css?v=20261009-12" />
   </head>
   <body>
     <svg class="liquid-filter-defs" aria-hidden="true" focusable="false">
@@ -51,7 +51,7 @@
     </svg>
     <main class="site">
       <section class="screen" id="top" aria-label="Портфолио Мари">
-        <header class="screen-header">
+        <header class="screen-header reveal">
           <div class="brand-small">
             <a href="#top" aria-label="Главный экран">
               <h1 class="brand-title">Мари</h1>
@@ -86,11 +86,11 @@
           </div>
         </header>
 
-        <div class="center-logo" aria-hidden="true">
+        <div class="center-logo reveal" style="--reveal-delay: 100ms" aria-hidden="true">
           <img src="./assets/mari-logo.svg" alt="" />
         </div>
 
-        <section class="paired-carousel" data-carousel aria-label="Парная карусель компаний и кейсов">
+        <section class="paired-carousel reveal" style="--reveal-delay: 180ms" data-carousel aria-label="Парная карусель компаний и кейсов">
           <svg class="ring ring-left" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
             <path vector-effect="non-scaling-stroke" />
           </svg>
@@ -134,7 +134,7 @@
           </article>
         </section>
 
-        <div class="screen-actions" aria-label="Быстрые действия">
+        <div class="screen-actions reveal" style="--reveal-delay: 260ms" aria-label="Быстрые действия">
           <a class="scroll-down" href="#pricing" aria-label="Перейти к услугам и стоимости">
             <svg viewBox="0 0 24 24" aria-hidden="true">
               <path d="M12 4v16M5 13l7 7 7-7" />
@@ -189,7 +189,7 @@
       </section>
 
       <section class="panel pricing" id="pricing" aria-labelledby="pricing-heading">
-        <header class="pricing-heading">
+        <header class="pricing-heading reveal">
           <div>
             <p class="pricing-kicker">От идеи до запуска</p>
             <h2 id="pricing-heading">Услуги<br /> и стоимость</h2>
@@ -197,7 +197,7 @@
         </header>
 
         <div class="pricing-list">
-          <details class="pricing-service">
+          <details class="pricing-service reveal">
             <summary>
               <span class="pricing-number" aria-hidden="true">01</span>
               <span class="pricing-name">Айдентика / ребрендинг<span class="pricing-caption">От первого знака до целой системы</span></span>
@@ -209,7 +209,7 @@
             </div>
           </details>
 
-          <details class="pricing-service">
+          <details class="pricing-service reveal">
             <summary>
               <span class="pricing-number" aria-hidden="true">02</span>
               <span class="pricing-name">Дизайн мерча<span class="pricing-caption">Фирменный стиль на вещах</span></span>
@@ -221,7 +221,7 @@
             </div>
           </details>
 
-          <details class="pricing-service">
+          <details class="pricing-service reveal">
             <summary>
               <span class="pricing-number" aria-hidden="true">03</span>
               <span class="pricing-name">Линейка мерча<span class="pricing-caption">Коллекция в едином стиле</span></span>
@@ -233,7 +233,7 @@
             </div>
           </details>
 
-          <details class="pricing-service">
+          <details class="pricing-service reveal">
             <summary>
               <span class="pricing-number" aria-hidden="true">04</span>
               <span class="pricing-name">Дизайн упаковки<span class="pricing-caption">Дизайн, который можно взять в руки</span></span>
@@ -245,7 +245,7 @@
             </div>
           </details>
 
-          <details class="pricing-service">
+          <details class="pricing-service reveal">
             <summary>
               <span class="pricing-number" aria-hidden="true">05</span>
               <span class="pricing-name">SMM-дизайн<span class="pricing-caption">Контент с вашим характером</span></span>
@@ -257,7 +257,7 @@
             </div>
           </details>
 
-          <details class="pricing-service">
+          <details class="pricing-service reveal">
             <summary>
               <span class="pricing-number" aria-hidden="true">06</span>
               <span class="pricing-name">Оформление соцсетей<span class="pricing-caption">Единый образ бренда в соцсетях</span></span>
@@ -269,7 +269,7 @@
             </div>
           </details>
 
-          <details class="pricing-service">
+          <details class="pricing-service reveal">
             <summary>
               <span class="pricing-number" aria-hidden="true">07</span>
               <span class="pricing-name">Печатная продукция<span class="pricing-caption">От визитки до плаката</span></span>
@@ -281,7 +281,7 @@
             </div>
           </details>
 
-          <details class="pricing-service">
+          <details class="pricing-service reveal">
             <summary>
               <span class="pricing-number" aria-hidden="true">08</span>
               <span class="pricing-name">Дизайн приложений<span class="pricing-caption">Понятные интерфейсы с характером</span></span>
@@ -294,7 +294,7 @@
           </details>
         </div>
 
-        <footer class="pricing-footer">
+        <footer class="pricing-footer reveal">
           <p>
             <span class="pricing-note-marker" aria-hidden="true">*</span>
             <span>Цены — ориентир для старта.<br /> Точную стоимость и состав работы согласуем после знакомства с задачей.</span>
@@ -512,7 +512,7 @@
       </section>
 
       <section class="panel skills" id="skills" data-skills aria-labelledby="skills-heading">
-        <header class="skills-heading">
+        <header class="skills-heading reveal">
           <div>
             <p class="skills-kicker">Дизайн-стек</p>
             <h2 id="skills-heading">Мои скиллы</h2>
@@ -521,7 +521,7 @@
         </header>
 
         <div class="skills-workspace">
-          <div class="skill-stage">
+          <div class="skill-stage reveal">
             <div class="skill-canvas" aria-hidden="true">
               <div class="skill-art">
                 <img src="./assets/icon-figma-official.svg" alt="" width="74" height="74" data-skill-image />
@@ -539,7 +539,7 @@
             </div>
           </div>
 
-          <div class="skill-dock" role="group" aria-label="Выбрать инструмент">
+          <div class="skill-dock reveal" style="--reveal-delay: 100ms" role="group" aria-label="Выбрать инструмент">
             <button class="skill-tool" type="button" data-skill-select data-skill-name="Figma" data-skill-category="Дизайн" data-skill-tasks='["Интерфейсы", "Дизайн-системы", "Прототипы"]' aria-pressed="true" aria-controls="skill-details">
               <img src="./assets/icon-figma-official.svg" alt="" width="31" height="31" />
               <span>Figma</span>
@@ -575,7 +575,7 @@
           </div>
         </div>
 
-        <footer class="skills-footer">
+        <footer class="skills-footer reveal">
           <span>Дизайн + AI-инструменты</span>
           <span>Выберите инструмент ↗</span>
         </footer>
@@ -629,7 +629,7 @@
         </div>
       </section>
 
-      <footer class="site-footer glass">
+      <footer class="site-footer glass reveal">
         <span>2026 Все права защищены</span>
         <a href="#" aria-label="Политика конфиденциальности">Политика конфиденциальности</a>
         <span>
@@ -733,6 +733,6 @@
       </article>
     </dialog>
 
-    <script src="./script.js?v=20261009-08"></script>
+    <script src="./script.js?v=20261009-09"></script>
   </body>
 </html>
