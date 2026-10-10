@@ -1416,16 +1416,50 @@ body.case-dialog-is-open {
 }
 
 .pricing-list {
-  border-top: 1px solid #dfe1ef;
+  --pricing-fill-fade: 10%;
+  --pricing-line-fade: 14%;
+  border-top: 1px solid transparent;
+  position: relative;
 }
 
 .pricing-service {
-  border-bottom: 1px solid #dfe1ef;
-  transition: background 180ms ease;
+  border-bottom: 1px solid transparent;
+  isolation: isolate;
+  position: relative;
 }
 
-.pricing-service[open] {
-  background: #eff0fb;
+.pricing-list::before,
+.pricing-service::after {
+  background: linear-gradient(90deg, transparent, #dfe1ef var(--pricing-line-fade), #dfe1ef calc(100% - var(--pricing-line-fade)), transparent);
+  content: "";
+  height: 1px;
+  left: 0;
+  pointer-events: none;
+  position: absolute;
+  right: 0;
+}
+
+.pricing-list::before {
+  top: -1px;
+}
+
+.pricing-service::after {
+  bottom: -1px;
+}
+
+.pricing-service::before {
+  background: linear-gradient(90deg, transparent, #eff0fb var(--pricing-fill-fade), #eff0fb calc(100% - var(--pricing-fill-fade)), transparent);
+  content: "";
+  inset: 0;
+  opacity: 0;
+  pointer-events: none;
+  position: absolute;
+  transition: opacity 200ms ease;
+  z-index: -1;
+}
+
+.pricing-service[open]::before {
+  opacity: 1;
 }
 
 .pricing-service summary {
@@ -1616,8 +1650,8 @@ body.case-dialog-is-open {
 }
 
 @media (hover: hover) and (pointer: fine) {
-  .pricing-service:hover {
-    background: #eff0fb;
+  .pricing-service:hover::before {
+    opacity: 1;
   }
 
   .pricing-service summary:hover .pricing-toggle {
