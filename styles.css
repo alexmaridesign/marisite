@@ -2869,6 +2869,35 @@ body.case-dialog-is-open {
 
   .contact-actions {
     align-self: end;
+    grid-template-columns: minmax(0, 1.8fr) minmax(0, 0.9fr) minmax(0, 1.2fr);
+    width: 100%;
+  }
+
+  .contact-actions .process-contact-actions {
+    display: contents;
+  }
+}
+
+@media (min-width: 821px) and (max-width: 1000px) {
+  .contact-actions .process-button {
+    font-size: 13px;
+    gap: 6px;
+    padding-inline: 10px;
+  }
+
+  .contact-actions .process-button--primary {
+    font-size: 16px;
+    gap: 8px;
+  }
+
+  .contact-actions .process-button svg {
+    height: 16px;
+    width: 16px;
+  }
+
+  .contact-actions .process-button--primary svg {
+    height: 18px;
+    width: 18px;
   }
 }
 
