@@ -34,7 +34,7 @@
       href="https://fonts.googleapis.com/css2?family=Dela+Gothic+One&family=Inter:wght@400;500;600;700;800;900&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="./styles.css?v=20261012-02" />
+    <link rel="stylesheet" href="./styles.css?v=20261012-03" />
   </head>
   <body>
     <svg class="liquid-filter-defs" aria-hidden="true" focusable="false">
@@ -199,7 +199,7 @@
           <details class="pricing-service reveal">
             <summary>
               <span class="pricing-name">Айдентика / ребрендинг<span class="pricing-caption">Рабочая визуальная система</span></span>
-              <span class="pricing-price"><span>от</span> 90 000 ₽</span>
+              <span class="pricing-price"><span>от</span> 120 000 ₽</span>
               <span class="pricing-toggle" aria-hidden="true"></span>
             </summary>
             <div class="pricing-details">
@@ -376,7 +376,7 @@
                 <div class="step-panel" id="process-panel-1" role="region" aria-labelledby="process-step-1">
                   <div class="step-panel-clip">
                     <div class="step-copy">
-                      <p>Заполните бриф или&nbsp;свяжитесь со&nbsp;мной в&nbsp;Telegram&nbsp;/&nbsp;по&nbsp;почте.</p>
+                      <p>Заполните <button class="step-brief-link" type="button">бриф</button> или&nbsp;свяжитесь со&nbsp;мной в&nbsp;Telegram&nbsp;/&nbsp;по&nbsp;почте.</p>
                     </div>
                     <span class="step-logo" aria-hidden="true"></span>
                   </div>
@@ -520,7 +520,7 @@
             <span>Заполнить бриф</span>
           </button>
           <div class="process-contact-actions">
-            <a class="process-button" href="mailto:i@alexmaria.ru">
+            <a class="process-button" href="mailto:i@alexmaria.ru?subject=%D0%A0%D0%B0%D0%B7%D1%80%D0%B0%D0%B1%D0%BE%D1%82%D0%BA%D0%B0%20%D0%B4%D0%B8%D0%B7%D0%B0%D0%B9%D0%BD%D0%B0">
               <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
                 <rect x="3" y="5" width="18" height="14" rx="3" />
                 <path d="m4 7 8 6 8-6" />
@@ -648,9 +648,29 @@
             Есть существующий проект или создаете с 0? Давайте обсудим,<br />
             как он должен выглядеть!
           </p>
-          <div class="contact-actions">
-            <a href="https://t.me/alexmari_a" class="contact-button">Написать в Telegram</a>
-            <a href="mailto:i@alexmaria.ru" class="contact-button">Написать на почту</a>
+          <div class="contact-actions" role="group" aria-label="Бриф и связь с Марией">
+            <button class="process-button process-button--primary contact-button" type="button">
+              <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                <path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9l-6-6Z" />
+                <path d="M14 3v6h6M8 13h8M8 17h5" />
+              </svg>
+              <span>Заполнить бриф</span>
+            </button>
+            <div class="process-contact-actions">
+              <a class="process-button contact-button" href="mailto:i@alexmaria.ru?subject=%D0%A0%D0%B0%D0%B7%D1%80%D0%B0%D0%B1%D0%BE%D1%82%D0%BA%D0%B0%20%D0%B4%D0%B8%D0%B7%D0%B0%D0%B9%D0%BD%D0%B0">
+                <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                  <rect x="3" y="5" width="18" height="14" rx="3" />
+                  <path d="m4 7 8 6 8-6" />
+                </svg>
+                <span>Почта</span>
+              </a>
+              <a class="process-button contact-button" href="https://t.me/alexmari_a">
+                <svg class="process-telegram-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                  <path d="m21.4 3.8-3.2 16c-.2 1.1-.9 1.3-1.8.8l-4.9-3.6-2.4 2.3c-.3.3-.5.5-1 .5l.4-5 9-8.2c.4-.4-.1-.6-.6-.3L5.8 13.4 1 11.9c-1-.3-1-1 .2-1.4L20 3.2c.9-.3 1.6.2 1.4.6Z" />
+                </svg>
+                <span>Телеграм</span>
+              </a>
+            </div>
           </div>
         </div>
       </section>

@@ -1884,12 +1884,14 @@ body.case-dialog-is-open {
 }
 
 @media (hover: hover) and (pointer: fine) {
-  .process-button:hover {
+  .process-button:hover,
+  .contact-cursor .process-button.is-hovered {
     background: #eceefb;
     border-color: var(--process-accent);
   }
 
-  .process-button--primary:hover {
+  .process-button--primary:hover,
+  .contact-cursor .process-button--primary.is-hovered {
     background: #7079b7;
     border-color: #7079b7;
   }
@@ -2135,6 +2137,26 @@ body.case-dialog-is-open {
 
 .step.is-active p {
   color: #e0e1f3;
+}
+
+.step-brief-link {
+  background: transparent;
+  border-radius: 3px;
+  color: inherit;
+  font: inherit;
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
+  transition: opacity 150ms ease;
+}
+
+.step-brief-link:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 2px;
+}
+
+.step-brief-link:active {
+  opacity: 0.6;
 }
 
 .step--final .step-copy {
@@ -2754,38 +2776,24 @@ body.case-dialog-is-open {
 }
 
 .contact-actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: clamp(16px, 2.3vw, 30px);
+  --process-accent: #828ac4;
+  display: grid;
+  gap: 12px;
+  width: min(100%, 436px);
 }
 
-.contact-button {
-  align-items: center;
-  background: #626dc0;
-  border-radius: 999px;
-  color: #fff;
-  display: inline-flex;
-  font-size: clamp(13px, 1.15vw, 16px);
-  font-weight: 600;
-  justify-content: center;
-  min-height: 54px;
-  min-width: clamp(190px, 20vw, 270px);
-  padding: 0 24px;
-  transition:
-    background 180ms ease,
-    transform 180ms ease;
+.contact-actions .process-contact-actions {
+  gap: 12px;
 }
 
-.contact-button:hover,
-.contact-button:focus-visible,
-.contact-cursor .contact-button.is-hovered {
-  background: #4e59a8;
-  transform: translateY(-2px);
+.contact-actions .process-button {
+  font-size: clamp(14px, 4vw, 16px);
+  min-height: 48px;
 }
 
-.contact-button:focus-visible {
-  outline: 2px solid #626dc0;
-  outline-offset: 4px;
+.contact-actions .process-button--primary {
+  font-size: 18px;
+  min-height: 56px;
 }
 
 .site-footer {
