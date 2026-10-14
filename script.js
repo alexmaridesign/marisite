@@ -1,4 +1,105 @@
-const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+const motionPreference = window.matchMedia("(prefers-reduced-motion: reduce)");
+let reduceMotion = motionPreference.matches;
+const motionEasing = "cubic-bezier(0.22, 1, 0.36, 1)";
+const runningUiAnimations = new Map();
+
+function playUiMotion(element, keyframes, { duration = 220, easing = motionEasing } = {}) {
+  if (!element || reduceMotion || !element.animate) return null;
+  runningUiAnimations.get(element)?.cancel();
+  const animation = element.animate(keyframes, { duration, easing });
+  runningUiAnimations.set(element, animation);
+  animation.finished.catch(() => {}).finally(() => {
+    if (runningUiAnimations.get(element) === animation) runningUiAnimations.delete(element);
+  });
+  return animation;
+}
+
+function waitForUiMotion(elements, timeout = 340) {
+  if (reduceMotion) return Promise.resolve();
+  const animations = elements.flatMap((element) => element?.getAnimations?.() ?? []);
+  if (!animations.length) return Promise.resolve();
+  return new Promise((resolve) => {
+    let done = false;
+    let timer;
+    const finish = () => {
+      if (done) return;
+      done = true;
+      clearTimeout(timer);
+      resolve();
+    };
+    timer = setTimeout(finish, timeout);
+    Promise.all(animations.map((animation) => animation.finished.catch(() => {}))).then(finish);
+  });
+}
+
+
+const motionScrolls = new Map();
+
+function cancelMotionScroll(scroller) {
+  const state = motionScrolls.get(scroller);
+  if (!state) return;
+  cancelAnimationFrame(state.frame);
+  motionScrolls.delete(scroller);
+}
+
+function scrollWithMotion(scroller, requestedTop) {
+  if (!scroller) return;
+  cancelMotionScroll(scroller);
+  const from = scroller.scrollTop;
+  const top = Math.max(0, Math.min(requestedTop, scroller.scrollHeight - scroller.clientHeight));
+  if (reduceMotion || Math.abs(top - from) < 1) {
+    scroller.scrollTo({ top, behavior: "instant" });
+    return;
+  }
+  const duration = Math.min(720, Math.max(420, 320 + Math.abs(top - from) * 0.09));
+  const start = performance.now();
+  const state = { frame: 0 };
+  motionScrolls.set(scroller, state);
+  const tick = (now) => {
+    if (motionScrolls.get(scroller) !== state) return;
+    const progress = Math.min(1, (now - start) / duration);
+    const eased = 1 - Math.pow(1 - progress, 4);
+    scroller.scrollTo({ top: from + (top - from) * eased, behavior: "instant" });
+    if (progress < 1) state.frame = requestAnimationFrame(tick);
+    else motionScrolls.delete(scroller);
+  };
+  state.frame = requestAnimationFrame(tick);
+}
+
+function cancelAllMotionScrolls() {
+  motionScrolls.forEach((_, scroller) => cancelMotionScroll(scroller));
+}
+
+document.addEventListener("click", (event) => {
+  if (event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+  const link = event.target.closest?.('a[href*="#"]');
+  if (!link || link.target === "_blank" || link.hasAttribute("download")) return;
+  const url = new URL(link.href, window.location.href);
+  if (url.origin !== location.origin || url.pathname !== location.pathname || url.search !== location.search || url.hash.length < 2) return;
+  let id;
+  try { id = decodeURIComponent(url.hash.slice(1)); } catch { return; }
+  const target = document.getElementById(id);
+  if (!target || caseDialog?.open) return;
+  event.preventDefault();
+  history.pushState(null, "", url.hash);
+  if (!target.hasAttribute("tabindex")) {
+    target.setAttribute("tabindex", "-1");
+    target.addEventListener("blur", () => target.removeAttribute("tabindex"), { once: true });
+  }
+  target.focus({ preventScroll: true });
+  scrollWithMotion(document.scrollingElement, target.getBoundingClientRect().top + window.scrollY);
+});
+
+window.addEventListener("wheel", cancelAllMotionScrolls, { passive: true });
+window.addEventListener("touchstart", cancelAllMotionScrolls, { passive: true });
+window.addEventListener("pointerdown", cancelAllMotionScrolls, { passive: true });
+window.addEventListener("resize", cancelAllMotionScrolls);
+window.addEventListener("keydown", (event) => {
+  if (["ArrowUp", "ArrowDown", "PageUp", "PageDown", "Home", "End", " ", "Tab", "Escape"].includes(event.key)) cancelAllMotionScrolls();
+});
+document.addEventListener("visibilitychange", () => {
+  if (document.hidden) cancelAllMotionScrolls();
+});
 
 const pairs = [
   {
@@ -208,6 +309,21 @@ let caseReaderScrollFrame = 0;
 let caseReaderAnchorTarget = null;
 let caseImageViewerReturnFocus = null;
 let activeCaseCover = null;
+const caseDialogCard = document.querySelector(".case-dialog-card");
+const caseDialogStackCards = Array.from(document.querySelectorAll(".case-dialog-stack-card"));
+let caseClosingPromise = null;
+let caseMotionSerial = 0;
+let caseSwitchSerial = 0;
+let pendingCaseIndex = null;
+let caseViewerMotionSerial = 0;
+
+function clearCaseExitStyles() {
+  [caseDialogCard, ...caseDialogStackCards].forEach((element) => {
+    element?.style.removeProperty("--case-exit-opacity");
+    element?.style.removeProperty("--case-exit-transform");
+  });
+  caseDialog?.style.removeProperty("--case-backdrop-exit-opacity");
+}
 
 function createCompanyNode(pair, index) {
   const button = document.createElement("button");
@@ -449,21 +565,44 @@ function updateActiveCaseSection() {
   setActiveCaseSection(currentSection.dataset.caseSection);
 }
 
-function closeCaseImageViewer({ returnFocus = true } = {}) {
-  if (!caseImageViewer || caseImageViewer.hidden) return;
-  caseImageViewer.hidden = true;
-  caseDialog.classList.remove("is-viewing-image");
-  caseReaderSurface.inert = false;
-  caseReaderSurface.removeAttribute("aria-hidden");
-  caseImageViewerImage.removeAttribute("src");
-  if (returnFocus && caseImageViewerReturnFocus?.isConnected) {
-    caseImageViewerReturnFocus.focus({ preventScroll: true });
+function closeCaseImageViewer({ returnFocus = true, immediate = false } = {}) {
+  if (!caseImageViewer || caseImageViewer.hidden) return Promise.resolve();
+  const serial = ++caseViewerMotionSerial;
+  const finish = () => {
+    if (serial !== caseViewerMotionSerial) return;
+    caseImageViewer.hidden = true;
+    caseDialog.classList.remove("is-viewing-image");
+    caseReaderSurface.inert = false;
+    caseReaderSurface.removeAttribute("aria-hidden");
+    caseImageViewerImage.removeAttribute("src");
+    if (returnFocus && caseImageViewerReturnFocus?.isConnected) {
+      caseImageViewerReturnFocus.focus({ preventScroll: true });
+    }
+    caseImageViewerReturnFocus = null;
+    if (!immediate && caseDialog.open && !caseDialog.classList.contains("is-closing")) {
+      playUiMotion(caseReaderSurface, [
+        { opacity: 0.7, transform: "translateY(5px)" },
+        { opacity: 1, transform: "translateY(0)" },
+      ]);
+    }
+  };
+  if (immediate || reduceMotion) {
+    runningUiAnimations.get(caseImageViewer)?.cancel();
+    finish();
+    return Promise.resolve();
   }
-  caseImageViewerReturnFocus = null;
+  const style = getComputedStyle(caseImageViewer);
+  const animation = playUiMotion(caseImageViewer, [
+    { opacity: style.opacity, transform: style.transform },
+    { opacity: 0, transform: "translateY(8px)" },
+  ], { duration: 160 });
+  return (animation?.finished.catch(() => {}) ?? Promise.resolve()).then(finish);
 }
 
 function openCaseImageViewer(media, opener) {
-  if (!caseDialog?.open || !media?.src || !caseImageViewer) return;
+  if (!caseDialog?.open || caseDialog.classList.contains("is-closing") || !media?.src || !caseImageViewer) return;
+  ++caseViewerMotionSerial;
+  const opacity = caseImageViewer.hidden ? 0 : Number(getComputedStyle(caseImageViewer).opacity);
   caseImageViewerReturnFocus = opener;
   caseImageViewerImage.src = media.src;
   caseImageViewerImage.alt = media.alt ?? "Материал проекта";
@@ -474,6 +613,10 @@ function openCaseImageViewer(media, opener) {
   caseReaderSurface.inert = true;
   caseReaderSurface.setAttribute("aria-hidden", "true");
   caseImageViewerBack.focus({ preventScroll: true });
+  playUiMotion(caseImageViewer, [
+    { opacity, transform: "translateY(8px)" },
+    { opacity: 1, transform: "translateY(0)" },
+  ]);
 }
 
 function renderCaseDialog(index) {
@@ -484,7 +627,7 @@ function renderCaseDialog(index) {
   const companyImage = pair.companyImage ?? pair.image;
   const story = getCaseStory(pair);
 
-  closeCaseImageViewer({ returnFocus: false });
+  closeCaseImageViewer({ returnFocus: false, immediate: true });
   activeCaseDialogIndex = normalizedIndex;
   caseDialogTitle.textContent = pair.title;
   caseReaderHeading.textContent = pair.title;
@@ -555,13 +698,28 @@ function renderCaseDialog(index) {
   caseDialogNextTitle.textContent = nextPair.title;
   caseDialogPrevButton.setAttribute("aria-label", `Предыдущий кейс: ${previousPair.title}`);
   caseDialogNextButton.setAttribute("aria-label", `Следующий кейс: ${nextPair.title}`);
+  cancelMotionScroll(caseReaderScroll);
   caseReaderScroll.scrollTo({ top: 0, behavior: "instant" });
   caseReaderAnchorTarget = null;
   setActiveCaseSection("about");
 }
 
 function openCaseDialog(opener) {
-  if (!caseDialog || caseDialog.open) return;
+  if (!caseDialog) return;
+  if (caseDialog.open) {
+    if (caseDialog.classList.contains("is-closing")) {
+      ++caseMotionSerial;
+      caseClosingPromise = null;
+      caseDialog.classList.remove("is-closing");
+      caseDialogCard.inert = false;
+      clearCaseExitStyles();
+    }
+    return;
+  }
+  ++caseMotionSerial;
+  caseDialogCard.inert = false;
+  caseDialog.classList.remove("is-closing");
+  clearCaseExitStyles();
 
   caseDialogReturnFocus = opener;
   caseDialogAutoWasPaused = orbitPicker.autoPausedByUser;
@@ -574,21 +732,64 @@ function openCaseDialog(opener) {
   document.documentElement.classList.add("case-dialog-is-open");
   document.body.classList.add("case-dialog-is-open");
   caseDialog.showModal();
+  orbitPicker.suspendRendering();
+  cancelMotionScroll(caseReaderScroll);
   caseReaderScroll.scrollTo({ top: 0, behavior: "instant" });
   setActiveCaseSection("about");
   requestAnimationFrame(() => caseDialogCloseButton?.focus({ preventScroll: true }));
 }
 
 function closeCaseDialog() {
-  if (caseDialog?.open) caseDialog.close();
+  if (!caseDialog?.open) return Promise.resolve();
+  if (caseClosingPromise) return caseClosingPromise;
+  cancelMotionScroll(caseReaderScroll);
+  ++caseSwitchSerial;
+  pendingCaseIndex = null;
+  const serial = ++caseMotionSerial;
+  if (reduceMotion) {
+    caseDialog.close();
+    return Promise.resolve();
+  }
+  const elements = [caseDialogCard, ...caseDialogStackCards];
+  const startStyles = elements.map((element) => {
+    const style = getComputedStyle(element);
+    return { opacity: style.opacity, transform: style.transform };
+  });
+  const backdropOpacity = getComputedStyle(caseDialog, "::backdrop").opacity;
+  elements.forEach((element, index) => {
+    element.style.setProperty("--case-exit-opacity", startStyles[index].opacity);
+    element.style.setProperty("--case-exit-transform", startStyles[index].transform);
+  });
+  caseDialog.style.setProperty("--case-backdrop-exit-opacity", backdropOpacity);
+  caseDialogCard.inert = true;
+  caseDialog.classList.add("is-closing");
+  caseClosingPromise = waitForUiMotion([caseDialog, ...elements]).then(() => {
+    if (serial === caseMotionSerial && caseDialog.open) caseDialog.close();
+  });
+  return caseClosingPromise;
 }
 
-function stepCaseDialog(direction) {
-  const nextIndex = normalizePairIndex(activeCaseDialogIndex + direction);
+async function stepCaseDialog(direction) {
+  if (!caseDialog?.open || caseDialog.classList.contains("is-closing")) return;
+  const nextIndex = normalizePairIndex((pendingCaseIndex ?? activeCaseDialogIndex) + direction);
+  pendingCaseIndex = nextIndex;
+  const serial = ++caseSwitchSerial;
   caseDialogSelectionChanged = true;
+  const style = getComputedStyle(caseReaderScroll);
+  const outgoing = playUiMotion(caseReaderScroll, [
+    { opacity: style.opacity, transform: style.transform },
+    { opacity: 0, transform: "translateY(-6px)" },
+  ], { duration: 120 });
+  await (outgoing?.finished.catch(() => {}) ?? Promise.resolve());
+  if (serial !== caseSwitchSerial || !caseDialog.open || caseDialog.classList.contains("is-closing")) return;
   renderCaseDialog(nextIndex);
+  pendingCaseIndex = null;
   orbitPicker.select(nextIndex);
   caseReaderHeading.focus({ preventScroll: true });
+  playUiMotion(caseReaderScroll, [
+    { opacity: 0, transform: "translateY(8px)" },
+    { opacity: 1, transform: "translateY(0)" },
+  ], { duration: 260 });
 }
 
 class LiquidGlassLens {
@@ -797,6 +998,9 @@ class OrbitalPicker {
     this.autoSpeed = reduceMotion ? 0 : 0.00115;
     this.autoPausedByUser = false;
     this.autoInViewport = true;
+    this.renderInViewport = true;
+    this.frame = 0;
+    this.settleUntil = performance.now() + 600;
     this.nodes = [];
     this.lensNodes = [];
     this.decorations = [];
@@ -804,7 +1008,7 @@ class OrbitalPicker {
     this.mount();
     this.bind();
     this.update();
-    requestAnimationFrame((now) => this.tick(now));
+    this.wake();
   }
 
   mount() {
@@ -846,7 +1050,10 @@ class OrbitalPicker {
 
   bind() {
     this.surface?.addEventListener("pointerdown", (event) => this.onPointerDown(event));
-    this.surface?.addEventListener("pointermove", (event) => this.lens?.trackPointer(event));
+    this.surface?.addEventListener("pointermove", (event) => {
+      this.pendingLightPointer = { clientX: event.clientX, clientY: event.clientY };
+      this.wake();
+    });
     window.addEventListener("pointermove", (event) => this.onPointerMove(event), { passive: false });
     window.addEventListener("pointerup", (event) => this.onPointerUp(event));
     window.addEventListener("pointercancel", (event) => {
@@ -860,7 +1067,15 @@ class OrbitalPicker {
       if (event.target === this.surface && event.pointerId === this.gesture?.pointerId) this.cancelGesture();
     });
     window.addEventListener("blur", () => this.cancelGesture());
-    window.addEventListener("resize", () => this.cancelGesture());
+    window.addEventListener("resize", () => {
+      this.cancelGesture();
+      this.wake();
+    });
+    document.addEventListener("visibilitychange", () => {
+      if (document.hidden) this.suspendRendering();
+      else this.wake();
+    });
+    document.fonts?.ready.then(() => this.wake());
     this.surface?.addEventListener("dragstart", (event) => event.preventDefault());
     this.surface?.addEventListener("click", (event) => {
       // Block the click generated after a swipe, including swipes over the CTA.
@@ -869,7 +1084,10 @@ class OrbitalPicker {
       event.preventDefault();
       event.stopPropagation();
     }, true);
-    this.surface?.addEventListener("pointerleave", () => this.lens?.resetPointer());
+    this.surface?.addEventListener("pointerleave", () => {
+      this.pendingLightPointer = null;
+      this.lens?.resetPointer();
+    });
     this.surface?.addEventListener(
       "wheel",
       (event) => {
@@ -883,7 +1101,7 @@ class OrbitalPicker {
         this.angle += delta;
         this.velocity = clamp(this.velocity + delta * 0.16, -0.032, 0.032);
         this.snapAfter = performance.now() + 280;
-        this.update();
+        this.wake();
       },
       { passive: false },
     );
@@ -930,11 +1148,13 @@ class OrbitalPicker {
     if (immediate || reduceMotion) {
       this.angle = target;
       this.targetAngle = null;
-      this.update();
+      if (this.canRender()) this.update();
+      this.wake();
       return;
     }
 
     this.targetAngle = target;
+    this.wake();
   }
 
   snapToNearest() {
@@ -947,9 +1167,31 @@ class OrbitalPicker {
 
   setAutoInViewport(isVisible) {
     this.autoInViewport = isVisible;
-    if (!isVisible) {
-      this.autoPausedByUser = false;
-    }
+    if (!isVisible) this.autoPausedByUser = false;
+    this.wake();
+  }
+
+  canRender() {
+    return this.renderInViewport && !document.hidden && !caseDialog?.open;
+  }
+
+  suspendRendering() {
+    cancelAnimationFrame(this.frame);
+    this.frame = 0;
+    this.pendingLightPointer = null;
+  }
+
+  setRenderInViewport(isVisible) {
+    this.renderInViewport = isVisible;
+    if (isVisible) this.wake();
+    else this.suspendRendering();
+  }
+
+  wake() {
+    this.settleUntil = performance.now() + (reduceMotion ? 0 : 600);
+    if (!this.canRender() || this.frame) return;
+    this.lastFrameTime = performance.now();
+    this.frame = requestAnimationFrame((now) => this.tick(now));
   }
 
   commit(index) {
@@ -1040,7 +1282,7 @@ class OrbitalPicker {
     // One gesture previews at most one neighbouring case, with no release inertia.
     const delta = gesture.axis === "y" ? deltaY : deltaX;
     this.angle = gesture.startAngle + clamp(delta / gesture.pixelsPerStep, -1, 1) * this.step;
-    this.update();
+    this.wake();
   }
 
   resetGesture() {
@@ -1094,11 +1336,6 @@ class OrbitalPicker {
 
   update() {
     const nextVisualIndex = this.nearestIndex();
-    if (nextVisualIndex !== this.visualIndex) {
-      this.onPreview?.(this.values[nextVisualIndex], nextVisualIndex);
-    }
-
-    this.visualIndex = nextVisualIndex;
     const lensFrame = this.lens?.readFrame();
     const lensLaneFrames = this.lanes.map((lane) =>
       lane.lensRoot && lensFrame ? this.lens.readLane(lane.root, lensFrame) : null,
@@ -1116,10 +1353,12 @@ class OrbitalPicker {
         centerDrop: lensCenterDrops[laneIndex],
         focusX: frame ? ((frame.slotCenter - frame.laneRect.left) / frame.laneRect.width) * 100 : undefined,
       };
-      this.updateRing(lane, position);
       return position;
     });
     const sourceBaseSizes = this.nodes.map((nodes) => nodes[0]?.offsetHeight || 0);
+    if (nextVisualIndex !== this.visualIndex) this.onPreview?.(this.values[nextVisualIndex], nextVisualIndex);
+    this.visualIndex = nextVisualIndex;
+    this.lanes.forEach((lane, index) => this.updateRing(lane, lanePositions[index]));
 
     this.values.forEach((_, index) => {
       const baseAngle = this.angle + index * this.step;
@@ -1155,6 +1394,9 @@ class OrbitalPicker {
   }
 
   tick(now) {
+    this.frame = 0;
+    if (!this.canRender()) return;
+    const previousAngle = this.angle;
     const delta = Math.min(2, (now - this.lastFrameTime) / 16.67 || 1);
     this.lastFrameTime = now;
 
@@ -1185,8 +1427,17 @@ class OrbitalPicker {
       }
     }
 
+    if (this.angle !== previousAngle || this.gesture) this.settleUntil = now + (reduceMotion ? 0 : 600);
     this.update();
-    requestAnimationFrame((frameNow) => this.tick(frameNow));
+    if (this.pendingLightPointer) {
+      this.lens?.trackPointer(this.pendingLightPointer);
+      this.pendingLightPointer = null;
+    }
+    const hasMotion = this.gesture || this.targetAngle !== null || this.snapAfter ||
+      Math.abs(this.velocity) > 0.0006 || (this.autoSpeed && this.autoInViewport && !this.autoPausedByUser);
+    if (hasMotion || now < this.settleUntil) {
+      this.frame = requestAnimationFrame((frameNow) => this.tick(frameNow));
+    }
   }
 }
 
@@ -1234,6 +1485,7 @@ if (topSection) {
     ([entry]) => {
       const isVisible = entry.isIntersecting && entry.intersectionRatio > 0.68;
       orbitPicker.setAutoInViewport(isVisible);
+      orbitPicker.setRenderInViewport(entry.isIntersecting);
     },
     { threshold: [0, 0.28, 0.68, 0.9] },
   );
@@ -1254,12 +1506,54 @@ const casesMenuRoot = document.querySelector("[data-cases-menu]");
 const casesMenuTrigger = document.querySelector("[data-cases-menu-trigger]");
 const casesPopover = document.querySelector("[data-cases-popover]");
 
-if (casesMenuRoot && casesMenuTrigger && casesPopover) {
-  const setCasesMenuOpen = (isOpen, { returnFocus = false } = {}) => {
-    casesMenuTrigger.setAttribute("aria-expanded", String(isOpen));
-    casesPopover.hidden = !isOpen;
+motionPreference.addEventListener("change", () => {
+  reduceMotion = motionPreference.matches;
+  runningUiAnimations.forEach((animation) => animation.cancel());
+  cancelAllMotionScrolls();
+  orbitPicker.autoSpeed = reduceMotion ? 0 : 0.00115;
+  if (reduceMotion) {
+    orbitPicker.cancelGesture();
+    const index = orbitPicker.targetAngle !== null ? orbitPicker.selectedIndex : orbitPicker.nearestIndex();
+    orbitPicker.angle = nearestEquivalentAngle(orbitPicker.angleForIndex(index), orbitPicker.angle);
+    orbitPicker.targetAngle = null;
+    orbitPicker.velocity = 0;
+    orbitPicker.snapAfter = 0;
+    orbitPicker.commit(index);
+    document.documentElement.classList.remove("motion-ready");
+    revealItems.forEach((item) => item.classList.add("is-visible"));
+  }
+  orbitPicker.wake();
+});
 
-    if (!isOpen && returnFocus) casesMenuTrigger.focus();
+if (casesMenuRoot && casesMenuTrigger && casesPopover) {
+  let menuMotionSerial = 0;
+  const setCasesMenuOpen = async (isOpen, { returnFocus = false } = {}) => {
+    const serial = ++menuMotionSerial;
+    casesMenuTrigger.setAttribute("aria-expanded", String(isOpen));
+    if (returnFocus) casesMenuTrigger.focus({ preventScroll: true });
+    if (isOpen) {
+      const opacity = casesPopover.hidden ? 0 : Number(getComputedStyle(casesPopover).opacity);
+      casesPopover.classList.remove("is-closing");
+      casesPopover.inert = false;
+      casesPopover.hidden = false;
+      playUiMotion(casesPopover, [
+        { opacity, transform: "translateY(-6px) scale(0.985)" },
+        { opacity: 1, transform: "translateY(0) scale(1)" },
+      ]);
+      return;
+    }
+    if (casesPopover.hidden) return;
+    casesPopover.inert = true;
+    const style = getComputedStyle(casesPopover);
+    casesPopover.classList.add("is-closing");
+    const animation = playUiMotion(casesPopover, [
+      { opacity: style.opacity, transform: style.transform },
+      { opacity: 0, transform: "translateY(-6px) scale(0.985)" },
+    ], { duration: 160 });
+    await (animation?.finished.catch(() => {}) ?? Promise.resolve());
+    if (serial !== menuMotionSerial) return;
+    casesPopover.hidden = true;
+    casesPopover.classList.remove("is-closing");
   };
 
   casesMenuTrigger.addEventListener("click", () => {
@@ -1305,7 +1599,7 @@ if (caseDialogOpenButton && caseDialog && caseDialogCloseButton) {
       const top = section.getBoundingClientRect().top - caseReaderSections[0].getBoundingClientRect().top;
       caseReaderAnchorTarget = section.dataset.caseSection;
       setActiveCaseSection(section.dataset.caseSection);
-      caseReaderScroll.scrollTo({ top, behavior: reduceMotion ? "instant" : "smooth" });
+      scrollWithMotion(caseReaderScroll, top);
       section.focus({ preventScroll: true });
     });
   });
@@ -1320,6 +1614,7 @@ if (caseDialogOpenButton && caseDialog && caseDialogCloseButton) {
   caseReaderScroll?.addEventListener("scroll", queueCaseSectionUpdate, { passive: true });
   const releaseCaseAnchor = () => {
     caseReaderAnchorTarget = null;
+    cancelMotionScroll(caseReaderScroll);
     queueCaseSectionUpdate();
   };
   caseReaderScroll?.addEventListener("wheel", releaseCaseAnchor, { passive: true });
@@ -1360,7 +1655,14 @@ if (caseDialogOpenButton && caseDialog && caseDialogCloseButton) {
   });
 
   caseDialog.addEventListener("close", () => {
-    closeCaseImageViewer({ returnFocus: false });
+    ++caseMotionSerial;
+    ++caseSwitchSerial;
+    pendingCaseIndex = null;
+    caseClosingPromise = null;
+    caseDialog.classList.remove("is-closing");
+    caseDialogCard.inert = false;
+    clearCaseExitStyles();
+    closeCaseImageViewer({ returnFocus: false, immediate: true });
     if (caseReaderScrollFrame) cancelAnimationFrame(caseReaderScrollFrame);
     caseReaderScrollFrame = 0;
     document.documentElement.classList.remove("case-dialog-is-open");
@@ -1369,8 +1671,48 @@ if (caseDialogOpenButton && caseDialog && caseDialogCloseButton) {
     orbitPicker.autoPausedByUser = caseDialogSelectionChanged || caseDialogAutoWasPaused;
     caseDialogReturnFocus?.focus({ preventScroll: true });
     caseDialogReturnFocus = null;
+    orbitPicker.wake();
   });
 }
+
+
+// Preserve native details behavior while animating the surrounding document flow.
+document.querySelectorAll(".pricing-service").forEach((details) => {
+  const summary = details.querySelector("summary");
+  const content = details.querySelector(".pricing-details");
+  if (!summary || !content) return;
+  let state = null;
+  summary.addEventListener("click", (event) => {
+    if (reduceMotion || !details.animate) return;
+    event.preventDefault();
+    const expanded = !(state ? state.expanded : details.open);
+    const from = details.getBoundingClientRect().height;
+    const style = getComputedStyle(details);
+    const border = parseFloat(style.borderTopWidth) + parseFloat(style.borderBottomWidth);
+    const nextState = { expanded };
+    state = nextState;
+    runningUiAnimations.get(details)?.cancel();
+    details.open = true;
+    details.style.height = "auto";
+    const to = expanded ? details.getBoundingClientRect().height : summary.getBoundingClientRect().height + border;
+    details.style.height = from + "px";
+    details.style.overflow = "hidden";
+    details.classList.toggle("is-closing", !expanded);
+    content.inert = !expanded;
+    const animation = playUiMotion(details, [{ height: from + "px" }, { height: to + "px" }], {
+      duration: expanded ? 360 : 260,
+    });
+    (animation?.finished.catch(() => {}) ?? Promise.resolve()).then(() => {
+      if (state !== nextState) return;
+      details.open = expanded;
+      content.inert = false;
+      details.classList.remove("is-closing");
+      details.style.removeProperty("height");
+      details.style.removeProperty("overflow");
+      state = null;
+    });
+  });
+});
 
 const processStack = document.querySelector("[data-process-stack]");
 
@@ -1462,18 +1804,24 @@ if (processStack) {
   const taskList = skills.querySelector("[data-skill-tasks]");
   if (!buttons.length || !image || !title || !category || !taskList) return;
 
-  const selectSkill = (button) => {
+  const panel = skills.querySelector(".skill-details");
+  let skillMotionSerial = 0;
+  const selectSkill = async (button, { animate = true } = {}) => {
     const buttonImage = button.querySelector("img");
     if (!buttonImage) return;
-
     let tasks;
-    try {
-      tasks = JSON.parse(button.dataset.skillTasks || "[]");
-    } catch {
-      return;
-    }
+    try { tasks = JSON.parse(button.dataset.skillTasks || "[]"); } catch { return; }
     if (!Array.isArray(tasks) || !tasks.every((task) => typeof task === "string")) return;
-
+    const serial = ++skillMotionSerial;
+    buttons.forEach((candidate) => candidate.setAttribute("aria-pressed", String(candidate === button)));
+    if (animate) {
+      const outgoing = [panel, image].filter(Boolean).map((element) => {
+        const style = getComputedStyle(element);
+        return playUiMotion(element, [{ opacity: style.opacity }, { opacity: 0 }], { duration: 120 });
+      });
+      await Promise.all(outgoing.map((animation) => animation?.finished.catch(() => {}) ?? Promise.resolve()));
+      if (serial !== skillMotionSerial) return;
+    }
     image.src = buttonImage.src;
     image.alt = buttonImage.alt;
     title.textContent = button.dataset.skillName;
@@ -1483,13 +1831,14 @@ if (processStack) {
       item.textContent = task;
       return item;
     }));
-    buttons.forEach((candidate) => {
-      candidate.setAttribute("aria-pressed", String(candidate === button));
-    });
+    if (animate) {
+      playUiMotion(panel, [{ opacity: 0, transform: "translateY(5px)" }, { opacity: 1, transform: "translateY(0)" }]);
+      playUiMotion(image, [{ opacity: 0 }, { opacity: 1 }]);
+    }
   };
 
   buttons.forEach((button) => button.addEventListener("click", () => selectSkill(button)));
-  selectSkill(buttons.find((button) => button.getAttribute("aria-pressed") === "true") || buttons[0]);
+  selectSkill(buttons.find((button) => button.getAttribute("aria-pressed") === "true") || buttons[0], { animate: false });
 })();
 
 (() => {

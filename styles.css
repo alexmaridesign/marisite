@@ -8,6 +8,12 @@
   --glass: rgba(255, 255, 255, 0.58);
   --violet: #8794eb;
   --heading-letter-spacing: 0.02em;
+  --motion-fast: 160ms;
+  --motion-ui: 220ms;
+  --motion-panel: 420ms;
+  --motion-reveal: 600ms;
+  --motion-ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --motion-exit-ease: cubic-bezier(0.4, 0, 1, 1);
 }
 
 * {
@@ -275,7 +281,7 @@ body.case-dialog-is-open {
   flex: 0 0 auto;
   height: 44px;
   justify-content: center;
-  transition: background 180ms ease, transform 180ms ease;
+  transition: background var(--motion-ui) var(--motion-ease), transform var(--motion-ui) var(--motion-ease);
   width: 44px;
 }
 
@@ -325,7 +331,7 @@ body.case-dialog-is-open {
   line-height: 1.35;
   min-height: 46px;
   padding: 12px;
-  transition: background 180ms ease, color 180ms ease;
+  transition: background var(--motion-ui) var(--motion-ease), color var(--motion-ui) var(--motion-ease);
 }
 
 .case-reader-contents a::before {
@@ -539,7 +545,7 @@ body.case-dialog-is-open {
   min-height: 230px;
   overflow: hidden;
   padding: 18px;
-  transition: background 180ms ease;
+  transition: background var(--motion-ui) var(--motion-ease);
   width: 100%;
 }
 
@@ -586,7 +592,7 @@ body.case-dialog-is-open {
   min-width: 0;
   padding: 10px 18px;
   text-align: left;
-  transition: background 180ms ease, color 180ms ease;
+  transition: background var(--motion-ui) var(--motion-ease), color var(--motion-ui) var(--motion-ease);
 }
 
 .case-dialog-nav-button:hover {
@@ -683,23 +689,77 @@ body.case-dialog-is-open {
 }
 
 @media (prefers-reduced-motion: no-preference) {
-  .case-dialog[open] .case-dialog-card {
-    animation: case-reader-in 480ms cubic-bezier(0.2, 0.86, 0.22, 1);
+  .case-dialog[open]:not(.is-closing) .case-dialog-card {
+    animation: case-reader-in var(--motion-panel) var(--motion-ease) both;
   }
 
-  .case-dialog[open]::backdrop {
-    animation: case-dialog-backdrop-in 260ms ease-out;
+  .case-dialog[open]:not(.is-closing) .case-dialog-stack-card--previous {
+    animation: case-stack-previous-in var(--motion-reveal) var(--motion-ease) 180ms both;
+  }
+
+  .case-dialog[open]:not(.is-closing) .case-dialog-stack-card--next {
+    animation: case-stack-next-in var(--motion-reveal) var(--motion-ease) 180ms both;
+  }
+
+  .case-dialog[open]:not(.is-closing)::backdrop {
+    animation: case-dialog-backdrop-in var(--motion-panel) var(--motion-ease) both;
+  }
+
+  .case-dialog.is-closing .case-dialog-card {
+    animation: case-reader-out var(--motion-ui) var(--motion-exit-ease) 40ms both;
+  }
+
+  .case-dialog.is-closing .case-dialog-stack-card--previous {
+    animation: case-stack-previous-out var(--motion-fast) var(--motion-exit-ease) both;
+  }
+
+  .case-dialog.is-closing .case-dialog-stack-card--next {
+    animation: case-stack-next-out var(--motion-fast) var(--motion-exit-ease) both;
+  }
+
+  .case-dialog.is-closing::backdrop {
+    animation: case-dialog-backdrop-out 260ms var(--motion-exit-ease) both;
   }
 }
 
 @keyframes case-reader-in {
-  from { opacity: 0; transform: translateY(28px) scale(0.85, 0.96); }
+  from { opacity: 0; transform: translateY(16px) scale(0.98); }
   to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes case-reader-out {
+  from { opacity: var(--case-exit-opacity, 1); transform: var(--case-exit-transform, translateY(0) scale(1)); }
+  to { opacity: 0; transform: translateY(10px) scale(0.985); }
+}
+
+@keyframes case-stack-previous-in {
+  from { opacity: 0; transform: translateX(80px) rotate(-3deg) scale(0.94); }
+  to { opacity: 1; transform: translateX(0) rotate(-5deg) scale(0.94); }
+}
+
+@keyframes case-stack-next-in {
+  from { opacity: 0; transform: translateX(-80px) rotate(3deg) scale(0.94); }
+  to { opacity: 1; transform: translateX(0) rotate(5deg) scale(0.94); }
+}
+
+@keyframes case-stack-previous-out {
+  from { opacity: var(--case-exit-opacity, 1); transform: var(--case-exit-transform, rotate(-5deg) scale(0.94)); }
+  to { opacity: 0; transform: translateX(80px) rotate(-3deg) scale(0.94); }
+}
+
+@keyframes case-stack-next-out {
+  from { opacity: var(--case-exit-opacity, 1); transform: var(--case-exit-transform, rotate(5deg) scale(0.94)); }
+  to { opacity: 0; transform: translateX(-80px) rotate(3deg) scale(0.94); }
 }
 
 @keyframes case-dialog-backdrop-in {
   from { opacity: 0; }
   to { opacity: 1; }
+}
+
+@keyframes case-dialog-backdrop-out {
+  from { opacity: var(--case-backdrop-exit-opacity, 1); }
+  to { opacity: 0; }
 }
 
 @media (max-width: 900px) {
@@ -869,6 +929,7 @@ body.case-dialog-is-open {
   min-height: 44px;
   text-align: center;
   text-transform: uppercase;
+  transition: color var(--motion-ui) var(--motion-ease);
 }
 
 .screen-nav a:hover,
@@ -886,7 +947,7 @@ body.case-dialog-is-open {
 }
 
 .cases-popover {
-  animation: cases-popover-in 180ms cubic-bezier(0.2, 0.8, 0.2, 1);
+  animation: cases-popover-in var(--motion-ui) var(--motion-ease) both;
   background: rgba(248, 249, 255, 0.82);
   backdrop-filter: blur(26px) saturate(1.08);
   -webkit-backdrop-filter: blur(26px) saturate(1.08);
@@ -909,6 +970,11 @@ body.case-dialog-is-open {
   display: none;
 }
 
+.cases-popover.is-closing {
+  animation: cases-popover-out var(--motion-fast) var(--motion-exit-ease) both;
+  pointer-events: none;
+}
+
 .cases-popover ul {
   display: flex;
   flex-direction: column;
@@ -924,6 +990,10 @@ body.case-dialog-is-open {
   letter-spacing: -0.025em;
   line-height: 1;
   text-transform: uppercase;
+}
+
+@keyframes cases-popover-out {
+  to { opacity: 0; transform: translateY(-6px) scale(0.985); }
 }
 
 @keyframes cases-popover-in {
@@ -1118,7 +1188,6 @@ body.case-dialog-is-open {
   filter: saturate(1.06) brightness(1.018) contrast(1.02);
   pointer-events: none;
   transition: none;
-  will-change: left, top, opacity, transform;
 }
 
 .lens-node.is-active {
@@ -1204,12 +1273,8 @@ body.case-dialog-is-open {
   position: absolute;
   top: 50%;
   transform-origin: center;
-  transition:
-    box-shadow 180ms ease,
-    filter 180ms ease,
-    height 180ms ease,
-    opacity 180ms ease,
-    width 180ms ease;
+  /* Orbit positions and scale are interpolated together by the motion loop. */
+  transition: none;
   width: clamp(120px, 12vw, 154px);
 }
 
@@ -1229,7 +1294,6 @@ body.case-dialog-is-open {
   transform-origin: center;
   transition: none;
   width: clamp(36px, 3.6vw, 50px);
-  will-change: left, top, opacity, transform;
   z-index: 4;
 }
 
@@ -1479,7 +1543,7 @@ body.case-dialog-is-open {
 .spotlight.is-switching > p[data-case-copy],
 .spotlight.is-switching .spotlight-meta,
 .spotlight.is-switching .black-button {
-  animation: spotlight-content-page 420ms cubic-bezier(0.2, 0.86, 0.22, 1);
+  animation: spotlight-content-page var(--motion-panel) var(--motion-ease);
 }
 
 @keyframes spotlight-content-page {
@@ -1519,8 +1583,8 @@ body.case-dialog-is-open {
   min-height: 40px;
   padding: 0 16px;
   transition:
-    background 180ms ease,
-    transform 180ms ease;
+    background var(--motion-ui) var(--motion-ease),
+    transform var(--motion-ui) var(--motion-ease);
 }
 
 .black-button:hover,
@@ -1564,9 +1628,9 @@ body.case-dialog-is-open {
   height: 36px;
   justify-content: center;
   transition:
-    background 180ms ease,
-    color 180ms ease,
-    transform 180ms ease;
+    background var(--motion-ui) var(--motion-ease),
+    color var(--motion-ui) var(--motion-ease),
+    transform var(--motion-ui) var(--motion-ease);
   width: 36px;
 }
 
@@ -1715,7 +1779,7 @@ body.case-dialog-is-open {
   opacity: 0;
   pointer-events: none;
   position: absolute;
-  transition: opacity 200ms ease;
+  transition: opacity var(--motion-ui) var(--motion-ease);
   z-index: -1;
 }
 
@@ -1789,7 +1853,7 @@ body.case-dialog-is-open {
   box-shadow: 0 5px 12px rgba(67, 75, 130, 0.07);
   height: 42px;
   position: relative;
-  transition: transform 200ms ease, background 200ms ease;
+  transition: transform var(--motion-ui) var(--motion-ease), background var(--motion-ui) var(--motion-ease);
   width: 42px;
 }
 
@@ -1807,17 +1871,27 @@ body.case-dialog-is-open {
 
 .pricing-toggle::after {
   transform: rotate(90deg);
-  transition: transform 200ms ease;
+  transition: transform var(--motion-ui) var(--motion-ease);
 }
 
 .pricing-service[open] .pricing-toggle::after {
   transform: rotate(0deg);
 }
 
+.pricing-service.is-closing .pricing-toggle::after {
+  transform: rotate(90deg);
+}
+
+.pricing-service.is-closing::before {
+  opacity: 0;
+}
+
 .pricing-details {
   display: grid;
   gap: 24px 48px;
   grid-template-columns: minmax(0, 1fr);
+  min-height: 0;
+  overflow: hidden;
   padding: 0 80px 28px 12px;
 }
 
@@ -1907,7 +1981,7 @@ body.case-dialog-is-open {
   justify-content: center;
   min-height: 52px;
   padding: 14px 22px;
-  transition: background 180ms ease, transform 180ms ease;
+  transition: background var(--motion-ui) var(--motion-ease), transform var(--motion-ui) var(--motion-ease);
 }
 
 @media (hover: hover) and (pointer: fine) {
@@ -2110,7 +2184,7 @@ body.case-dialog-is-open {
   min-height: clamp(32px, 3.1vw, 44px);
   min-width: 0;
   padding: 8px 10px;
-  transition: background-color 180ms ease, border-color 180ms ease, transform 180ms ease;
+  transition: background-color var(--motion-ui) var(--motion-ease), border-color var(--motion-ui) var(--motion-ease), transform var(--motion-ui) var(--motion-ease);
   width: 100%;
 }
 
@@ -2233,9 +2307,7 @@ body.case-dialog-is-open {
   border-radius: 10px;
   min-width: 0;
   overflow: hidden;
-  transition:
-    box-shadow 220ms ease,
-    transform 220ms ease;
+  transition: transform var(--motion-panel) var(--motion-ease);
 }
 
 .case-card:hover {
@@ -2409,7 +2481,7 @@ body.case-dialog-is-open {
   padding: 0.02em 0.24em 0.04em;
   text-decoration: none;
   vertical-align: baseline;
-  transition: background 150ms ease, opacity 150ms ease;
+  transition: background var(--motion-fast) var(--motion-ease), opacity var(--motion-fast) var(--motion-ease);
 }
 
 .step-brief-link:hover {
@@ -2697,7 +2769,7 @@ body.case-dialog-is-open {
   height: clamp(136px, 14vw, 180px);
   place-items: center;
   transform: rotate(-8deg);
-  transition: transform 250ms ease;
+  transition: transform var(--motion-panel) var(--motion-ease);
   width: clamp(136px, 14vw, 180px);
 }
 
@@ -2784,7 +2856,7 @@ body.case-dialog-is-open {
   min-height: 66px;
   min-width: 0;
   padding: 7px 1px;
-  transition: background 180ms ease, transform 180ms ease;
+  transition: background var(--motion-ui) var(--motion-ease), transform var(--motion-ui) var(--motion-ease);
 }
 
 .skill-tool[aria-pressed="true"] {
@@ -3083,7 +3155,7 @@ body.case-dialog-is-open {
   text-decoration: underline;
   text-decoration-color: rgba(135, 148, 235, 0.36);
   text-underline-offset: 4px;
-  transition: color 180ms ease, text-decoration-color 180ms ease;
+  transition: color var(--motion-ui) var(--motion-ease), text-decoration-color var(--motion-ui) var(--motion-ease);
 }
 
 .site-footer a:hover,
@@ -3094,10 +3166,10 @@ body.case-dialog-is-open {
 
 .motion-ready .reveal {
   opacity: 0;
-  translate: 0 30px;
+  translate: 0 20px;
   transition:
-    opacity 700ms ease,
-    translate 800ms cubic-bezier(0.22, 1, 0.36, 1);
+    opacity var(--motion-reveal) var(--motion-ease),
+    translate var(--motion-reveal) var(--motion-ease);
   transition-delay: var(--reveal-delay, 0ms);
 }
 
@@ -3694,5 +3766,6 @@ body.case-dialog-is-open {
     animation-iteration-count: 1 !important;
     scroll-behavior: auto !important;
     transition-duration: 0.001ms !important;
+    transition-delay: 0ms !important;
   }
 }
