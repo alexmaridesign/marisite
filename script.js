@@ -310,19 +310,41 @@ let caseReaderAnchorTarget = null;
 let caseImageViewerReturnFocus = null;
 let activeCaseCover = null;
 const caseDialogCard = document.querySelector(".case-dialog-card");
+const caseDialogStack = document.querySelector(".case-dialog-stack");
 const caseDialogStackCards = Array.from(document.querySelectorAll(".case-dialog-stack-card"));
 let caseClosingPromise = null;
 let caseMotionSerial = 0;
 let caseSwitchSerial = 0;
-let pendingCaseIndex = null;
+let caseCardTransition = null;
 let caseViewerMotionSerial = 0;
 
 function clearCaseExitStyles() {
   [caseDialogCard, ...caseDialogStackCards].forEach((element) => {
     element?.style.removeProperty("--case-exit-opacity");
     element?.style.removeProperty("--case-exit-transform");
+    element?.style.removeProperty("opacity");
+    element?.style.removeProperty("transform");
   });
   caseDialog?.style.removeProperty("--case-backdrop-exit-opacity");
+  caseDialog?.style.removeProperty("--case-close-center-delay");
+  caseDialog?.style.removeProperty("--case-close-side-duration");
+}
+
+function clearCaseTransition(transition = caseCardTransition) {
+  if (!transition || caseCardTransition !== transition) return;
+  transition.elements.forEach((element) => runningUiAnimations.get(element)?.cancel());
+  transition.ghost?.remove();
+  caseCardTransition = null;
+  caseDialog.classList.remove("is-switching");
+  caseDialogCard.style.removeProperty("opacity");
+  caseDialogCard.style.removeProperty("transform");
+  caseDialogStackCards.forEach((element) => {
+    if (transition.closeRequested && caseDialog.open) element.style.opacity = "0";
+    else element.style.removeProperty("opacity");
+    element.style.removeProperty("transform");
+  });
+  caseDialogStack.inert = Boolean(caseClosingPromise);
+  caseDialogCard.inert = Boolean(caseClosingPromise);
 }
 
 function createCompanyNode(pair, index) {
@@ -698,6 +720,8 @@ function renderCaseDialog(index) {
   caseDialogNextTitle.textContent = nextPair.title;
   caseDialogPrevButton.setAttribute("aria-label", `Предыдущий кейс: ${previousPair.title}`);
   caseDialogNextButton.setAttribute("aria-label", `Следующий кейс: ${nextPair.title}`);
+  caseDialogStackCards[0].setAttribute("aria-label", `Открыть кейс: ${previousPair.title}`);
+  caseDialogStackCards[1].setAttribute("aria-label", `Открыть кейс: ${nextPair.title}`);
   cancelMotionScroll(caseReaderScroll);
   caseReaderScroll.scrollTo({ top: 0, behavior: "instant" });
   caseReaderAnchorTarget = null;
@@ -712,12 +736,15 @@ function openCaseDialog(opener) {
       caseClosingPromise = null;
       caseDialog.classList.remove("is-closing");
       caseDialogCard.inert = false;
+      caseDialogStack.inert = false;
       clearCaseExitStyles();
     }
     return;
   }
   ++caseMotionSerial;
   caseDialogCard.inert = false;
+  caseDialogStack.inert = false;
+  caseDialog.classList.remove("has-switched");
   caseDialog.classList.remove("is-closing");
   clearCaseExitStyles();
 
@@ -732,6 +759,7 @@ function openCaseDialog(opener) {
   document.documentElement.classList.add("case-dialog-is-open");
   document.body.classList.add("case-dialog-is-open");
   caseDialog.showModal();
+  caseDialogStack.inert = !reduceMotion && caseDialogStackCards.some((element) => element.offsetWidth > 0 && getComputedStyle(element).animationName.includes("-in"));
   orbitPicker.suspendRendering();
   cancelMotionScroll(caseReaderScroll);
   caseReaderScroll.scrollTo({ top: 0, behavior: "instant" });
@@ -743,53 +771,146 @@ function closeCaseDialog() {
   if (!caseDialog?.open) return Promise.resolve();
   if (caseClosingPromise) return caseClosingPromise;
   cancelMotionScroll(caseReaderScroll);
-  ++caseSwitchSerial;
-  pendingCaseIndex = null;
   const serial = ++caseMotionSerial;
-  if (reduceMotion) {
-    caseDialog.close();
-    return Promise.resolve();
-  }
-  const elements = [caseDialogCard, ...caseDialogStackCards];
-  const startStyles = elements.map((element) => {
-    const style = getComputedStyle(element);
-    return { opacity: style.opacity, transform: style.transform };
-  });
-  const backdropOpacity = getComputedStyle(caseDialog, "::backdrop").opacity;
-  elements.forEach((element, index) => {
-    element.style.setProperty("--case-exit-opacity", startStyles[index].opacity);
-    element.style.setProperty("--case-exit-transform", startStyles[index].transform);
-  });
-  caseDialog.style.setProperty("--case-backdrop-exit-opacity", backdropOpacity);
+  const transition = caseCardTransition;
+  if (transition) transition.closeRequested = true;
   caseDialogCard.inert = true;
-  caseDialog.classList.add("is-closing");
-  caseClosingPromise = waitForUiMotion([caseDialog, ...elements]).then(() => {
+  caseDialogStack.inert = true;
+  caseClosingPromise = (transition?.ready ?? Promise.resolve()).then(async () => {
+    if (serial !== caseMotionSerial || !caseDialog.open) return;
+    ++caseSwitchSerial;
+    if (reduceMotion) {
+      caseDialog.close();
+      return;
+    }
+    const elements = [caseDialogCard, ...caseDialogStackCards];
+    const startStyles = elements.map((element) => {
+      const style = getComputedStyle(element);
+      return { opacity: style.opacity, transform: style.transform, visible: element.offsetWidth > 0 };
+    });
+    const centerDelay = startStyles.slice(1).some((style) => style.visible && Number(style.opacity) > 0.01) ? 560 : 0;
+    const backdropOpacity = getComputedStyle(caseDialog, "::backdrop").opacity;
+    elements.forEach((element, index) => {
+      runningUiAnimations.get(element)?.cancel();
+      element.style.removeProperty("opacity");
+      element.style.removeProperty("transform");
+      element.style.setProperty("--case-exit-opacity", startStyles[index].opacity);
+      element.style.setProperty("--case-exit-transform", startStyles[index].transform);
+    });
+    caseDialog.style.setProperty("--case-backdrop-exit-opacity", backdropOpacity);
+    caseDialog.style.setProperty("--case-close-center-delay", `${centerDelay}ms`);
+    caseDialog.style.setProperty("--case-close-side-duration", centerDelay ? "520ms" : "0ms");
+    caseDialog.classList.add("is-closing");
+    await waitForUiMotion([caseDialog, ...elements], centerDelay + 450);
     if (serial === caseMotionSerial && caseDialog.open) caseDialog.close();
   });
   return caseClosingPromise;
 }
 
-async function stepCaseDialog(direction) {
-  if (!caseDialog?.open || caseDialog.classList.contains("is-closing")) return;
-  const nextIndex = normalizePairIndex((pendingCaseIndex ?? activeCaseDialogIndex) + direction);
-  pendingCaseIndex = nextIndex;
+function stepCaseDialog(direction) {
+  if (!caseDialog?.open || caseClosingPromise) return Promise.resolve();
+  if (caseCardTransition) return caseCardTransition.ready;
+  const nextIndex = normalizePairIndex(activeCaseDialogIndex + direction);
   const serial = ++caseSwitchSerial;
   caseDialogSelectionChanged = true;
-  const style = getComputedStyle(caseReaderScroll);
-  const outgoing = playUiMotion(caseReaderScroll, [
-    { opacity: style.opacity, transform: style.transform },
-    { opacity: 0, transform: "translateY(-6px)" },
-  ], { duration: 120 });
-  await (outgoing?.finished.catch(() => {}) ?? Promise.resolve());
-  if (serial !== caseSwitchSerial || !caseDialog.open || caseDialog.classList.contains("is-closing")) return;
-  renderCaseDialog(nextIndex);
-  pendingCaseIndex = null;
-  orbitPicker.select(nextIndex);
-  caseReaderHeading.focus({ preventScroll: true });
-  playUiMotion(caseReaderScroll, [
-    { opacity: 0, transform: "translateY(8px)" },
-    { opacity: 1, transform: "translateY(0)" },
-  ], { duration: 260 });
+  cancelMotionScroll(caseReaderScroll);
+  if (reduceMotion || !caseDialogCard.animate) {
+    caseDialog.classList.add("has-switched");
+    renderCaseDialog(nextIndex);
+    orbitPicker.select(nextIndex);
+    caseReaderHeading.focus({ preventScroll: true });
+    return Promise.resolve();
+  }
+
+  // Read the visible positions before disabling the filled entrance animations.
+  const source = caseDialogStackCards[direction < 0 ? 0 : 1];
+  const sourceRect = source.getBoundingClientRect();
+  const dialogRect = caseDialog.getBoundingClientRect();
+  const centerStyle = getComputedStyle(caseDialogCard);
+  const centerStart = { opacity: centerStyle.opacity, transform: centerStyle.transform };
+  const sideStarts = caseDialogStackCards.map((element) => {
+    const style = getComputedStyle(element);
+    return { opacity: style.opacity, transform: style.transform };
+  });
+  const target = { left: caseDialogCard.offsetLeft, top: caseDialogCard.offsetTop, width: caseDialogCard.offsetWidth, height: caseDialogCard.offsetHeight };
+  const hasSideCards = source.offsetWidth > 0 && source.offsetHeight > 0;
+  const transition = { elements: [caseDialogCard, ...caseDialogStackCards], ghost: null, closeRequested: false, ready: null };
+  caseCardTransition = transition;
+  caseDialog.classList.add("is-switching", "has-switched");
+  caseDialogCard.inert = true;
+  caseDialogStack.inert = true;
+  transition.elements.forEach((element) => runningUiAnimations.get(element)?.cancel());
+  caseDialogCard.style.opacity = "0";
+  caseDialogStackCards.forEach((element) => { element.style.opacity = "0"; });
+
+  transition.ready = (async () => {
+    try {
+      let promotion;
+      if (hasSideCards) {
+        const sourceStyle = sideStarts[direction < 0 ? 0 : 1];
+        const matrix = new DOMMatrix(sourceStyle.transform === "none" ? undefined : sourceStyle.transform);
+        matrix.e = 0;
+        matrix.f = 0;
+        const ghost = document.createElement("div");
+        ghost.className = "case-dialog-transition-card";
+        ghost.inert = true;
+        ghost.setAttribute("aria-hidden", "true");
+        [source.querySelector("img"), source.querySelector("span")].forEach((element) => {
+          const copy = element.cloneNode(true);
+          Array.from(copy.attributes).forEach((attribute) => {
+            if (attribute.name === "id" || attribute.name.startsWith("data-")) copy.removeAttribute(attribute.name);
+          });
+          ghost.append(copy);
+        });
+        Object.assign(ghost.style, { left: `${target.left}px`, top: `${target.top}px`, width: `${target.width}px`, height: `${target.height}px`, transform: "none" });
+        transition.ghost = ghost;
+        transition.elements.push(ghost, ...ghost.children);
+        caseDialog.append(ghost);
+        promotion = playUiMotion(ghost, [
+          { left: `${sourceRect.left + sourceRect.width / 2 - dialogRect.left - source.offsetWidth / 2}px`, top: `${sourceRect.top + sourceRect.height / 2 - dialogRect.top - source.offsetHeight / 2}px`, width: `${source.offsetWidth}px`, height: `${source.offsetHeight}px`, transform: matrix.toString(), opacity: sourceStyle.opacity },
+          { left: `${target.left}px`, top: `${target.top}px`, width: `${target.width}px`, height: `${target.height}px`, transform: "none", opacity: 1 },
+        ], { duration: 540 });
+        Array.from(ghost.children).forEach((element) => {
+          const opacity = getComputedStyle(element).opacity;
+          element.style.opacity = "0";
+          playUiMotion(element, [{ opacity }, { opacity: 0 }], { duration: 300 });
+        });
+      }
+      const outgoing = playUiMotion(caseDialogCard, [
+        centerStart,
+        { opacity: 0, transform: `translateX(${-direction * (hasSideCards ? 130 : 24)}px) rotate(${-direction * (hasSideCards ? 2 : 0)}deg) scale(0.97)` },
+      ], { duration: hasSideCards ? 420 : 160 });
+      caseDialogStackCards.forEach((element, index) => {
+        if (element === source) return;
+        playUiMotion(element, [sideStarts[index], { opacity: 0, transform: `translateX(${index === 0 ? 80 : -80}px) rotate(${index === 0 ? -3 : 3}deg) scale(0.94)` }], { duration: 360 });
+      });
+      await ((promotion ?? outgoing)?.finished.catch(() => {}) ?? Promise.resolve());
+      if (serial !== caseSwitchSerial || !caseDialog.open) return;
+      renderCaseDialog(nextIndex);
+      orbitPicker.select(nextIndex);
+      const incoming = playUiMotion(caseDialogCard, [
+        { opacity: 0, transform: `translateX(${hasSideCards ? 0 : direction * 24}px) scale(0.99)` },
+        { opacity: 1, transform: "none" },
+      ], { duration: 260 });
+      if (transition.ghost) {
+        transition.ghost.style.opacity = "0";
+        playUiMotion(transition.ghost, [{ opacity: 1 }, { opacity: 0 }], { duration: 260 });
+      }
+      await (incoming?.finished.catch(() => {}) ?? Promise.resolve());
+      if (serial !== caseSwitchSerial || !caseDialog.open) return;
+      clearCaseTransition(transition);
+      if (!transition.closeRequested) {
+        caseDialogStackCards.forEach((element, index) => playUiMotion(element, [
+          { opacity: 0, transform: `translateX(${index === 0 ? 80 : -80}px) rotate(${index === 0 ? -3 : 3}deg) scale(0.94)` },
+          { opacity: 1, transform: `rotate(${index === 0 ? -5 : 5}deg) scale(0.94)` },
+        ], { duration: 650 }));
+        caseReaderHeading.focus({ preventScroll: true });
+      }
+    } finally {
+      clearCaseTransition(transition);
+    }
+  })();
+  return transition.ready;
 }
 
 class LiquidGlassLens {
@@ -1512,6 +1633,7 @@ motionPreference.addEventListener("change", () => {
   cancelAllMotionScrolls();
   orbitPicker.autoSpeed = reduceMotion ? 0 : 0.00115;
   if (reduceMotion) {
+    if (caseDialog?.open && !caseClosingPromise && !caseCardTransition) caseDialogStack.inert = false;
     orbitPicker.cancelGesture();
     const index = orbitPicker.targetAngle !== null ? orbitPicker.selectedIndex : orbitPicker.nearestIndex();
     orbitPicker.angle = nearestEquivalentAngle(orbitPicker.angleForIndex(index), orbitPicker.angle);
@@ -1584,6 +1706,12 @@ if (caseDialogOpenButton && caseDialog && caseDialogCloseButton) {
   caseDialogCloseButton.addEventListener("click", closeCaseDialog);
   caseDialogPrevButton?.addEventListener("click", () => stepCaseDialog(-1));
   caseDialogNextButton?.addEventListener("click", () => stepCaseDialog(1));
+  caseDialogStackCards.forEach((button) => button.addEventListener("click", () => stepCaseDialog(Number(button.dataset.caseStackDirection))));
+  caseDialogStack.addEventListener("animationstart", (event) => {
+    if (event.animationName.startsWith("case-stack-") && event.animationName.endsWith("-in") && !caseClosingPromise && !caseCardTransition) {
+      caseDialogStack.inert = false;
+    }
+  });
   caseReaderCover?.addEventListener("click", () => openCaseImageViewer(activeCaseCover, caseReaderCover));
   caseImageViewerBack?.addEventListener("click", () => closeCaseImageViewer());
   caseImageViewerImage?.addEventListener("load", () => {
@@ -1657,10 +1785,12 @@ if (caseDialogOpenButton && caseDialog && caseDialogCloseButton) {
   caseDialog.addEventListener("close", () => {
     ++caseMotionSerial;
     ++caseSwitchSerial;
-    pendingCaseIndex = null;
     caseClosingPromise = null;
+    clearCaseTransition();
     caseDialog.classList.remove("is-closing");
+    caseDialog.classList.remove("has-switched");
     caseDialogCard.inert = false;
+    caseDialogStack.inert = false;
     clearCaseExitStyles();
     closeCaseImageViewer({ returnFocus: false, immediate: true });
     if (caseReaderScrollFrame) cancelAnimationFrame(caseReaderScrollFrame);

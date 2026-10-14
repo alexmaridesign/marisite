@@ -168,12 +168,38 @@ body.case-dialog-is-open {
   height: 100%;
   overflow: hidden;
   padding: 20px;
+  pointer-events: auto;
   position: absolute;
   top: 0;
   width: 300px;
+  cursor: pointer;
 }
 
-.case-dialog-stack-card img {
+.case-dialog-stack-card:focus-visible {
+  outline: 3px solid rgba(98, 109, 170, 0.6);
+  outline-offset: 3px;
+}
+
+.case-dialog-transition-card {
+  contain: layout paint;
+  background: rgba(248, 248, 255, 0.98);
+  border: 1px solid rgba(255, 255, 255, 0.96);
+  border-radius: 34px;
+  box-shadow:
+    0 30px 90px rgba(67, 75, 130, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.96);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  overflow: hidden;
+  padding: 20px;
+  pointer-events: none;
+  position: absolute;
+  z-index: 3;
+}
+
+.case-dialog-stack-card img,
+.case-dialog-transition-card img {
   border-radius: 24px;
   height: calc(100% - 44px);
   object-fit: cover;
@@ -181,7 +207,8 @@ body.case-dialog-is-open {
   width: 100%;
 }
 
-.case-dialog-stack-card span {
+.case-dialog-stack-card span,
+.case-dialog-transition-card span {
   color: var(--reader-violet);
   font-family: "Dela Gothic One", Inter, sans-serif;
   font-size: 18px;
@@ -689,15 +716,15 @@ body.case-dialog-is-open {
 }
 
 @media (prefers-reduced-motion: no-preference) {
-  .case-dialog[open]:not(.is-closing) .case-dialog-card {
+  .case-dialog[open]:not(.is-closing):not(.has-switched) .case-dialog-card {
     animation: case-reader-in var(--motion-panel) var(--motion-ease) both;
   }
 
-  .case-dialog[open]:not(.is-closing) .case-dialog-stack-card--previous {
+  .case-dialog[open]:not(.is-closing):not(.has-switched) .case-dialog-stack-card--previous {
     animation: case-stack-previous-in 800ms var(--motion-ease) calc(var(--motion-panel) + 60ms) both;
   }
 
-  .case-dialog[open]:not(.is-closing) .case-dialog-stack-card--next {
+  .case-dialog[open]:not(.is-closing):not(.has-switched) .case-dialog-stack-card--next {
     animation: case-stack-next-in 800ms var(--motion-ease) calc(var(--motion-panel) + 60ms) both;
   }
 
@@ -706,20 +733,32 @@ body.case-dialog-is-open {
   }
 
   .case-dialog.is-closing .case-dialog-card {
-    animation: case-reader-out var(--motion-ui) var(--motion-exit-ease) 40ms both;
+    animation: case-reader-out 360ms var(--motion-ease) var(--case-close-center-delay, 560ms) both;
   }
 
   .case-dialog.is-closing .case-dialog-stack-card--previous {
-    animation: case-stack-previous-out var(--motion-fast) var(--motion-exit-ease) both;
+    animation: case-stack-previous-out var(--case-close-side-duration, 520ms) var(--motion-ease) both;
   }
 
   .case-dialog.is-closing .case-dialog-stack-card--next {
-    animation: case-stack-next-out var(--motion-fast) var(--motion-exit-ease) both;
+    animation: case-stack-next-out var(--case-close-side-duration, 520ms) var(--motion-ease) both;
   }
 
   .case-dialog.is-closing::backdrop {
-    animation: case-dialog-backdrop-out 260ms var(--motion-exit-ease) both;
+    animation: case-dialog-backdrop-out 360ms var(--motion-ease) var(--case-close-center-delay, 560ms) both;
   }
+}
+
+/* Switching is driven from the visible positions by Web Animations. */
+.case-dialog[open].is-switching .case-dialog-card,
+.case-dialog[open].is-switching .case-dialog-stack-card {
+  animation: none;
+}
+
+.case-dialog.is-switching .case-dialog-stack,
+.case-dialog.is-switching .case-dialog-stack-card,
+.case-dialog.is-closing .case-dialog-stack-card {
+  pointer-events: none;
 }
 
 @keyframes case-reader-in {

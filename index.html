@@ -34,7 +34,7 @@
       href="https://fonts.googleapis.com/css2?family=Dela+Gothic+One&family=Inter:wght@400;500;600;700;800;900&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="./styles.css?v=20261014-04" />
+    <link rel="stylesheet" href="./styles.css?v=20261014-05" />
   </head>
   <body>
     <svg class="liquid-filter-defs" aria-hidden="true" focusable="false">
@@ -692,16 +692,16 @@
       aria-describedby="case-dialog-copy"
       data-case-dialog
     >
-      <div class="case-dialog-stack" aria-hidden="true">
-        <div class="case-dialog-stack-card case-dialog-stack-card--previous">
+      <nav class="case-dialog-stack" aria-label="Соседние кейсы">
+        <button class="case-dialog-stack-card case-dialog-stack-card--previous" type="button" data-case-stack-direction="-1" aria-label="Открыть кейс: Vera">
           <img src="./assets/case-cult.png" alt="" data-case-stack-previous-image />
           <span data-case-stack-previous-title>Vera</span>
-        </div>
-        <div class="case-dialog-stack-card case-dialog-stack-card--next">
+        </button>
+        <button class="case-dialog-stack-card case-dialog-stack-card--next" type="button" data-case-stack-direction="1" aria-label="Открыть кейс: Mirai">
           <img src="./assets/company-mirai.png" alt="" data-case-stack-next-image />
           <span data-case-stack-next-title>Mirai</span>
-        </div>
-      </div>
+        </button>
+      </nav>
       <article class="case-dialog-card">
         <div class="case-reader-surface" data-case-reader-surface>
           <header class="case-dialog-topbar">
@@ -798,6 +798,6 @@
       </article>
     </dialog>
 
-    <script src="./script.js?v=20261014-03"></script>
+    <script src="./script.js?v=20261014-05"></script>
   </body>
 </html>
