@@ -181,11 +181,33 @@ const caseDialogPrevButton = document.querySelector("[data-case-dialog-prev]");
 const caseDialogNextButton = document.querySelector("[data-case-dialog-next]");
 const caseDialogPrevTitle = document.querySelector("[data-case-dialog-prev-title]");
 const caseDialogNextTitle = document.querySelector("[data-case-dialog-next-title]");
+const caseReaderSurface = document.querySelector("[data-case-reader-surface]");
+const caseReaderScroll = document.querySelector("[data-case-reader-scroll]");
+const caseReaderHeading = document.querySelector("[data-case-reader-heading]");
+const caseReaderCover = document.querySelector("[data-case-reader-cover]");
+const caseReaderTask = document.querySelector("[data-case-reader-task]");
+const caseReaderStages = document.querySelector("[data-case-reader-stages]");
+const caseReaderResult = document.querySelector("[data-case-reader-result]");
+const caseReaderGallery = document.querySelector("[data-case-reader-gallery]");
+const caseReaderSections = Array.from(document.querySelectorAll("[data-case-section]"));
+const caseReaderSectionLinks = Array.from(document.querySelectorAll("[data-case-section-link]"));
+const caseStackPreviousImage = document.querySelector("[data-case-stack-previous-image]");
+const caseStackNextImage = document.querySelector("[data-case-stack-next-image]");
+const caseStackPreviousTitle = document.querySelector("[data-case-stack-previous-title]");
+const caseStackNextTitle = document.querySelector("[data-case-stack-next-title]");
+const caseImageViewer = document.querySelector("[data-case-image-viewer]");
+const caseImageViewerBack = document.querySelector("[data-case-image-viewer-back]");
+const caseImageViewerImage = document.querySelector("[data-case-image-viewer-image]");
+const caseImageViewerCaption = document.querySelector("[data-case-image-viewer-caption]");
 let renderedPairIndex = -1;
 let activeCaseDialogIndex = 0;
 let caseDialogReturnFocus = null;
 let caseDialogAutoWasPaused = false;
 let caseDialogSelectionChanged = false;
+let caseReaderScrollFrame = 0;
+let caseReaderAnchorTarget = null;
+let caseImageViewerReturnFocus = null;
+let activeCaseCover = null;
 
 function createCompanyNode(pair, index) {
   const button = document.createElement("button");
@@ -321,37 +343,221 @@ function normalizePairIndex(index) {
   return (index + pairs.length) % pairs.length;
 }
 
+// Add approved case content in pair.story without changing the reader layout:
+// { about: [paragraph], task: { paragraphs: [], items: [] },
+//   stages: [{ title, paragraphs: [], media: [{ src, alt, caption }] }],
+//   result: { paragraphs: [], media: [{ src, alt, caption }] }, cover: { src, alt } }.
+// Existing copy and artwork remain the fallback; missing process details stay explicit.
+function getCaseStory(pair) {
+  const story = pair.story ?? {};
+  const artwork = pair.caseImage ?? pair.image;
+  const logo = pair.companyImage;
+  const existingMedia = [];
+  if (artwork) existingMedia.push({ src: artwork, alt: `Визуал кейса ${pair.title}` });
+  if (logo && logo !== artwork) existingMedia.push({ src: logo, alt: `Визуал бренда ${pair.company}` });
+
+  return {
+    about: Array.isArray(story.about) && story.about.length ? story.about : [pair.copy],
+    task: story.task ?? {},
+    stages: Array.isArray(story.stages) ? story.stages : [],
+    result: story.result ?? {},
+    media: Array.isArray(story.result?.media) ? story.result.media : existingMedia,
+    cover: story.cover ?? existingMedia[0] ?? null,
+    logoOnly: !artwork && Boolean(logo) && !story.cover,
+  };
+}
+
+function appendCaseParagraphs(container, paragraphs, emptyText = "") {
+  const validParagraphs = Array.isArray(paragraphs)
+    ? paragraphs.filter((paragraph) => typeof paragraph === "string" && paragraph.trim())
+    : [];
+  validParagraphs.forEach((text) => {
+    const paragraph = document.createElement("p");
+    paragraph.className = "case-reader-paragraph";
+    paragraph.textContent = text;
+    container.append(paragraph);
+  });
+  if (!validParagraphs.length && emptyText) {
+    const paragraph = document.createElement("p");
+    paragraph.className = "case-reader-empty";
+    paragraph.textContent = emptyText;
+    container.append(paragraph);
+  }
+}
+
+function setCaseImage(image, media) {
+  image.hidden = !media?.src;
+  if (!media?.src) {
+    image.removeAttribute("src");
+    image.alt = "";
+    return;
+  }
+  image.src = media.src;
+  image.alt = media.alt ?? "Материал проекта";
+  image.dataset.caseDialogCrop = media.crop ?? caseDialogImageCrop.get(media.src) ?? "none";
+}
+
+function appendCaseMedia(container, mediaItems) {
+  if (!Array.isArray(mediaItems)) return;
+  mediaItems.forEach((media) => {
+    if (!media?.src) return;
+    const figure = document.createElement("figure");
+    figure.className = "case-reader-media";
+    const button = document.createElement("button");
+    button.className = "case-reader-image-button";
+    button.type = "button";
+    button.setAttribute("aria-label", `Увеличить: ${media.alt ?? "материал проекта"}`);
+    const image = document.createElement("img");
+    image.loading = "lazy";
+    image.decoding = "async";
+    setCaseImage(image, media);
+    button.append(image);
+    button.addEventListener("click", () => openCaseImageViewer(media, button));
+    figure.append(button);
+    if (media.caption) {
+      const caption = document.createElement("figcaption");
+      caption.textContent = media.caption;
+      figure.append(caption);
+    }
+    container.append(figure);
+  });
+}
+
+function setActiveCaseSection(sectionName) {
+  caseReaderSectionLinks.forEach((link) => {
+    const isActive = link.dataset.caseSectionLink === sectionName;
+    link.classList.toggle("is-active", isActive);
+    if (isActive) link.setAttribute("aria-current", "location");
+    else link.removeAttribute("aria-current");
+  });
+}
+
+function updateActiveCaseSection() {
+  if (!caseDialog?.open || !caseReaderScroll || !caseReaderSections.length) return;
+  if (caseReaderAnchorTarget) {
+    setActiveCaseSection(caseReaderAnchorTarget);
+    return;
+  }
+  const threshold = caseReaderScroll.getBoundingClientRect().top + Math.min(140, caseReaderScroll.clientHeight * 0.28);
+  let currentSection = caseReaderSections[0];
+  caseReaderSections.forEach((section) => {
+    if (section.getBoundingClientRect().top <= threshold) currentSection = section;
+  });
+  if (caseReaderScroll.scrollTop + caseReaderScroll.clientHeight >= caseReaderScroll.scrollHeight - 2) {
+    currentSection = caseReaderSections[caseReaderSections.length - 1];
+  }
+  setActiveCaseSection(currentSection.dataset.caseSection);
+}
+
+function closeCaseImageViewer({ returnFocus = true } = {}) {
+  if (!caseImageViewer || caseImageViewer.hidden) return;
+  caseImageViewer.hidden = true;
+  caseDialog.classList.remove("is-viewing-image");
+  caseReaderSurface.inert = false;
+  caseReaderSurface.removeAttribute("aria-hidden");
+  caseImageViewerImage.removeAttribute("src");
+  if (returnFocus && caseImageViewerReturnFocus?.isConnected) {
+    caseImageViewerReturnFocus.focus({ preventScroll: true });
+  }
+  caseImageViewerReturnFocus = null;
+}
+
+function openCaseImageViewer(media, opener) {
+  if (!caseDialog?.open || !media?.src || !caseImageViewer) return;
+  caseImageViewerReturnFocus = opener;
+  caseImageViewerImage.src = media.src;
+  caseImageViewerImage.alt = media.alt ?? "Материал проекта";
+  caseImageViewerCaption.textContent = media.caption ?? media.alt ?? "";
+  caseImageViewer.hidden = false;
+  caseImageViewer.querySelector(".case-image-viewer-frame").scrollTo({ top: 0, left: 0, behavior: "instant" });
+  caseDialog.classList.add("is-viewing-image");
+  caseReaderSurface.inert = true;
+  caseReaderSurface.setAttribute("aria-hidden", "true");
+  caseImageViewerBack.focus({ preventScroll: true });
+}
+
 function renderCaseDialog(index) {
   const normalizedIndex = normalizePairIndex(index);
   const pair = pairs[normalizedIndex];
   const previousPair = pairs[normalizePairIndex(normalizedIndex - 1)];
   const nextPair = pairs[normalizePairIndex(normalizedIndex + 1)];
   const companyImage = pair.companyImage ?? pair.image;
-  const caseImage = pair.caseImage ?? pair.image;
+  const story = getCaseStory(pair);
 
+  closeCaseImageViewer({ returnFocus: false });
   activeCaseDialogIndex = normalizedIndex;
   caseDialogTitle.textContent = pair.title;
+  caseReaderHeading.textContent = pair.title;
   caseDialogKind.textContent = pair.label;
-  caseDialogCopy.textContent = pair.copy;
+  caseDialogCopy.replaceChildren();
+  appendCaseParagraphs(caseDialogCopy, story.about);
   caseDialogCompany.textContent = pair.company;
   caseDialogType.textContent = pair.type;
   caseDialogCount.textContent = pair.count;
   caseDialogCounter.textContent = `${String(normalizedIndex + 1).padStart(2, "0")} / ${String(pairs.length).padStart(2, "0")}`;
-  caseDialogCompanyImage.src = companyImage;
-  caseDialogCompanyImage.alt = `Визуал бренда ${pair.company}`;
-  caseDialogCompanyImage.dataset.caseDialogCrop = caseDialogImageCrop.get(companyImage) ?? "none";
-  caseDialogCaseImage.parentElement.hidden = !caseImage;
-  if (caseImage) {
-    caseDialogCaseImage.src = caseImage;
-    caseDialogCaseImage.alt = `Визуал кейса ${pair.title}`;
-    caseDialogCaseImage.dataset.caseDialogCrop = caseDialogImageCrop.get(caseImage) ?? "none";
-  } else {
-    caseDialogCaseImage.removeAttribute("src");
+  setCaseImage(caseDialogCompanyImage, companyImage ? { src: companyImage, alt: "" } : null);
+  activeCaseCover = story.cover;
+  caseReaderCover.hidden = !activeCaseCover?.src;
+  caseReaderCover.classList.toggle("case-reader-cover--logo", story.logoOnly);
+  caseReaderCover.setAttribute("aria-label", `Увеличить: ${activeCaseCover?.alt ?? pair.title}`);
+  setCaseImage(caseDialogCaseImage, activeCaseCover);
+
+  caseReaderTask.replaceChildren();
+  const taskItems = Array.isArray(story.task.items)
+    ? story.task.items.filter((item) => typeof item === "string" && item.trim())
+    : [];
+  appendCaseParagraphs(caseReaderTask, story.task.paragraphs, taskItems.length ? "" : "Подробная задача пока не добавлена.");
+  if (taskItems.length) {
+    const list = document.createElement("ul");
+    list.className = "case-reader-task-list";
+    taskItems.forEach((text) => {
+      const item = document.createElement("li");
+      item.textContent = text;
+      list.append(item);
+    });
+    caseReaderTask.append(list);
   }
+
+  caseReaderStages.replaceChildren();
+  story.stages.forEach((stage, stageIndex) => {
+    const article = document.createElement("article");
+    article.className = "case-reader-step";
+    const number = document.createElement("span");
+    number.className = "case-reader-step-number";
+    number.textContent = String(stageIndex + 1).padStart(2, "0");
+    const title = document.createElement("h4");
+    title.textContent = stage.title ?? `Этап ${stageIndex + 1}`;
+    const prose = document.createElement("div");
+    prose.className = "case-reader-prose";
+    appendCaseParagraphs(prose, stage.paragraphs);
+    article.append(number, title, prose);
+    const gallery = document.createElement("div");
+    gallery.className = "case-reader-gallery";
+    appendCaseMedia(gallery, stage.media);
+    if (gallery.childElementCount) article.append(gallery);
+    caseReaderStages.append(article);
+  });
+  if (!story.stages.length) appendCaseParagraphs(caseReaderStages, [], "Описание этапов работы пока не добавлено.");
+
+  caseReaderResult.replaceChildren();
+  appendCaseParagraphs(caseReaderResult, story.result.paragraphs);
+  caseReaderGallery.replaceChildren();
+  appendCaseMedia(caseReaderGallery, story.media);
+  if (!caseReaderGallery.childElementCount && !caseReaderResult.childElementCount) {
+    appendCaseParagraphs(caseReaderResult, [], "Материалы проекта пока не добавлены.");
+  }
+
+  setCaseImage(caseStackPreviousImage, { src: previousPair.caseImage ?? previousPair.image ?? previousPair.companyImage, alt: "" });
+  setCaseImage(caseStackNextImage, { src: nextPair.caseImage ?? nextPair.image ?? nextPair.companyImage, alt: "" });
+  caseStackPreviousTitle.textContent = previousPair.title;
+  caseStackNextTitle.textContent = nextPair.title;
   caseDialogPrevTitle.textContent = previousPair.title;
   caseDialogNextTitle.textContent = nextPair.title;
   caseDialogPrevButton.setAttribute("aria-label", `Предыдущий кейс: ${previousPair.title}`);
   caseDialogNextButton.setAttribute("aria-label", `Следующий кейс: ${nextPair.title}`);
+  caseReaderScroll.scrollTo({ top: 0, behavior: "instant" });
+  caseReaderAnchorTarget = null;
+  setActiveCaseSection("about");
 }
 
 function openCaseDialog(opener) {
@@ -368,6 +574,8 @@ function openCaseDialog(opener) {
   document.documentElement.classList.add("case-dialog-is-open");
   document.body.classList.add("case-dialog-is-open");
   caseDialog.showModal();
+  caseReaderScroll.scrollTo({ top: 0, behavior: "instant" });
+  setActiveCaseSection("about");
   requestAnimationFrame(() => caseDialogCloseButton?.focus({ preventScroll: true }));
 }
 
@@ -380,6 +588,7 @@ function stepCaseDialog(direction) {
   caseDialogSelectionChanged = true;
   renderCaseDialog(nextIndex);
   orbitPicker.select(nextIndex);
+  caseReaderHeading.focus({ preventScroll: true });
 }
 
 class LiquidGlassLens {
@@ -1081,6 +1290,56 @@ if (caseDialogOpenButton && caseDialog && caseDialogCloseButton) {
   caseDialogCloseButton.addEventListener("click", closeCaseDialog);
   caseDialogPrevButton?.addEventListener("click", () => stepCaseDialog(-1));
   caseDialogNextButton?.addEventListener("click", () => stepCaseDialog(1));
+  caseReaderCover?.addEventListener("click", () => openCaseImageViewer(activeCaseCover, caseReaderCover));
+  caseImageViewerBack?.addEventListener("click", () => closeCaseImageViewer());
+  caseImageViewerImage?.addEventListener("load", () => {
+    const width = Math.min(900, Math.max(320, caseImageViewerImage.naturalWidth));
+    caseImageViewerImage.style.setProperty("--case-image-width", `${width}px`);
+  });
+
+  caseReaderSectionLinks.forEach((link) => {
+    link.addEventListener("click", (event) => {
+      event.preventDefault();
+      const section = caseReaderSections.find((item) => item.dataset.caseSection === link.dataset.caseSectionLink);
+      if (!section || !caseReaderScroll) return;
+      const top = section.getBoundingClientRect().top - caseReaderSections[0].getBoundingClientRect().top;
+      caseReaderAnchorTarget = section.dataset.caseSection;
+      setActiveCaseSection(section.dataset.caseSection);
+      caseReaderScroll.scrollTo({ top, behavior: reduceMotion ? "instant" : "smooth" });
+      section.focus({ preventScroll: true });
+    });
+  });
+
+  const queueCaseSectionUpdate = () => {
+    if (caseReaderScrollFrame) return;
+    caseReaderScrollFrame = requestAnimationFrame(() => {
+      caseReaderScrollFrame = 0;
+      updateActiveCaseSection();
+    });
+  };
+  caseReaderScroll?.addEventListener("scroll", queueCaseSectionUpdate, { passive: true });
+  const releaseCaseAnchor = () => {
+    caseReaderAnchorTarget = null;
+    queueCaseSectionUpdate();
+  };
+  caseReaderScroll?.addEventListener("wheel", releaseCaseAnchor, { passive: true });
+  caseReaderScroll?.addEventListener("touchstart", releaseCaseAnchor, { passive: true });
+  caseReaderScroll?.addEventListener("pointerdown", (event) => {
+    if (event.target === caseReaderScroll) releaseCaseAnchor();
+  });
+  caseReaderScroll?.addEventListener("keydown", (event) => {
+    if (["ArrowUp", "ArrowDown", "PageUp", "PageDown", "Home", "End", " ", "Tab"].includes(event.key)) releaseCaseAnchor();
+  });
+  window.addEventListener("resize", () => {
+    if (caseDialog.open && caseReaderAnchorTarget) {
+      const section = caseReaderSections.find((item) => item.dataset.caseSection === caseReaderAnchorTarget);
+      if (section) {
+        const top = section.getBoundingClientRect().top - caseReaderSections[0].getBoundingClientRect().top;
+        caseReaderScroll.scrollTo({ top, behavior: "instant" });
+      }
+    }
+    queueCaseSectionUpdate();
+  });
 
   caseDialog.addEventListener("click", (event) => {
     if (event.target === caseDialog) closeCaseDialog();
@@ -1089,11 +1348,21 @@ if (caseDialogOpenButton && caseDialog && caseDialogCloseButton) {
   caseDialog.addEventListener("keydown", (event) => {
     if (event.key === "Escape") {
       event.preventDefault();
-      closeCaseDialog();
+      if (!caseImageViewer.hidden) closeCaseImageViewer();
+      else closeCaseDialog();
     }
   });
 
+  caseDialog.addEventListener("cancel", (event) => {
+    event.preventDefault();
+    if (!caseImageViewer.hidden) closeCaseImageViewer();
+    else closeCaseDialog();
+  });
+
   caseDialog.addEventListener("close", () => {
+    closeCaseImageViewer({ returnFocus: false });
+    if (caseReaderScrollFrame) cancelAnimationFrame(caseReaderScrollFrame);
+    caseReaderScrollFrame = 0;
     document.documentElement.classList.remove("case-dialog-is-open");
     document.body.classList.remove("case-dialog-is-open");
     document.body.style.removeProperty("--case-dialog-scrollbar-gap");

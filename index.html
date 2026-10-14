@@ -34,7 +34,7 @@
       href="https://fonts.googleapis.com/css2?family=Dela+Gothic+One&family=Inter:wght@400;500;600;700;800;900&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="./styles.css?v=20261012-04" />
+    <link rel="stylesheet" href="./styles.css?v=20261014-02" />
   </head>
   <body>
     <svg class="liquid-filter-defs" aria-hidden="true" focusable="false">
@@ -692,93 +692,112 @@
       aria-describedby="case-dialog-copy"
       data-case-dialog
     >
+      <div class="case-dialog-stack" aria-hidden="true">
+        <div class="case-dialog-stack-card case-dialog-stack-card--previous">
+          <img src="./assets/case-cult.png" alt="" data-case-stack-previous-image />
+          <span data-case-stack-previous-title>Vera</span>
+        </div>
+        <div class="case-dialog-stack-card case-dialog-stack-card--next">
+          <img src="./assets/company-mirai.png" alt="" data-case-stack-next-image />
+          <span data-case-stack-next-title>Mirai</span>
+        </div>
+      </div>
       <article class="case-dialog-card">
-        <button
-          class="case-dialog-close"
-          type="button"
-          aria-label="Закрыть кейс"
-          data-case-dialog-close
-        >
-          <svg viewBox="0 0 24 24" aria-hidden="true">
-            <path d="m6 6 12 12M18 6 6 18" />
-          </svg>
-        </button>
-
-        <div class="case-dialog-stage">
-          <span class="case-dialog-counter" data-case-dialog-counter>01 / 10</span>
-          <span class="case-dialog-orbit" aria-hidden="true"></span>
-          <span class="case-dialog-lens" aria-hidden="true"></span>
-          <span class="case-dialog-object case-dialog-object--company">
-            <img
-              class="case-dialog-object-image"
-              src="./assets/company-meren-coffee.png"
-              alt="Визуал бренда МеренКофе"
-              data-case-dialog-company-image
-            />
-          </span>
-          <span class="case-dialog-object case-dialog-object--case">
-            <img
-              class="case-dialog-object-image"
-              src="./assets/case-meren-coffee.png"
-              alt="Визуал кейса МеренКофе"
-              data-case-dialog-case-image
-            />
-          </span>
-        </div>
-
-        <div class="case-dialog-details">
-          <div class="case-dialog-intro">
-            <p class="case-dialog-label">выбранный кейс</p>
-            <h2 id="case-dialog-title" data-case-dialog-title>МеренКофе</h2>
-            <p class="case-dialog-kind" data-case-dialog-kind>кофейный бренд</p>
-            <p id="case-dialog-copy" class="case-dialog-copy" data-case-dialog-copy>
-              Я&nbsp;собираю знак, упаковку, визуалы и&nbsp;правила кампании.
-            </p>
-          </div>
-
-          <dl class="case-dialog-meta">
-            <div>
-              <dt>Компания</dt>
-              <dd data-case-dialog-company>МеренКофе</dd>
+        <div class="case-reader-surface" data-case-reader-surface>
+          <header class="case-dialog-topbar">
+            <div class="case-dialog-brand">
+              <img src="./assets/company-meren-coffee.png" alt="" data-case-dialog-company-image />
+              <span id="case-dialog-title" data-case-dialog-title>МеренКофе</span>
             </div>
-            <div>
-              <dt>Направление</dt>
-              <dd data-case-dialog-type>айдентика / упаковка</dd>
-            </div>
-            <div>
-              <dt>Объём</dt>
-              <dd data-case-dialog-count>24 материала</dd>
-            </div>
-          </dl>
-
-          <nav class="case-dialog-navigation" aria-label="Другие кейсы">
-            <button class="case-dialog-nav-button" type="button" data-case-dialog-prev>
-              <svg viewBox="0 0 24 24" aria-hidden="true">
-                <path d="m15 18-6-6 6-6" />
-              </svg>
-              <span>
-                <small>Предыдущий</small>
-                <strong data-case-dialog-prev-title>Vera</strong>
-              </span>
-            </button>
+            <span class="case-dialog-counter" data-case-dialog-counter>01 / 10</span>
             <button
-              class="case-dialog-nav-button case-dialog-nav-button--next"
+              class="case-dialog-close"
               type="button"
-              data-case-dialog-next
+              aria-label="Закрыть кейс"
+              data-case-dialog-close
             >
-              <span>
-                <small>Следующий</small>
-                <strong data-case-dialog-next-title>Noire</strong>
-              </span>
               <svg viewBox="0 0 24 24" aria-hidden="true">
-                <path d="m9 18 6-6-6-6" />
+                <path d="m6 6 12 12M18 6 6 18" />
               </svg>
             </button>
-          </nav>
+          </header>
+
+          <div class="case-reader-layout">
+            <aside class="case-reader-sidebar">
+              <nav class="case-reader-contents" aria-label="Содержание кейса">
+                <a href="#case-section-about" class="is-active" aria-current="location" data-case-section-link="about">О проекте</a>
+                <a href="#case-section-task" data-case-section-link="task">Задача</a>
+                <a href="#case-section-stages" data-case-section-link="stages">Этапы работы</a>
+                <a href="#case-section-result" data-case-section-link="result">Результат</a>
+              </nav>
+            </aside>
+
+            <div class="case-reader-main" data-case-reader-scroll tabindex="0" role="region" aria-label="История проекта">
+              <section class="case-reader-section case-reader-section--about" id="case-section-about" data-case-section="about" tabindex="-1" aria-labelledby="case-reader-heading">
+                <button class="case-reader-cover" type="button" data-case-reader-cover aria-label="Увеличить визуал кейса МеренКофе">
+                  <img src="./assets/case-meren-coffee.png" alt="Визуал кейса МеренКофе" data-case-dialog-case-image />
+                </button>
+                <div class="case-dialog-intro">
+                  <h2 class="case-reader-title" id="case-reader-heading" data-case-reader-heading tabindex="-1">МеренКофе</h2>
+                  <p class="case-dialog-kind" data-case-dialog-kind>кофейный бренд</p>
+                  <div id="case-dialog-copy" class="case-dialog-copy case-reader-prose" data-case-dialog-copy>
+                    <p class="case-reader-paragraph">Я&nbsp;собираю знак, упаковку, визуалы и&nbsp;правила кампании.</p>
+                  </div>
+                </div>
+
+                <dl class="case-dialog-meta">
+                  <div><dt>Компания</dt><dd data-case-dialog-company>МеренКофе</dd></div>
+                  <div><dt>Направление</dt><dd data-case-dialog-type>айдентика / упаковка</dd></div>
+                  <div><dt>Объём</dt><dd data-case-dialog-count>24 материала</dd></div>
+                </dl>
+              </section>
+
+              <section class="case-reader-section" id="case-section-task" data-case-section="task" tabindex="-1" aria-labelledby="case-task-heading">
+                <h3 id="case-task-heading">Задача</h3>
+                <div class="case-reader-prose" data-case-reader-task></div>
+              </section>
+
+              <section class="case-reader-section" id="case-section-stages" data-case-section="stages" tabindex="-1" aria-labelledby="case-stages-heading">
+                <h3 id="case-stages-heading">Этапы работы</h3>
+                <div class="case-reader-stages" data-case-reader-stages></div>
+              </section>
+
+              <section class="case-reader-section" id="case-section-result" data-case-section="result" tabindex="-1" aria-labelledby="case-result-heading">
+                <h3 id="case-result-heading">Результат</h3>
+                <div class="case-reader-prose" data-case-reader-result></div>
+                <div class="case-reader-gallery" data-case-reader-gallery></div>
+              </section>
+
+              <nav class="case-dialog-navigation" aria-label="Другие кейсы">
+                <button class="case-dialog-nav-button" type="button" data-case-dialog-prev>
+                  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m15 18-6-6 6-6" /></svg>
+                  <span><small>Предыдущий</small><strong data-case-dialog-prev-title>Vera</strong></span>
+                </button>
+                <button class="case-dialog-nav-button case-dialog-nav-button--next" type="button" data-case-dialog-next>
+                  <span><small>Следующий</small><strong data-case-dialog-next-title>Mirai</strong></span>
+                  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6" /></svg>
+                </button>
+              </nav>
+            </div>
+          </div>
         </div>
+
+        <section class="case-image-viewer" data-case-image-viewer hidden aria-label="Просмотр изображения">
+          <header class="case-image-viewer-topbar">
+            <button class="case-image-viewer-back" type="button" data-case-image-viewer-back>
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m15 18-6-6 6-6" /></svg>
+              Вернуться к кейсу
+            </button>
+            <span class="case-image-viewer-label">Просмотр изображения</span>
+          </header>
+          <figure class="case-image-viewer-frame" tabindex="0" aria-label="Изображение и подпись">
+            <img alt="" data-case-image-viewer-image />
+            <figcaption data-case-image-viewer-caption></figcaption>
+          </figure>
+        </section>
       </article>
     </dialog>
 
-    <script src="./script.js?v=20261010-01"></script>
+    <script src="./script.js?v=20261014-01"></script>
   </body>
 </html>
