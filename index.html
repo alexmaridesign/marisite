@@ -7,7 +7,7 @@
       name="description"
       content="Портфолио Мари Алекс: я создаю айдентику, кампании и цифровое направление для брендов."
     />
-    <title>Мари — бренд &amp; креативный дизайнер</title>
+    <title>Мари — бренд-дизайнер</title>
     <link rel="canonical" href="https://alexmaridesign.ru/" />
     <link rel="icon" href="./favicon.ico?v=20260916-01" sizes="16x16 32x32 48x48" type="image/x-icon" />
     <link rel="icon" href="./favicon.svg?v=20260916-01" type="image/svg+xml" sizes="any" />
@@ -15,7 +15,7 @@
     <meta property="og:type" content="website" />
     <meta property="og:locale" content="ru_RU" />
     <meta property="og:site_name" content="Мари" />
-    <meta property="og:title" content="Мари — бренд &amp; креативный дизайнер" />
+    <meta property="og:title" content="Мари — бренд-дизайнер" />
     <meta property="og:description" content="Айдентика, упаковка и визуальные системы для брендов." />
     <meta property="og:url" content="https://alexmaridesign.ru/" />
     <meta property="og:image" content="https://alexmaridesign.ru/assets/og-mari-v1.jpg" />
@@ -24,7 +24,7 @@
     <meta property="og:image:height" content="630" />
     <meta property="og:image:alt" content="Обложка портфолио Мари: фирменный знак и карточки Pinhead и Sofacinic." />
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="Мари — бренд &amp; креативный дизайнер" />
+    <meta name="twitter:title" content="Мари — бренд-дизайнер" />
     <meta name="twitter:description" content="Айдентика, упаковка и визуальные системы для брендов." />
     <meta name="twitter:image" content="https://alexmaridesign.ru/assets/og-mari-v1.jpg" />
     <meta name="twitter:image:alt" content="Обложка портфолио Мари: фирменный знак и карточки Pinhead и Sofacinic." />
@@ -34,7 +34,7 @@
       href="https://fonts.googleapis.com/css2?family=Dela+Gothic+One&family=Inter:wght@400;500;600;700;800;900&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="./styles.css?v=20261014-05" />
+    <link rel="stylesheet" href="./styles.css?v=20261014-06" />
   </head>
   <body>
     <svg class="liquid-filter-defs" aria-hidden="true" focusable="false">
@@ -56,7 +56,7 @@
             <a href="#top" aria-label="Главный экран">
               <h1 class="brand-title">Мари</h1>
             </a>
-            <p class="brand-subtitle">бренд &amp; креативный дизайнер</p>
+            <p class="brand-subtitle">бренд-дизайнер</p>
           </div>
 
           <div class="nav-menu" data-cases-menu>
@@ -693,15 +693,21 @@
       data-case-dialog
     >
       <nav class="case-dialog-stack" aria-label="Соседние кейсы">
-        <button class="case-dialog-stack-card case-dialog-stack-card--previous" type="button" data-case-stack-direction="-1" aria-label="Открыть кейс: Vera">
+        <button class="case-dialog-stack-card case-dialog-stack-card--previous" type="button" data-case-stack-direction="-1" aria-label="Открыть предыдущий кейс: Vera">
           <img src="./assets/case-cult.png" alt="" data-case-stack-previous-image />
           <span data-case-stack-previous-title>Vera</span>
+          <span class="case-stack-arrow" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m14 6-6 6 6 6" /></svg></span>
         </button>
-        <button class="case-dialog-stack-card case-dialog-stack-card--next" type="button" data-case-stack-direction="1" aria-label="Открыть кейс: Mirai">
+        <button class="case-dialog-stack-card case-dialog-stack-card--next" type="button" data-case-stack-direction="1" aria-label="Открыть следующий кейс: Mirai">
           <img src="./assets/company-mirai.png" alt="" data-case-stack-next-image />
           <span data-case-stack-next-title>Mirai</span>
+          <span class="case-stack-arrow" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m10 6 6 6-6 6" /></svg></span>
         </button>
       </nav>
+      <div class="case-stack-hints" aria-hidden="true">
+        <div class="case-stack-hint--previous"><span class="case-stack-hint-direction">Предыдущий кейс</span><strong data-case-stack-previous-hint>Vera</strong></div>
+        <div class="case-stack-hint--next"><span class="case-stack-hint-direction">Следующий кейс</span><strong data-case-stack-next-hint>Mirai</strong></div>
+      </div>
       <article class="case-dialog-card">
         <div class="case-reader-surface" data-case-reader-surface>
           <header class="case-dialog-topbar">
@@ -798,6 +804,6 @@
       </article>
     </dialog>
 
-    <script src="./script.js?v=20261014-05"></script>
+    <script src="./script.js?v=20261014-06"></script>
   </body>
 </html>

@@ -166,13 +166,15 @@ body.case-dialog-is-open {
   flex-direction: column;
   gap: 16px;
   height: 100%;
-  overflow: hidden;
+  overflow: visible;
   padding: 20px;
   pointer-events: auto;
   position: absolute;
   top: 0;
   width: 300px;
   cursor: pointer;
+  translate: 0 0;
+  transition: translate var(--motion-ui) var(--motion-ease);
 }
 
 .case-dialog-stack-card:focus-visible {
@@ -207,7 +209,8 @@ body.case-dialog-is-open {
   width: 100%;
 }
 
-.case-dialog-stack-card span,
+[data-case-stack-previous-title],
+[data-case-stack-next-title],
 .case-dialog-transition-card span {
   color: var(--reader-violet);
   font-family: "Dela Gothic One", Inter, sans-serif;
@@ -217,12 +220,112 @@ body.case-dialog-is-open {
 
 .case-dialog-stack-card--previous {
   left: 0;
-  transform: rotate(-5deg) scale(0.94);
+  transform: translateX(-12px) rotate(-8deg) scale(0.94);
 }
 
 .case-dialog-stack-card--next {
   right: 0;
-  transform: rotate(5deg) scale(0.94);
+  transform: translateX(12px) rotate(8deg) scale(0.94);
+}
+
+.case-dialog:not(.is-closing):not(.is-switching) .case-dialog-stack:not([inert]) .case-dialog-stack-card--previous:is(:hover, :focus-visible) {
+  translate: -8px 0;
+}
+
+.case-dialog:not(.is-closing):not(.is-switching) .case-dialog-stack:not([inert]) .case-dialog-stack-card--next:is(:hover, :focus-visible) {
+  translate: 8px 0;
+}
+
+.case-dialog-stack[inert] .case-dialog-stack-card,
+.case-dialog.is-closing .case-dialog-stack-card,
+.case-dialog.is-switching .case-dialog-stack-card {
+  translate: 0 0;
+}
+
+.case-stack-arrow {
+  align-items: center;
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(130, 138, 196, 0.22);
+  border-radius: 50%;
+  color: var(--reader-accent);
+  display: flex;
+  height: 32px;
+  justify-content: center;
+  pointer-events: none;
+  position: absolute;
+  top: 50%;
+  width: 32px;
+}
+
+.case-dialog-stack-card--previous .case-stack-arrow {
+  left: 4px;
+  transform: translateY(-50%) rotate(8deg);
+}
+
+.case-dialog-stack-card--next .case-stack-arrow {
+  right: 4px;
+  transform: translateY(-50%) rotate(-8deg);
+}
+
+.case-stack-arrow svg {
+  height: 16px;
+  width: 16px;
+}
+
+.case-stack-hints {
+  inset: 0;
+  pointer-events: none;
+  position: absolute;
+  z-index: 2;
+}
+
+.case-stack-hint--previous,
+.case-stack-hint--next {
+  background: rgba(255, 255, 255, 0.94);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(130, 138, 196, 0.18);
+  border-radius: 14px;
+  color: var(--reader-accent);
+  display: grid;
+  font-family: Inter, sans-serif;
+  font-size: 12px;
+  gap: 4px;
+  max-width: min(230px, calc(100vw - 116px));
+  opacity: 0;
+  padding: 10px 14px;
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  transition: opacity var(--motion-ui) var(--motion-ease), translate var(--motion-ui) var(--motion-ease);
+}
+
+.case-stack-hint--previous {
+  left: max(58px, calc((100vw - 1200px) / 2 + 10px));
+  translate: -8px 0;
+}
+
+.case-stack-hint--next {
+  right: max(58px, calc((100vw - 1200px) / 2 + 10px));
+  translate: 8px 0;
+}
+
+.case-stack-hint-direction {
+  font-size: 10px;
+  font-weight: 500;
+  opacity: 0.68;
+}
+
+.case-stack-hints strong {
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.case-dialog:not(.is-closing):not(.is-switching):has(.case-dialog-stack:not([inert]) .case-dialog-stack-card--previous:is(:hover, :focus-visible)) .case-stack-hint--previous,
+.case-dialog:not(.is-closing):not(.is-switching):has(.case-dialog-stack:not([inert]) .case-dialog-stack-card--next:is(:hover, :focus-visible)) .case-stack-hint--next {
+  opacity: 1;
+  translate: 0 0;
 }
 
 .case-dialog-card {
@@ -773,21 +876,21 @@ body.case-dialog-is-open {
 
 @keyframes case-stack-previous-in {
   from { opacity: 0; transform: translateX(80px) rotate(-3deg) scale(0.94); }
-  to { opacity: 1; transform: translateX(0) rotate(-5deg) scale(0.94); }
+  to { opacity: 1; transform: translateX(-12px) rotate(-8deg) scale(0.94); }
 }
 
 @keyframes case-stack-next-in {
   from { opacity: 0; transform: translateX(-80px) rotate(3deg) scale(0.94); }
-  to { opacity: 1; transform: translateX(0) rotate(5deg) scale(0.94); }
+  to { opacity: 1; transform: translateX(12px) rotate(8deg) scale(0.94); }
 }
 
 @keyframes case-stack-previous-out {
-  from { opacity: var(--case-exit-opacity, 1); transform: var(--case-exit-transform, rotate(-5deg) scale(0.94)); }
+  from { opacity: var(--case-exit-opacity, 1); transform: var(--case-exit-transform, translateX(-12px) rotate(-8deg) scale(0.94)); }
   to { opacity: 0; transform: translateX(80px) rotate(-3deg) scale(0.94); }
 }
 
 @keyframes case-stack-next-out {
-  from { opacity: var(--case-exit-opacity, 1); transform: var(--case-exit-transform, rotate(5deg) scale(0.94)); }
+  from { opacity: var(--case-exit-opacity, 1); transform: var(--case-exit-transform, translateX(12px) rotate(8deg) scale(0.94)); }
   to { opacity: 0; transform: translateX(-80px) rotate(3deg) scale(0.94); }
 }
 
@@ -804,6 +907,8 @@ body.case-dialog-is-open {
 @media (max-width: 900px) {
   .case-dialog { padding: 16px 26px; }
   .case-dialog-card { height: calc(100dvh - 32px); border-radius: 28px; }
+  .case-dialog-stack-card--previous .case-stack-arrow { left: -14px; }
+  .case-dialog-stack-card--next .case-stack-arrow { right: -14px; }
   .case-reader-layout { grid-template-columns: 170px minmax(0, 1fr); }
   .case-reader-sidebar { padding: 24px 8px; }
   .case-reader-main { padding: 24px; }
@@ -814,7 +919,8 @@ body.case-dialog-is-open {
 @media (max-width: 740px) {
   .case-dialog { padding: max(6px, env(safe-area-inset-top)) 6px max(6px, env(safe-area-inset-bottom)); }
   .case-dialog-card { height: 100%; border-radius: 24px; }
-  .case-dialog-stack { display: none; }
+  .case-dialog-stack,
+  .case-stack-hints { display: none; }
   .case-reader-surface { grid-template-rows: 66px minmax(0, 1fr); }
   .case-dialog-topbar { gap: 10px; padding: 10px 14px; }
   .case-dialog-brand { gap: 10px; }

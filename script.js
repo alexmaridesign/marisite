@@ -296,6 +296,8 @@ const caseStackPreviousImage = document.querySelector("[data-case-stack-previous
 const caseStackNextImage = document.querySelector("[data-case-stack-next-image]");
 const caseStackPreviousTitle = document.querySelector("[data-case-stack-previous-title]");
 const caseStackNextTitle = document.querySelector("[data-case-stack-next-title]");
+const caseStackPreviousHint = document.querySelector("[data-case-stack-previous-hint]");
+const caseStackNextHint = document.querySelector("[data-case-stack-next-hint]");
 const caseImageViewer = document.querySelector("[data-case-image-viewer]");
 const caseImageViewerBack = document.querySelector("[data-case-image-viewer-back]");
 const caseImageViewerImage = document.querySelector("[data-case-image-viewer-image]");
@@ -716,12 +718,14 @@ function renderCaseDialog(index) {
   setCaseImage(caseStackNextImage, { src: nextPair.caseImage ?? nextPair.image ?? nextPair.companyImage, alt: "" });
   caseStackPreviousTitle.textContent = previousPair.title;
   caseStackNextTitle.textContent = nextPair.title;
+  caseStackPreviousHint.textContent = previousPair.title;
+  caseStackNextHint.textContent = nextPair.title;
   caseDialogPrevTitle.textContent = previousPair.title;
   caseDialogNextTitle.textContent = nextPair.title;
   caseDialogPrevButton.setAttribute("aria-label", `Предыдущий кейс: ${previousPair.title}`);
   caseDialogNextButton.setAttribute("aria-label", `Следующий кейс: ${nextPair.title}`);
-  caseDialogStackCards[0].setAttribute("aria-label", `Открыть кейс: ${previousPair.title}`);
-  caseDialogStackCards[1].setAttribute("aria-label", `Открыть кейс: ${nextPair.title}`);
+  caseDialogStackCards[0].setAttribute("aria-label", `Открыть предыдущий кейс: ${previousPair.title}`);
+  caseDialogStackCards[1].setAttribute("aria-label", `Открыть следующий кейс: ${nextPair.title}`);
   cancelMotionScroll(caseReaderScroll);
   caseReaderScroll.scrollTo({ top: 0, behavior: "instant" });
   caseReaderAnchorTarget = null;
@@ -902,7 +906,7 @@ function stepCaseDialog(direction) {
       if (!transition.closeRequested) {
         caseDialogStackCards.forEach((element, index) => playUiMotion(element, [
           { opacity: 0, transform: `translateX(${index === 0 ? 80 : -80}px) rotate(${index === 0 ? -3 : 3}deg) scale(0.94)` },
-          { opacity: 1, transform: `rotate(${index === 0 ? -5 : 5}deg) scale(0.94)` },
+          { opacity: 1, transform: `translateX(${index === 0 ? -12 : 12}px) rotate(${index === 0 ? -8 : 8}deg) scale(0.94)` },
         ], { duration: 650 }));
         caseReaderHeading.focus({ preventScroll: true });
       }
