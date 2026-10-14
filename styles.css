@@ -694,11 +694,11 @@ body.case-dialog-is-open {
   }
 
   .case-dialog[open]:not(.is-closing) .case-dialog-stack-card--previous {
-    animation: case-stack-previous-in var(--motion-reveal) var(--motion-ease) 180ms both;
+    animation: case-stack-previous-in 800ms var(--motion-ease) calc(var(--motion-panel) + 60ms) both;
   }
 
   .case-dialog[open]:not(.is-closing) .case-dialog-stack-card--next {
-    animation: case-stack-next-in var(--motion-reveal) var(--motion-ease) 180ms both;
+    animation: case-stack-next-in 800ms var(--motion-ease) calc(var(--motion-panel) + 60ms) both;
   }
 
   .case-dialog[open]:not(.is-closing)::backdrop {
