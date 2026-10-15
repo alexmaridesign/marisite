@@ -174,7 +174,12 @@ const ORBIT_DECORATIONS = {
   ],
   right: [
     { id: "heart", image: "./assets/icon-heart.svg", offset: ORBIT_STEP * -0.5 },
-    { id: "lightning", image: "./assets/icon-lightning.svg", offset: ORBIT_STEP * 1.5 },
+    {
+      id: "lightning",
+      image: "./assets/icon-lightning.svg",
+      offset: ORBIT_STEP * -1.5,
+      angleRange: { start: ORBIT_STEP * -2, period: ORBIT_STEP },
+    },
   ],
 };
 
@@ -350,10 +355,10 @@ function normalizeAngle(value) {
   return Math.atan2(Math.sin(value), Math.cos(value));
 }
 
-function wrapDecorationAngle(value) {
-  const period = Math.PI / ORBIT_DENSITY;
-  const halfPeriod = period / 2;
-  return ((value + halfPeriod) % period + period) % period - halfPeriod;
+function wrapDecorationAngle(value, range = {}) {
+  const period = range.period ?? Math.PI / ORBIT_DENSITY;
+  const start = range.start ?? -period / 2;
+  return ((value - start) % period + period) % period + start;
 }
 
 function nearestEquivalentAngle(target, current) {
@@ -1112,7 +1117,7 @@ class OrbitalPicker {
         const lensNode = lane.lensRoot ? createOrbitDecorationNode(decoration, { lens: true }) : null;
         if (lensNode) lane.lensRoot.append(lensNode);
 
-        this.decorations[laneIndex].push({ node, lensNode, offset: decoration.offset });
+        this.decorations[laneIndex].push({ node, lensNode, offset: decoration.offset, angleRange: decoration.angleRange });
       });
     });
   }
@@ -1450,8 +1455,9 @@ class OrbitalPicker {
     });
 
     this.lanes.forEach((lane, laneIndex) => {
-      this.decorations[laneIndex]?.forEach(({ node, lensNode, offset }) => {
-        const decorationAngle = wrapDecorationAngle(this.angle + offset);
+      this.decorations[laneIndex]?.forEach(({ node, lensNode, offset, angleRange }) => {
+        // Keep lightning in the upper gap, with a wrap period aligned to the cards.
+        const decorationAngle = wrapDecorationAngle(this.angle + offset, angleRange);
         const orbitAngle = lane.mirror ? Math.PI - decorationAngle : decorationAngle;
         const state = setNodePosition(node, orbitAngle, lane.id, -1, false, { stickToRing: true });
 
