@@ -362,19 +362,6 @@ function normalizeAngle(value) {
   return Math.atan2(Math.sin(value), Math.cos(value));
 }
 
-function getDecorationVisibility(angle, centerAngle, step) {
-  const halfWidth = step * 0.75;
-  const distance = Math.abs(normalizeAngle(angle - centerAngle));
-  if (distance >= halfWidth) return 0;
-  const opacity = (1 + Math.cos((distance / halfWidth) * Math.PI)) / 2;
-  const neighborDistance = step - distance;
-  const neighborOpacity = neighborDistance < halfWidth
-    ? (1 + Math.cos((neighborDistance / halfWidth) * Math.PI)) / 2
-    : 0;
-  // Keep brightness steady while the next gap's icon enters the visible zone.
-  return opacity / (opacity + neighborOpacity);
-}
-
 function nearestEquivalentAngle(target, current) {
   return current + normalizeAngle(target - current);
 }
@@ -1125,21 +1112,13 @@ class OrbitalPicker {
       });
 
       lane.decorations?.forEach((decoration) => {
-        // Each copy follows a real gap around the full orbit; none resets its position.
-        this.values.forEach((_, gapIndex) => {
-          const node = createOrbitDecorationNode(decoration);
-          lane.root.append(node);
+        const node = createOrbitDecorationNode(decoration);
+        lane.root.append(node);
 
-          const lensNode = lane.lensRoot ? createOrbitDecorationNode(decoration, { lens: true }) : null;
-          if (lensNode) lane.lensRoot.append(lensNode);
+        const lensNode = lane.lensRoot ? createOrbitDecorationNode(decoration, { lens: true }) : null;
+        if (lensNode) lane.lensRoot.append(lensNode);
 
-          this.decorations[laneIndex].push({
-            node,
-            lensNode,
-            offset: decoration.offset + gapIndex * this.step,
-            centerAngle: decoration.offset,
-          });
-        });
+        this.decorations[laneIndex].push({ node, lensNode, offset: decoration.offset });
       });
     });
   }
@@ -1477,22 +1456,14 @@ class OrbitalPicker {
     });
 
     this.lanes.forEach((lane, laneIndex) => {
-      this.decorations[laneIndex]?.forEach(({ node, lensNode, offset, centerAngle }) => {
+      this.decorations[laneIndex]?.forEach(({ node, lensNode, offset }) => {
+        // A fixed half-step offset keeps each icon in the same gap as the cards rotate.
         const decorationAngle = this.angle + offset;
-        // Fade at the edges of the upper/lower gap zone, away from the focused card.
-        const visibility = getDecorationVisibility(decorationAngle, centerAngle, this.step);
-        if (!visibility) {
-          node.style.opacity = "0";
-          if (lensNode) lensNode.style.opacity = "0";
-          return;
-        }
         const orbitAngle = lane.mirror ? Math.PI - decorationAngle : decorationAngle;
-        const state = setNodePosition(node, orbitAngle, lane.id, -1, false, { stickToRing: true });
-        node.style.opacity = (state.opacity * visibility).toFixed(3);
+        const state = setNodePosition(node, orbitAngle, lane.id, -1, false, lanePositions[laneIndex]);
 
         if (lensNode) {
           this.lens?.syncNode(lensNode, state, lensLaneFrames[laneIndex], false);
-          lensNode.style.opacity = (Number(lensNode.style.opacity) * visibility).toFixed(3);
         }
       });
     });
