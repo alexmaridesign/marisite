@@ -174,7 +174,6 @@ const ORBIT_DECORATIONS = {
       id: "finger",
       image: "./assets/icon-finger.svg",
       offset: ORBIT_STEP * -1.5,
-      angleRange: { start: ORBIT_STEP * -2, period: ORBIT_STEP },
     },
   ],
   right: [
@@ -182,13 +181,11 @@ const ORBIT_DECORATIONS = {
       id: "heart",
       image: "./assets/icon-heart.svg",
       offset: ORBIT_STEP * 1.5,
-      angleRange: { start: ORBIT_STEP, period: ORBIT_STEP },
     },
     {
       id: "lightning",
       image: "./assets/icon-lightning.svg",
       offset: ORBIT_STEP * -1.5,
-      angleRange: { start: ORBIT_STEP * -2, period: ORBIT_STEP },
     },
   ],
 };
@@ -365,10 +362,17 @@ function normalizeAngle(value) {
   return Math.atan2(Math.sin(value), Math.cos(value));
 }
 
-function wrapDecorationAngle(value, range = {}) {
-  const period = range.period ?? Math.PI / ORBIT_DENSITY;
-  const start = range.start ?? -period / 2;
-  return ((value - start) % period + period) % period + start;
+function getDecorationVisibility(angle, centerAngle, step) {
+  const halfWidth = step * 0.75;
+  const distance = Math.abs(normalizeAngle(angle - centerAngle));
+  if (distance >= halfWidth) return 0;
+  const opacity = (1 + Math.cos((distance / halfWidth) * Math.PI)) / 2;
+  const neighborDistance = step - distance;
+  const neighborOpacity = neighborDistance < halfWidth
+    ? (1 + Math.cos((neighborDistance / halfWidth) * Math.PI)) / 2
+    : 0;
+  // Keep brightness steady while the next gap's icon enters the visible zone.
+  return opacity / (opacity + neighborOpacity);
 }
 
 function nearestEquivalentAngle(target, current) {
@@ -1121,13 +1125,21 @@ class OrbitalPicker {
       });
 
       lane.decorations?.forEach((decoration) => {
-        const node = createOrbitDecorationNode(decoration);
-        lane.root.append(node);
+        // Each copy follows a real gap around the full orbit; none resets its position.
+        this.values.forEach((_, gapIndex) => {
+          const node = createOrbitDecorationNode(decoration);
+          lane.root.append(node);
 
-        const lensNode = lane.lensRoot ? createOrbitDecorationNode(decoration, { lens: true }) : null;
-        if (lensNode) lane.lensRoot.append(lensNode);
+          const lensNode = lane.lensRoot ? createOrbitDecorationNode(decoration, { lens: true }) : null;
+          if (lensNode) lane.lensRoot.append(lensNode);
 
-        this.decorations[laneIndex].push({ node, lensNode, offset: decoration.offset, angleRange: decoration.angleRange });
+          this.decorations[laneIndex].push({
+            node,
+            lensNode,
+            offset: decoration.offset + gapIndex * this.step,
+            centerAngle: decoration.offset,
+          });
+        });
       });
     });
   }
@@ -1465,14 +1477,22 @@ class OrbitalPicker {
     });
 
     this.lanes.forEach((lane, laneIndex) => {
-      this.decorations[laneIndex]?.forEach(({ node, lensNode, offset, angleRange }) => {
-        // Keep each decoration in its gap, with a wrap period aligned to the cards.
-        const decorationAngle = wrapDecorationAngle(this.angle + offset, angleRange);
+      this.decorations[laneIndex]?.forEach(({ node, lensNode, offset, centerAngle }) => {
+        const decorationAngle = this.angle + offset;
+        // Fade at the edges of the upper/lower gap zone, away from the focused card.
+        const visibility = getDecorationVisibility(decorationAngle, centerAngle, this.step);
+        if (!visibility) {
+          node.style.opacity = "0";
+          if (lensNode) lensNode.style.opacity = "0";
+          return;
+        }
         const orbitAngle = lane.mirror ? Math.PI - decorationAngle : decorationAngle;
         const state = setNodePosition(node, orbitAngle, lane.id, -1, false, { stickToRing: true });
+        node.style.opacity = (state.opacity * visibility).toFixed(3);
 
         if (lensNode) {
           this.lens?.syncNode(lensNode, state, lensLaneFrames[laneIndex], false);
+          lensNode.style.opacity = (Number(lensNode.style.opacity) * visibility).toFixed(3);
         }
       });
     });
