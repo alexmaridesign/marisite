@@ -170,10 +170,20 @@ const orbitPairs = Array.from({ length: pairs.length * ORBIT_DENSITY }, (_, inde
 const ORBIT_STEP = (Math.PI * 2) / orbitPairs.length;
 const ORBIT_DECORATIONS = {
   left: [
-    { id: "finger", image: "./assets/icon-finger.svg", offset: ORBIT_STEP * -1.5 },
+    {
+      id: "finger",
+      image: "./assets/icon-finger.svg",
+      offset: ORBIT_STEP * -1.5,
+      angleRange: { start: ORBIT_STEP * -2, period: ORBIT_STEP },
+    },
   ],
   right: [
-    { id: "heart", image: "./assets/icon-heart.svg", offset: ORBIT_STEP * -0.5 },
+    {
+      id: "heart",
+      image: "./assets/icon-heart.svg",
+      offset: ORBIT_STEP * 1.5,
+      angleRange: { start: ORBIT_STEP, period: ORBIT_STEP },
+    },
     {
       id: "lightning",
       image: "./assets/icon-lightning.svg",
@@ -1456,7 +1466,7 @@ class OrbitalPicker {
 
     this.lanes.forEach((lane, laneIndex) => {
       this.decorations[laneIndex]?.forEach(({ node, lensNode, offset, angleRange }) => {
-        // Keep lightning in the upper gap, with a wrap period aligned to the cards.
+        // Keep each decoration in its gap, with a wrap period aligned to the cards.
         const decorationAngle = wrapDecorationAngle(this.angle + offset, angleRange);
         const orbitAngle = lane.mirror ? Math.PI - decorationAngle : decorationAngle;
         const state = setNodePosition(node, orbitAngle, lane.id, -1, false, { stickToRing: true });
