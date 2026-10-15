@@ -106,7 +106,7 @@ const pairs = [
     company: "МеренКофе",
     label: "кофейный бренд",
     type: "айдентика / упаковка",
-    count: "Визуал в разработке",
+    count: "24 материала",
     companyImage: "./assets/company-meren-coffee.png",
     caseImage: "./assets/case-meren-coffee.png",
     companyArtwork: true,
@@ -118,7 +118,7 @@ const pairs = [
     company: "Mirai",
     label: "логотип",
     type: "логотип",
-    count: "Визуал в разработке",
+    count: "1 логотип",
     companyImage: "./assets/company-mirai.png",
     companyArtwork: true,
     title: "Mirai",
@@ -129,7 +129,7 @@ const pairs = [
     company: "Round",
     label: "логотип",
     type: "логотип",
-    count: "Визуал в разработке",
+    count: "1 логотип",
     companyImage: "./assets/company-round.png",
     companyArtwork: true,
     title: "Round",
@@ -140,7 +140,7 @@ const pairs = [
     company: "Sofacinic",
     label: "бренд ухода",
     type: "бренд / digital",
-    count: "Визуал в разработке",
+    count: "20 материалов",
     companyImage: "./assets/company-sofacinic.png",
     companyArtwork: true,
     title: "Sofacinic",
@@ -151,7 +151,7 @@ const pairs = [
     company: "Pinhead",
     label: "креативная студия",
     type: "мерч",
-    count: "Визуал в разработке",
+    count: "1 материал",
     caseImage: "./assets/case-pinhead.png?v=20261010-01",
     companyImage: "./assets/company-pinhead.png",
     companyArtwork: true,
@@ -234,7 +234,6 @@ const caseReaderTask = document.querySelector("[data-case-reader-task]");
 const caseReaderStages = document.querySelector("[data-case-reader-stages]");
 const caseReaderResult = document.querySelector("[data-case-reader-result]");
 const caseReaderGallery = document.querySelector("[data-case-reader-gallery]");
-const casePlaceholder = document.querySelector("[data-case-placeholder]");
 const caseReaderSections = Array.from(document.querySelectorAll("[data-case-section]"));
 const caseReaderSectionLinks = Array.from(document.querySelectorAll("[data-case-section-link]"));
 const caseStackPreviousImage = document.querySelector("[data-case-stack-previous-image]");
@@ -432,14 +431,14 @@ function normalizePairIndex(index) {
 // { about: [paragraph], task: { paragraphs: [], items: [] },
 //   stages: [{ title, paragraphs: [], media: [{ src, alt, caption }] }],
 //   result: { paragraphs: [], media: [{ src, alt, caption }] }, cover: { src, alt } }.
-// Existing copy and artwork remain the fallback; missing process details stay explicit.
+// Keep existing text and sections; unfinished visual slots use the supplied placeholder.
 function getCaseStory(pair) {
   const story = pair.story ?? {};
   const artwork = pair.caseImage ?? pair.image;
   const logo = pair.companyImage;
   const existingMedia = [];
-  if (artwork) existingMedia.push({ src: artwork, alt: `Визуал кейса ${pair.title}` });
-  if (logo && logo !== artwork) existingMedia.push({ src: logo, alt: `Визуал бренда ${pair.company}` });
+  if (artwork) existingMedia.push({ src: "./assets/visual-in-development.png", alt: `Визуал кейса ${pair.title} в разработке`, crop: "placeholder" });
+  if (logo && logo !== artwork) existingMedia.push({ src: "./assets/visual-in-development.png", alt: `Визуал бренда ${pair.company} в разработке`, crop: "placeholder" });
 
   return {
     about: Array.isArray(story.about) && story.about.length ? story.about : [pair.copy],
@@ -448,7 +447,7 @@ function getCaseStory(pair) {
     result: story.result ?? {},
     media: Array.isArray(story.result?.media) ? story.result.media : existingMedia,
     cover: story.cover ?? existingMedia[0] ?? null,
-    logoOnly: !artwork && Boolean(logo) && !story.cover,
+    logoOnly: false,
   };
 }
 
@@ -595,12 +594,8 @@ function renderCaseDialog(index) {
   const nextPair = pairs[normalizePairIndex(normalizedIndex + 1)];
   const companyImage = pair.companyImage ?? pair.image;
   const story = getCaseStory(pair);
-  const inDevelopment = !pair.story;
 
   closeCaseImageViewer({ returnFocus: false, immediate: true });
-  caseDialog.classList.toggle("is-in-development", inDevelopment);
-  casePlaceholder.hidden = !inDevelopment;
-  caseDialog.setAttribute("aria-describedby", inDevelopment ? "case-placeholder-description" : "case-dialog-copy");
   activeCaseDialogIndex = normalizedIndex;
   caseDialogTitle.textContent = pair.title;
   caseReaderHeading.textContent = pair.title;
@@ -771,7 +766,7 @@ function stepCaseDialog(direction) {
     caseDialog.classList.add("has-switched");
     renderCaseDialog(nextIndex);
     orbitPicker.select(nextIndex);
-    (casePlaceholder.hidden ? caseReaderHeading : caseDialogTitle).focus({ preventScroll: true });
+    caseReaderHeading.focus({ preventScroll: true });
     return Promise.resolve();
   }
 
@@ -857,7 +852,7 @@ function stepCaseDialog(direction) {
           { opacity: 0, transform: `translateX(${index === 0 ? 80 : -80}px) rotate(${index === 0 ? -3 : 3}deg) scale(0.94)` },
           { opacity: 1, transform: `translateX(${index === 0 ? -12 : 12}px) rotate(${index === 0 ? -8 : 8}deg) scale(0.94)` },
         ], { duration: 650 }));
-        (casePlaceholder.hidden ? caseReaderHeading : caseDialogTitle).focus({ preventScroll: true });
+        caseReaderHeading.focus({ preventScroll: true });
       }
     } finally {
       clearCaseTransition(transition);

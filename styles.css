@@ -971,64 +971,20 @@ body.case-dialog-is-open {
   .case-reader-cover img { max-height: 160px; }
 }
 
-.case-placeholder {
-  align-items: center;
+.case-reader-cover:has(img[data-case-dialog-crop="placeholder"]),
+.case-reader-image-button:has(img[data-case-dialog-crop="placeholder"]) {
   background: #f2f3ff;
-  display: flex;
-  justify-content: center;
-  margin: 0;
   min-height: 0;
-  min-width: 0;
-  overflow: hidden;
+  padding: 0;
 }
 
-.case-placeholder[hidden] {
-  display: none;
-}
-
-.case-placeholder img {
-  flex: none;
-  height: 100%;
+.case-reader-cover img[data-case-dialog-crop="placeholder"],
+.case-reader-image-button img[data-case-dialog-crop="placeholder"] {
+  border-radius: inherit;
+  height: auto;
+  max-height: none;
   object-fit: contain;
   width: 100%;
-}
-
-.case-dialog.is-in-development .case-reader-sidebar,
-.case-dialog.is-in-development .case-reader-section {
-  display: none;
-}
-
-.case-dialog.is-in-development .case-reader-layout {
-  grid-template-columns: minmax(0, 1fr);
-  grid-template-rows: minmax(0, 1fr);
-}
-
-.case-dialog.is-in-development .case-reader-main {
-  display: grid;
-  grid-template-rows: minmax(0, 1fr) auto;
-  overflow: hidden;
-  padding: 0;
-  scrollbar-gutter: auto;
-}
-
-.case-dialog.is-in-development .case-dialog-navigation {
-  margin: 0;
-  max-width: none;
-  padding: 14px 24px;
-  width: 100%;
-}
-
-@media (max-width: 740px) {
-  .case-placeholder img {
-    height: min(100%, 180vw);
-    max-width: none;
-    width: auto;
-  }
-
-  .case-dialog.is-in-development .case-dialog-navigation {
-    gap: 10px;
-    padding: 12px;
-  }
 }
 
 .screen {

@@ -34,7 +34,7 @@
       href="https://fonts.googleapis.com/css2?family=Dela+Gothic+One&family=Inter:wght@400;500;600;700;800;900&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="./styles.css?v=20261016-01" />
+    <link rel="stylesheet" href="./styles.css?v=20261016-02" />
   </head>
   <body>
     <svg class="liquid-filter-defs" aria-hidden="true" focusable="false">
@@ -644,7 +644,7 @@
       class="case-dialog"
       id="case-dialog"
       aria-labelledby="case-dialog-title"
-      aria-describedby="case-placeholder-description"
+      aria-describedby="case-dialog-copy"
       data-case-dialog
     >
       <nav class="case-dialog-stack" aria-label="Соседние кейсы">
@@ -668,7 +668,7 @@
           <header class="case-dialog-topbar">
             <div class="case-dialog-brand">
               <img src="./assets/company-meren-coffee.png" alt="" data-case-dialog-company-image />
-              <span id="case-dialog-title" data-case-dialog-title tabindex="-1">МеренКофе</span>
+              <span id="case-dialog-title" data-case-dialog-title>МеренКофе</span>
             </div>
             <span class="case-dialog-counter" data-case-dialog-counter>01 / 05</span>
             <button
@@ -694,12 +694,9 @@
             </aside>
 
             <div class="case-reader-main" data-case-reader-scroll tabindex="0" role="region" aria-label="История проекта">
-              <figure class="case-placeholder" data-case-placeholder hidden>
-                <img src="./assets/visual-in-development.png" width="1121" height="718" alt="Визуал в разработке" id="case-placeholder-description" />
-              </figure>
               <section class="case-reader-section case-reader-section--about" id="case-section-about" data-case-section="about" tabindex="-1" aria-labelledby="case-reader-heading">
                 <button class="case-reader-cover" type="button" data-case-reader-cover aria-label="Увеличить визуал кейса МеренКофе">
-                  <img src="./assets/case-meren-coffee.png" alt="Визуал кейса МеренКофе" data-case-dialog-case-image />
+                  <img src="./assets/visual-in-development.png" alt="Визуал кейса МеренКофе в разработке" data-case-dialog-case-image data-case-dialog-crop="placeholder" />
                 </button>
                 <div class="case-dialog-intro">
                   <h2 class="case-reader-title" id="case-reader-heading" data-case-reader-heading tabindex="-1">МеренКофе</h2>
@@ -762,6 +759,6 @@
       </article>
     </dialog>
 
-    <script src="./script.js?v=20261016-01"></script>
+    <script src="./script.js?v=20261016-02"></script>
   </body>
 </html>
