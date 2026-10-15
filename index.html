@@ -34,7 +34,7 @@
       href="https://fonts.googleapis.com/css2?family=Dela+Gothic+One&family=Inter:wght@400;500;600;700;800;900&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="./styles.css?v=20261014-06" />
+    <link rel="stylesheet" href="./styles.css?v=20261016-01" />
   </head>
   <body>
     <svg class="liquid-filter-defs" aria-hidden="true" focusable="false">
@@ -140,51 +140,6 @@
               <path d="M12 4v16M5 13l7 7 7-7" />
             </svg>
           </a>
-        </div>
-      </section>
-
-      <section class="panel" id="cases" hidden>
-        <div class="panel-heading reveal">
-          <p>Выбранные работы</p>
-          <h2>Черновые кейсы для будущей замены</h2>
-          <span>Сейчас это сгенерированные примеры. Потом сюда вставим мои реальные проекты.</span>
-        </div>
-        <div class="case-grid">
-          <article class="case-card glass reveal">
-            <img src="./assets/case-card-aurora.png" alt="Кейс Aurora" />
-            <div>
-              <h3>Aurora</h3>
-              <p>Айдентика, упаковка</p>
-            </div>
-          </article>
-          <article class="case-card glass reveal">
-            <img src="./assets/case-noire.png" alt="Кейс Noire" />
-            <div>
-              <h3>Noire</h3>
-              <p>Редакционная айдентика</p>
-            </div>
-          </article>
-          <article class="case-card glass reveal">
-            <img src="./assets/case-cult.png" alt="Кейс Cult" />
-            <div>
-              <h3>Cult</h3>
-              <p>Кампания и арт-дирекшн</p>
-            </div>
-          </article>
-          <article class="case-card glass reveal">
-            <img src="./assets/case-forma.png" alt="Кейс Forma" />
-            <div>
-              <h3>Forma</h3>
-              <p>Цифровой бренд</p>
-            </div>
-          </article>
-          <article class="case-card glass reveal">
-            <img src="./assets/case-kinto.png" alt="Кейс Kinto" />
-            <div>
-              <h3>Kinto</h3>
-              <p>Система упаковки</p>
-            </div>
-          </article>
         </div>
       </section>
 
@@ -689,23 +644,23 @@
       class="case-dialog"
       id="case-dialog"
       aria-labelledby="case-dialog-title"
-      aria-describedby="case-dialog-copy"
+      aria-describedby="case-placeholder-description"
       data-case-dialog
     >
       <nav class="case-dialog-stack" aria-label="Соседние кейсы">
-        <button class="case-dialog-stack-card case-dialog-stack-card--previous" type="button" data-case-stack-direction="-1" aria-label="Открыть предыдущий кейс: Vera">
-          <img src="./assets/case-cult.png" alt="" data-case-stack-previous-image />
-          <span data-case-stack-previous-title>Vera</span>
+        <button class="case-dialog-stack-card case-dialog-stack-card--previous" type="button" data-case-stack-direction="-1" aria-label="Открыть предыдущий кейс: Pinhead">
+          <img src="./assets/visual-in-development.png" alt="" data-case-stack-previous-image />
+          <span data-case-stack-previous-title>Pinhead</span>
           <span class="case-stack-arrow" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m14 6-6 6 6 6" /></svg></span>
         </button>
         <button class="case-dialog-stack-card case-dialog-stack-card--next" type="button" data-case-stack-direction="1" aria-label="Открыть следующий кейс: Mirai">
-          <img src="./assets/company-mirai.png" alt="" data-case-stack-next-image />
+          <img src="./assets/visual-in-development.png" alt="" data-case-stack-next-image />
           <span data-case-stack-next-title>Mirai</span>
           <span class="case-stack-arrow" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m10 6 6 6-6 6" /></svg></span>
         </button>
       </nav>
       <div class="case-stack-hints" aria-hidden="true">
-        <div class="case-stack-hint--previous"><span class="case-stack-hint-direction">Предыдущий кейс</span><strong data-case-stack-previous-hint>Vera</strong></div>
+        <div class="case-stack-hint--previous"><span class="case-stack-hint-direction">Предыдущий кейс</span><strong data-case-stack-previous-hint>Pinhead</strong></div>
         <div class="case-stack-hint--next"><span class="case-stack-hint-direction">Следующий кейс</span><strong data-case-stack-next-hint>Mirai</strong></div>
       </div>
       <article class="case-dialog-card">
@@ -713,9 +668,9 @@
           <header class="case-dialog-topbar">
             <div class="case-dialog-brand">
               <img src="./assets/company-meren-coffee.png" alt="" data-case-dialog-company-image />
-              <span id="case-dialog-title" data-case-dialog-title>МеренКофе</span>
+              <span id="case-dialog-title" data-case-dialog-title tabindex="-1">МеренКофе</span>
             </div>
-            <span class="case-dialog-counter" data-case-dialog-counter>01 / 10</span>
+            <span class="case-dialog-counter" data-case-dialog-counter>01 / 05</span>
             <button
               class="case-dialog-close"
               type="button"
@@ -739,6 +694,9 @@
             </aside>
 
             <div class="case-reader-main" data-case-reader-scroll tabindex="0" role="region" aria-label="История проекта">
+              <figure class="case-placeholder" data-case-placeholder hidden>
+                <img src="./assets/visual-in-development.png" width="1121" height="718" alt="Визуал в разработке" id="case-placeholder-description" />
+              </figure>
               <section class="case-reader-section case-reader-section--about" id="case-section-about" data-case-section="about" tabindex="-1" aria-labelledby="case-reader-heading">
                 <button class="case-reader-cover" type="button" data-case-reader-cover aria-label="Увеличить визуал кейса МеренКофе">
                   <img src="./assets/case-meren-coffee.png" alt="Визуал кейса МеренКофе" data-case-dialog-case-image />
@@ -777,7 +735,7 @@
               <nav class="case-dialog-navigation" aria-label="Другие кейсы">
                 <button class="case-dialog-nav-button" type="button" data-case-dialog-prev>
                   <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m15 18-6-6 6-6" /></svg>
-                  <span><small>Предыдущий</small><strong data-case-dialog-prev-title>Vera</strong></span>
+                  <span><small>Предыдущий</small><strong data-case-dialog-prev-title>Pinhead</strong></span>
                 </button>
                 <button class="case-dialog-nav-button case-dialog-nav-button--next" type="button" data-case-dialog-next>
                   <span><small>Следующий</small><strong data-case-dialog-next-title>Mirai</strong></span>
@@ -804,6 +762,6 @@
       </article>
     </dialog>
 
-    <script src="./script.js?v=20261014-06"></script>
+    <script src="./script.js?v=20261016-01"></script>
   </body>
 </html>

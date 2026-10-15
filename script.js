@@ -106,7 +106,7 @@ const pairs = [
     company: "МеренКофе",
     label: "кофейный бренд",
     type: "айдентика / упаковка",
-    count: "24 материала",
+    count: "Визуал в разработке",
     companyImage: "./assets/company-meren-coffee.png",
     caseImage: "./assets/case-meren-coffee.png",
     companyArtwork: true,
@@ -118,7 +118,7 @@ const pairs = [
     company: "Mirai",
     label: "логотип",
     type: "логотип",
-    count: "1 логотип",
+    count: "Визуал в разработке",
     companyImage: "./assets/company-mirai.png",
     companyArtwork: true,
     title: "Mirai",
@@ -129,7 +129,7 @@ const pairs = [
     company: "Round",
     label: "логотип",
     type: "логотип",
-    count: "1 логотип",
+    count: "Визуал в разработке",
     companyImage: "./assets/company-round.png",
     companyArtwork: true,
     title: "Round",
@@ -137,42 +137,21 @@ const pairs = [
     copy: "Логотип Round.",
   },
   {
-    company: "Forma",
-    label: "цифровая студия",
-    type: "цифровой бренд",
-    count: "22 материала",
-    image: "./assets/case-forma.png",
-    title: "Forma",
-    short: "Forma",
-    copy: "Я\u00a0задаю интерфейсные правила, анимацию и\u00a0презентационный набор.",
-  },
-  {
-    company: "Kinto",
-    label: "линейка объектов",
-    type: "упаковка / система",
-    count: "16 материалов",
-    image: "./assets/case-kinto.png",
-    title: "Kinto",
-    short: "Kinto",
-    copy: "Я\u00a0соединяю знак, материал, тиснение и\u00a0серию носителей.",
-  },
-  {
     company: "Sofacinic",
     label: "бренд ухода",
     type: "бренд / digital",
-    count: "20 материалов",
-    image: "./assets/case-card-aurora.png",
+    count: "Визуал в разработке",
     companyImage: "./assets/company-sofacinic.png",
     companyArtwork: true,
-    title: "Luma",
-    short: "Luma",
+    title: "Sofacinic",
+    short: "Sofacinic",
     copy: "Я\u00a0проектирую визуальный язык, лендинг и\u00a0digital-носители.",
   },
   {
     company: "Pinhead",
     label: "креативная студия",
     type: "мерч",
-    count: "1 материал",
+    count: "Визуал в разработке",
     caseImage: "./assets/case-pinhead.png?v=20261010-01",
     companyImage: "./assets/company-pinhead.png",
     companyArtwork: true,
@@ -180,47 +159,12 @@ const pairs = [
     short: "Pinhead",
     copy: "Футболка с\u00a0принтом Forever Sexy Forever Busy.",
   },
-  {
-    company: "Sensa",
-    label: "beauty-бренд",
-    type: "упаковка / арт-дирекшн",
-    count: "19 материалов",
-    image: "./assets/case-kinto.png",
-    title: "Sensa",
-    short: "Sensa",
-    copy: "Я\u00a0веду упаковку, фотостиль и\u00a0визуальную систему запуска.",
-  },
-  {
-    company: "Motto",
-    label: "медиа-платформа",
-    type: "редакционная система",
-    count: "34 материала",
-    image: "./assets/case-noire.png",
-    title: "Motto",
-    short: "Motto",
-    copy: "Я\u00a0строю редакционную сетку, типографику и\u00a0промо-набор.",
-  },
-  {
-    company: "Vera",
-    label: "культурная серия",
-    type: "плакаты / концепция",
-    count: "15 материалов",
-    image: "./assets/case-cult.png",
-    title: "Vera",
-    short: "Vera",
-    copy: "Я\u00a0собираю постеры, визуальную идею и\u00a0серию кампейн-материалов.",
-  },
 ];
 
 const ORBIT_DENSITY = 2;
 const caseDialogImageCrop = new Map([
   ["./assets/company-sofacinic.png", "deep"],
   ["./assets/company-pinhead.png", "medium"],
-  ["./assets/case-noire.png", "frame"],
-  ["./assets/case-cult.png", "frame"],
-  ["./assets/case-forma.png", "frame"],
-  ["./assets/case-kinto.png", "frame"],
-  ["./assets/case-card-aurora.png", "frame"],
 ]);
 const orbitPairs = Array.from({ length: pairs.length * ORBIT_DENSITY }, (_, index) => pairs[index % pairs.length]);
 const ORBIT_STEP = (Math.PI * 2) / orbitPairs.length;
@@ -290,6 +234,7 @@ const caseReaderTask = document.querySelector("[data-case-reader-task]");
 const caseReaderStages = document.querySelector("[data-case-reader-stages]");
 const caseReaderResult = document.querySelector("[data-case-reader-result]");
 const caseReaderGallery = document.querySelector("[data-case-reader-gallery]");
+const casePlaceholder = document.querySelector("[data-case-placeholder]");
 const caseReaderSections = Array.from(document.querySelectorAll("[data-case-section]"));
 const caseReaderSectionLinks = Array.from(document.querySelectorAll("[data-case-section-link]"));
 const caseStackPreviousImage = document.querySelector("[data-case-stack-previous-image]");
@@ -650,8 +595,12 @@ function renderCaseDialog(index) {
   const nextPair = pairs[normalizePairIndex(normalizedIndex + 1)];
   const companyImage = pair.companyImage ?? pair.image;
   const story = getCaseStory(pair);
+  const inDevelopment = !pair.story;
 
   closeCaseImageViewer({ returnFocus: false, immediate: true });
+  caseDialog.classList.toggle("is-in-development", inDevelopment);
+  casePlaceholder.hidden = !inDevelopment;
+  caseDialog.setAttribute("aria-describedby", inDevelopment ? "case-placeholder-description" : "case-dialog-copy");
   activeCaseDialogIndex = normalizedIndex;
   caseDialogTitle.textContent = pair.title;
   caseReaderHeading.textContent = pair.title;
@@ -714,8 +663,8 @@ function renderCaseDialog(index) {
     appendCaseParagraphs(caseReaderResult, [], "Материалы проекта пока не добавлены.");
   }
 
-  setCaseImage(caseStackPreviousImage, { src: previousPair.caseImage ?? previousPair.image ?? previousPair.companyImage, alt: "" });
-  setCaseImage(caseStackNextImage, { src: nextPair.caseImage ?? nextPair.image ?? nextPair.companyImage, alt: "" });
+  setCaseImage(caseStackPreviousImage, { src: "./assets/visual-in-development.png", alt: "" });
+  setCaseImage(caseStackNextImage, { src: "./assets/visual-in-development.png", alt: "" });
   caseStackPreviousTitle.textContent = previousPair.title;
   caseStackNextTitle.textContent = nextPair.title;
   caseStackPreviousHint.textContent = previousPair.title;
@@ -822,7 +771,7 @@ function stepCaseDialog(direction) {
     caseDialog.classList.add("has-switched");
     renderCaseDialog(nextIndex);
     orbitPicker.select(nextIndex);
-    caseReaderHeading.focus({ preventScroll: true });
+    (casePlaceholder.hidden ? caseReaderHeading : caseDialogTitle).focus({ preventScroll: true });
     return Promise.resolve();
   }
 
@@ -908,7 +857,7 @@ function stepCaseDialog(direction) {
           { opacity: 0, transform: `translateX(${index === 0 ? 80 : -80}px) rotate(${index === 0 ? -3 : 3}deg) scale(0.94)` },
           { opacity: 1, transform: `translateX(${index === 0 ? -12 : 12}px) rotate(${index === 0 ? -8 : 8}deg) scale(0.94)` },
         ], { duration: 650 }));
-        caseReaderHeading.focus({ preventScroll: true });
+        (casePlaceholder.hidden ? caseReaderHeading : caseDialogTitle).focus({ preventScroll: true });
       }
     } finally {
       clearCaseTransition(transition);
