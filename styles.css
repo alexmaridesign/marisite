@@ -1022,7 +1022,7 @@ body.case-dialog-is-open {
   align-items: center;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 12px;
   justify-content: center;
   max-width: calc(100vw - 36px);
   text-align: center;
@@ -3660,7 +3660,7 @@ body.case-dialog-is-open {
   }
 
   .brand-small {
-    gap: 7px;
+    gap: 11px;
   }
 
   .brand-title {
@@ -3816,7 +3816,7 @@ body.case-dialog-is-open {
   .brand-small {
     align-items: center;
     flex: initial;
-    gap: 3px;
+    gap: 7px;
     max-width: calc(100vw - 36px);
     text-align: center;
   }
