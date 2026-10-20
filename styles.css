@@ -1648,6 +1648,7 @@ body.case-dialog-is-open {
 }
 
 .spotlight > p[data-case-copy] {
+  display: none;
   color: #6e6a64;
   font-family: Inter, ui-sans-serif, system-ui, sans-serif;
   font-size: clamp(10.5px, 1.15vw, 15px);
