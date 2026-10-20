@@ -1,3 +1,12 @@
+function formatRussianText(text) {
+  if (typeof text !== "string") return text;
+  // Keep short words with the following word, including chains such as «и в».
+  return text.replace(
+    /(?<![\p{L}\p{N}_-])(а|без|в|во|да|для|до|за|и|из|к|ко|между|на|над|не|ни|но|о|об|обо|от|перед|по|под|при|про|с|со|у|через)[ \t]+(?=\S)/giu,
+    "$1\u00a0",
+  );
+}
+
 const motionPreference = window.matchMedia("(prefers-reduced-motion: reduce)");
 let reduceMotion = motionPreference.matches;
 const motionEasing = "cubic-bezier(0.22, 1, 0.36, 1)";
@@ -475,12 +484,12 @@ function renderPair(index, { animate = true } = {}) {
 
   const pair = pairs[index];
   renderedPairIndex = index;
-  titleNode.textContent = pair.title;
+  titleNode.textContent = formatRussianText(pair.title);
   titleNode.classList.toggle("is-compact", pair.title.length > 8);
-  copyNode.textContent = pair.copy;
-  companyNode.textContent = pair.company;
-  typeNode.textContent = pair.type;
-  countNode.textContent = pair.count;
+  copyNode.textContent = formatRussianText(pair.copy);
+  companyNode.textContent = formatRussianText(pair.company);
+  typeNode.textContent = formatRussianText(pair.type);
+  countNode.textContent = formatRussianText(pair.count);
 
   if (!animate || reduceMotion || !spotlightNode) return;
 
@@ -524,13 +533,13 @@ function appendCaseParagraphs(container, paragraphs, emptyText = "") {
   validParagraphs.forEach((text) => {
     const paragraph = document.createElement("p");
     paragraph.className = "case-reader-paragraph";
-    paragraph.textContent = text;
+    paragraph.textContent = formatRussianText(text);
     container.append(paragraph);
   });
   if (!validParagraphs.length && emptyText) {
     const paragraph = document.createElement("p");
     paragraph.className = "case-reader-empty";
-    paragraph.textContent = emptyText;
+    paragraph.textContent = formatRussianText(emptyText);
     container.append(paragraph);
   }
 }
@@ -566,7 +575,7 @@ function appendCaseMedia(container, mediaItems) {
     figure.append(button);
     if (media.caption) {
       const caption = document.createElement("figcaption");
-      caption.textContent = media.caption;
+      caption.textContent = formatRussianText(media.caption);
       figure.append(caption);
     }
     container.append(figure);
@@ -640,7 +649,7 @@ function openCaseImageViewer(media, opener) {
   caseImageViewerReturnFocus = opener;
   caseImageViewerImage.src = media.src;
   caseImageViewerImage.alt = media.alt ?? "Материал проекта";
-  caseImageViewerCaption.textContent = media.caption ?? media.alt ?? "";
+  caseImageViewerCaption.textContent = formatRussianText(media.caption ?? media.alt ?? "");
   caseImageViewer.hidden = false;
   caseImageViewer.querySelector(".case-image-viewer-frame").scrollTo({ top: 0, left: 0, behavior: "instant" });
   caseDialog.classList.add("is-viewing-image");
@@ -663,14 +672,14 @@ function renderCaseDialog(index) {
 
   closeCaseImageViewer({ returnFocus: false, immediate: true });
   activeCaseDialogIndex = normalizedIndex;
-  caseDialogTitle.textContent = pair.title;
-  caseReaderHeading.textContent = pair.title;
-  caseDialogKind.textContent = pair.label;
+  caseDialogTitle.textContent = formatRussianText(pair.title);
+  caseReaderHeading.textContent = formatRussianText(pair.title);
+  caseDialogKind.textContent = formatRussianText(pair.label);
   caseDialogCopy.replaceChildren();
   appendCaseParagraphs(caseDialogCopy, story.about);
-  caseDialogCompany.textContent = pair.company;
-  caseDialogType.textContent = pair.type;
-  caseDialogCount.textContent = pair.count;
+  caseDialogCompany.textContent = formatRussianText(pair.company);
+  caseDialogType.textContent = formatRussianText(pair.type);
+  caseDialogCount.textContent = formatRussianText(pair.count);
   caseDialogCounter.textContent = `${String(normalizedIndex + 1).padStart(2, "0")} / ${String(pairs.length).padStart(2, "0")}`;
   setCaseImage(caseDialogCompanyImage, companyImage ? { src: companyImage, alt: "" } : null);
   activeCaseCover = story.cover;
@@ -689,7 +698,7 @@ function renderCaseDialog(index) {
     list.className = "case-reader-task-list";
     taskItems.forEach((text) => {
       const item = document.createElement("li");
-      item.textContent = text;
+      item.textContent = formatRussianText(text);
       list.append(item);
     });
     caseReaderTask.append(list);
@@ -703,7 +712,7 @@ function renderCaseDialog(index) {
     number.className = "case-reader-step-number";
     number.textContent = String(stageIndex + 1).padStart(2, "0");
     const title = document.createElement("h4");
-    title.textContent = stage.title ?? `Этап ${stageIndex + 1}`;
+    title.textContent = formatRussianText(stage.title ?? `Этап ${stageIndex + 1}`);
     const prose = document.createElement("div");
     prose.className = "case-reader-prose";
     appendCaseParagraphs(prose, stage.paragraphs);
@@ -726,12 +735,12 @@ function renderCaseDialog(index) {
 
   setCaseImage(caseStackPreviousImage, { src: "./assets/visual-in-development.png", alt: "" });
   setCaseImage(caseStackNextImage, { src: "./assets/visual-in-development.png", alt: "" });
-  caseStackPreviousTitle.textContent = previousPair.title;
-  caseStackNextTitle.textContent = nextPair.title;
-  caseStackPreviousHint.textContent = previousPair.title;
-  caseStackNextHint.textContent = nextPair.title;
-  caseDialogPrevTitle.textContent = previousPair.title;
-  caseDialogNextTitle.textContent = nextPair.title;
+  caseStackPreviousTitle.textContent = formatRussianText(previousPair.title);
+  caseStackNextTitle.textContent = formatRussianText(nextPair.title);
+  caseStackPreviousHint.textContent = formatRussianText(previousPair.title);
+  caseStackNextHint.textContent = formatRussianText(nextPair.title);
+  caseDialogPrevTitle.textContent = formatRussianText(previousPair.title);
+  caseDialogNextTitle.textContent = formatRussianText(nextPair.title);
   caseDialogPrevButton.setAttribute("aria-label", `Предыдущий кейс: ${previousPair.title}`);
   caseDialogNextButton.setAttribute("aria-label", `Следующий кейс: ${nextPair.title}`);
   caseDialogStackCards[0].setAttribute("aria-label", `Открыть предыдущий кейс: ${previousPair.title}`);
@@ -1969,11 +1978,11 @@ if (processStack) {
     }
     image.src = buttonImage.src;
     image.alt = buttonImage.alt;
-    title.textContent = button.dataset.skillName;
-    category.textContent = button.dataset.skillCategory;
+    title.textContent = formatRussianText(button.dataset.skillName);
+    category.textContent = formatRussianText(button.dataset.skillCategory);
     taskList.replaceChildren(...tasks.map((task) => {
       const item = document.createElement("li");
-      item.textContent = task;
+      item.textContent = formatRussianText(task);
       return item;
     }));
     if (animate) {

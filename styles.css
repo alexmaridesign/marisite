@@ -40,14 +40,15 @@ h4,
 h5,
 h6 {
   letter-spacing: var(--heading-letter-spacing);
+  text-wrap: balance;
 }
 
-.step-copy p,
-.pricing-details p,
+p,
+li,
+figcaption,
 .pricing-caption,
 .pricing-footer p > span:last-child,
-[data-case-copy],
-[data-case-dialog-copy] {
+.site-footer > span {
   text-wrap: pretty;
 }
 

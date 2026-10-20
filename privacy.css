@@ -67,6 +67,7 @@
   line-height: 1.2;
   margin: 0 0 20px;
   overflow-wrap: anywhere;
+  text-wrap: balance;
 }
 
 .privacy-date {
@@ -85,6 +86,7 @@
   letter-spacing: 0;
   line-height: 1.35;
   margin: 0 0 16px;
+  text-wrap: balance;
 }
 
 .privacy-document p:not(.privacy-eyebrow):not(.privacy-date),
@@ -92,6 +94,7 @@
   font-size: 16px;
   line-height: 1.75;
   overflow-wrap: anywhere;
+  text-wrap: pretty;
 }
 
 .privacy-document p {
