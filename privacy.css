@@ -1,0 +1,142 @@
+.privacy-header,
+.privacy-document {
+  margin-inline: auto;
+  max-width: 1080px;
+}
+
+.privacy-header {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  justify-content: space-between;
+  padding: clamp(14px, 3vw, 32px) 4px clamp(26px, 4vw, 48px);
+}
+
+.privacy-header .brand-title {
+  font-size: clamp(36px, 5vw, 52px);
+}
+
+.privacy-back {
+  align-items: center;
+  background: #e3e5fb;
+  border-radius: 999px;
+  color: #535c92;
+  display: inline-flex;
+  font-size: 14px;
+  font-weight: 600;
+  min-height: 44px;
+  padding: 12px 20px;
+}
+
+.privacy-back:hover {
+  background: #d8dcf6;
+}
+
+.privacy-site a:focus-visible {
+  outline: 3px solid #626daa;
+  outline-offset: 5px;
+}
+
+.privacy-document {
+  background: var(--section-paper);
+  border: 1px solid #fff;
+  border-radius: clamp(22px, 3vw, 38px);
+  padding: clamp(24px, 5.5vw, 72px);
+}
+
+.privacy-intro {
+  border-bottom: 1px solid var(--line);
+  padding-bottom: 28px;
+}
+
+.privacy-eyebrow {
+  color: #626daa;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  margin: 0 0 16px;
+  text-transform: uppercase;
+}
+
+.privacy-intro h1 {
+  color: #626daa;
+  font-family: "Dela Gothic One", Inter, sans-serif;
+  font-size: clamp(26px, 4.5vw, 48px);
+  font-weight: 400;
+  line-height: 1.2;
+  margin: 0 0 20px;
+  overflow-wrap: anywhere;
+}
+
+.privacy-date {
+  color: #686c85;
+  font-size: 13px;
+  margin-bottom: 24px;
+}
+
+.privacy-document section {
+  margin-top: 34px;
+}
+
+.privacy-document h2 {
+  color: #535c92;
+  font-size: clamp(20px, 2.3vw, 25px);
+  letter-spacing: 0;
+  line-height: 1.35;
+  margin: 0 0 16px;
+}
+
+.privacy-document p:not(.privacy-eyebrow):not(.privacy-date),
+.privacy-document li {
+  font-size: 16px;
+  line-height: 1.75;
+  overflow-wrap: anywhere;
+}
+
+.privacy-document p {
+  margin-top: 0;
+}
+
+.privacy-document p:last-child {
+  margin-bottom: 0;
+}
+
+.privacy-document ul {
+  margin: 0 0 16px;
+  padding-left: 22px;
+}
+
+.privacy-document li + li {
+  margin-top: 10px;
+}
+
+.privacy-document a:not(.privacy-back) {
+  color: #535c92;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.privacy-back--bottom {
+  margin-top: 36px;
+}
+
+.privacy-site .site-footer {
+  max-width: 1080px;
+}
+
+@media (max-width: 520px) {
+  .privacy-document {
+    padding: 26px 20px;
+  }
+
+  .privacy-document p:not(.privacy-eyebrow):not(.privacy-date),
+  .privacy-document li {
+    font-size: 15px;
+    line-height: 1.7;
+  }
+
+  .privacy-site .site-footer {
+    margin-inline: auto;
+  }
+}
