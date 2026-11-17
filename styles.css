@@ -19,7 +19,6 @@
   --radius-row: 16px;
   --tap-target: 44px;
   --font-display: "Dela Gothic One", Inter, sans-serif;
-  --font-hand: "Caveat", "Segoe Print", "Bradley Hand", cursive;
   --field-border: rgba(130, 138, 196, 0.34);
   --chip-surface: var(--surface-tint);
   --paper: #f6f1e3;
@@ -4407,10 +4406,12 @@ textarea.brief-input {
 .book-stage {
   --book-w: clamp(250px, 33vw, 420px);
   --book-thickness: calc(var(--book-w) * 0.47);
+  /* Depth of the 3D turns scales with the book: a small book on a phone still bends, not squashes. */
+  --book-perspective: calc(var(--book-w) * 5.5);
   display: grid;
   justify-items: center;
-  /* Room for the pages sticking out above and the ribbon and fallen scraps below. */
-  padding: calc(var(--book-w) * 0.2) 0 calc(var(--book-w) * 0.4);
+  /* Room for the pages sticking out above and the ribbon below. */
+  padding: calc(var(--book-w) * 0.2) 0 calc(var(--book-w) * 0.26);
 }
 
 /* The closed cover's footprint. Everything else is positioned against it. */
@@ -4420,7 +4421,7 @@ textarea.brief-input {
   --page-inset-x: 3.2%;
   aspect-ratio: 536 / 630;
   cursor: pointer;
-  perspective: 2200px;
+  perspective: var(--book-perspective);
   position: relative;
   touch-action: pan-y;
   transition: transform var(--motion-page) var(--motion-page-ease);
@@ -4487,7 +4488,8 @@ textarea.brief-input {
 }
 
 /* The photographed closed notebook: its cover sits exactly under the cover leaf,
-   its stuffed pages and ribbon stick out around it. */
+   its stuffed pages and ribbon stick out around it. The swap to the built book on opening
+   is quick (--motion-fast), so the two never show half-faded over each other. */
 .book-photo {
   height: 129.5%;
   left: -0.75%;
@@ -4495,7 +4497,7 @@ textarea.brief-input {
   pointer-events: none;
   position: absolute;
   top: -10.8%;
-  transition: opacity var(--motion-panel) var(--motion-ease);
+  transition: opacity var(--motion-fast) var(--motion-ease);
   width: 106.34%;
 }
 
@@ -4520,7 +4522,7 @@ textarea.brief-input {
   inset: var(--page-inset-y) var(--page-inset-x) var(--page-inset-y) 0;
   pointer-events: none;
   position: absolute;
-  transition: opacity var(--motion-panel) var(--motion-ease);
+  transition: opacity var(--motion-fast) var(--motion-ease);
   z-index: 1;
 }
 
@@ -4556,7 +4558,7 @@ textarea.brief-input {
   left: 6.2%;
   position: absolute;
   top: 98.6%;
-  transition: opacity var(--motion-panel) var(--motion-ease);
+  transition: opacity var(--motion-fast) var(--motion-ease);
   width: 5.4%;
 }
 
@@ -4574,15 +4576,17 @@ textarea.brief-input {
   left: 0;
   position: absolute;
   top: calc(var(--page-inset-y) + var(--leaf-top, 0%));
-  transform: perspective(2400px) rotateY(0deg) rotateZ(var(--leaf-tilt, 0deg));
+  transform: perspective(var(--book-perspective)) rotateY(0deg) rotateZ(var(--leaf-tilt, 0deg));
   transform-origin: left center;
   transform-style: preserve-3d;
   transition: transform var(--motion-page) var(--motion-page-ease);
+  /* Layers exist before the first turn, so it starts without a hitch. */
+  will-change: transform;
   width: calc((100% - var(--page-inset-x)) * var(--leaf-width, 1));
 }
 
 .book-leaf.is-flipped {
-  transform: perspective(2400px) rotateY(-180deg) rotateZ(var(--leaf-tilt, 0deg));
+  transform: perspective(var(--book-perspective)) rotateY(-180deg) rotateZ(var(--leaf-tilt, 0deg));
 }
 
 .book-leaf--cover {
@@ -4703,75 +4707,6 @@ textarea.brief-input {
   width: auto;
 }
 
-/* Scraps that fall out while the pages turn and stay on the table. */
-.book-scraps {
-  inset: 0;
-  pointer-events: none;
-  position: absolute;
-  z-index: 2000;
-}
-
-.book-scrap {
-  filter: drop-shadow(0 5px 8px rgba(51, 54, 80, 0.22));
-  left: var(--scrap-x);
-  position: absolute;
-  top: var(--scrap-y);
-  transform: translate(-50%, -50%) rotate(var(--scrap-tilt, 0deg));
-  width: var(--scrap-w);
-}
-
-.book-scrap-paper {
-  aspect-ratio: var(--scrap-ratio, 4 / 3);
-  background: var(--paper-grain), var(--scrap-color, var(--paper));
-  clip-path: var(--scrap-clip);
-  display: grid;
-}
-
-.book-scrap--drawing .book-scrap-paper {
-  background: var(--paper-grain), var(--scrap-image) var(--scrap-focus, center) / var(--scrap-zoom, 240%) no-repeat, var(--paper);
-}
-
-.book-scrap--swatches .book-scrap-paper {
-  align-content: center;
-  gap: 7%;
-  grid-auto-flow: column;
-  justify-content: center;
-  padding: 12%;
-}
-
-.book-scrap--swatches i {
-  aspect-ratio: 1;
-  background: var(--dab);
-  border-radius: 46% 54% 50% 50% / 55% 45% 55% 45%;
-  box-shadow: inset 0 -3px 5px rgba(61, 58, 51, 0.16);
-  width: clamp(14px, 2.2vw, 26px);
-}
-
-/* A handwritten note on a torn sheet. */
-.book-scrap--note .book-scrap-paper {
-  align-content: center;
-  color: var(--paper-ink);
-  font-family: var(--font-hand);
-  font-size: clamp(15px, 1.75vw, 22px);
-  font-weight: 500;
-  line-height: 1.12;
-  padding: 12% 12% 12% 14%;
-  text-wrap: balance;
-}
-
-.book-scrap--sticker .book-scrap-paper {
-  place-items: center;
-}
-
-.book-scrap--sticker .book-scrap-paper::before {
-  aspect-ratio: 28 / 21;
-  background: #fff;
-  content: "";
-  mask: url("./assets/mari-logo.svg") center / contain no-repeat;
-  -webkit-mask: url("./assets/mari-logo.svg") center / contain no-repeat;
-  width: 58%;
-}
-
 .book-controls {
   align-items: center;
   display: flex;
@@ -4829,12 +4764,18 @@ textarea.brief-input {
 }
 
 /* Phones: the same open spread as on desktop, sized to the screen width (each page is half of it),
-   so the loose sheets peek past the edges but the pages stay whole. Notes get tighter type,
-   and the fallen scraps are left out: there is no table around the book to land on. */
+   so the loose sheets peek past the edges but the pages stay whole. Notes get tighter type.
+   Turns run slower, and the paper grain (an SVG noise filter, costly to redraw mid-turn) is off:
+   at this size it is invisible anyway. */
 @media (max-width: 700px) {
   .book-stage {
     --book-w: calc(50vw - 10px);
-    padding-bottom: calc(var(--book-w) * 0.3);
+  }
+
+  .sketchbook {
+    --motion-page: 1000ms;
+    --motion-turn: 1200ms;
+    --paper-grain: none;
   }
 
   .book-note {
@@ -4855,9 +4796,5 @@ textarea.brief-input {
     font-size: 12px;
     min-height: 34px;
     padding-inline: 12px;
-  }
-
-  .book-scraps {
-    display: none;
   }
 }

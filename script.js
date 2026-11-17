@@ -2408,18 +2408,6 @@ const SKETCHBOOK_PAGES = [
   { src: "./assets/sketchbook/sketch-19-wardrobe.webp", alt: "Шкаф с платьями и плюшевым зайцем" },
 ];
 
-// Loose bits that fall out while the pages turn. `at` is how far through the book (0–1) it happens;
-// x/y are the resting spot in % of the closed cover (y > 100 is the table below the book);
-// wideX is where it lands next to the open spread.
-const SKETCHBOOK_SCRAPS = [
-  { at: 0.14, kind: "drawing", src: "./assets/sketchbook/sketch-04-gelato-cart.webp", focus: "38% 62%", x: 74, wideX: 58, y: 108, tilt: -11, width: 30, ratio: "5 / 4" },
-  { at: 0.25, kind: "note", text: "не забыть:<br>панамка, сандалии, море", color: "#f6ecc4", x: 28, wideX: -76, y: 105, tilt: -5, width: 44, ratio: "2 / 1" },
-  { at: 0.36, kind: "swatches", dabs: ["#f3b8c6", "#f6dd8d", "#a9d3b0", "#b9a2d8"], x: 30, wideX: -36, y: 124, tilt: 7, width: 38, ratio: "5 / 2" },
-  { at: 0.58, kind: "drawing", src: "./assets/sketchbook/sketch-11-easter-table.webp", focus: "60% 30%", x: 78, wideX: 84, y: 96, tilt: 14, width: 24, ratio: "3 / 4" },
-  { at: 0.69, kind: "note", text: "больше розового!", color: "#f7dfe3", x: 68, wideX: 34, y: 126, tilt: 8, width: 36, ratio: "5 / 2" },
-  { at: 0.8, kind: "sticker", color: "#b784d5", x: 8, wideX: -6, y: 97, tilt: -6, width: 20, ratio: "1 / 1" },
-];
-
 const SKETCHBOOK_PAPERS = ["#f6f1e3", "#f6f1e3", "#f3ead9", "#f7dfe3", "#e3ecd9", "#dfe7f2", "#f6ecc4"];
 const SKETCHBOOK_SHEETS = ["#f6f1e3", "#f2c6d0", "#cfe2c5", "#c9d7ec", "#f2e0a0", "#efe6d2", "#e7c9ea", "#fbf7ee"];
 
@@ -2427,7 +2415,6 @@ const SKETCHBOOK_SHEETS = ["#f6f1e3", "#f2c6d0", "#cfe2c5", "#c9d7ec", "#f2e0a0"
   const root = document.querySelector("[data-sketchbook]");
   const book = root?.querySelector("[data-book]");
   const leavesRoot = root?.querySelector("[data-book-leaves]");
-  const scrapsRoot = root?.querySelector("[data-book-scraps]");
   const stacks = {
     right: root?.querySelector('[data-book-stack="right"]'),
     left: root?.querySelector('[data-book-stack="left"]'),
@@ -2437,9 +2424,8 @@ const SKETCHBOOK_SHEETS = ["#f6f1e3", "#f2c6d0", "#cfe2c5", "#c9d7ec", "#f2e0a0"
   const counter = root?.querySelector("[data-book-counter]");
   if (!book || !leavesRoot || !prevButton || !nextButton || !counter) return;
 
-  const PRELOAD_LEAVES = 2;
+  const PRELOAD_LEAVES = 3;
   const SIDE = -1; // Fore-edge view: before the cover.
-  const TURN_MS = 1000;
   const STACK_SHEETS = 8;
   let leaves = [];
   let flipped = SIDE;
@@ -2447,7 +2433,6 @@ const SKETCHBOOK_SHEETS = ["#f6f1e3", "#f2c6d0", "#cfe2c5", "#c9d7ec", "#f2e0a0"
   let liftSerial = 0;
   let openSerial = 0;
   let turnTimer = 0;
-  let droppedScraps = new Set();
 
   const element = (tag, className, html) => {
     const node = document.createElement(tag);
@@ -2568,6 +2553,11 @@ const SKETCHBOOK_SHEETS = ["#f6f1e3", "#f2c6d0", "#cfe2c5", "#c9d7ec", "#f2e0a0"
     });
   };
 
+  // The turn length lives in CSS (--motion-page, longer on phones).
+  const motionMs = (name, fallback) => parseFloat(getComputedStyle(book).getPropertyValue(name)) || fallback;
+  const pageTurnMs = () => motionMs("--motion-page", 900);
+  const turnMs = () => motionMs("--motion-turn", 1000);
+
   // Even steps leave odd slots free: the left stack of loose sheets sits between
   // the opened cover and the turned pages.
   const settle = (leaf, index) => {
@@ -2581,51 +2571,6 @@ const SKETCHBOOK_SHEETS = ["#f6f1e3", "#f2c6d0", "#cfe2c5", "#c9d7ec", "#f2e0a0"
     const visible = { right: Math.ceil(STACK_SHEETS * (1 - turned)), left: Math.ceil(STACK_SHEETS * turnedPages) };
     Object.entries(stacks).forEach(([side, stack]) => {
       Array.from(stack?.children ?? []).forEach((sheet, index) => sheet.classList.toggle("is-gone", index >= visible[side]));
-    });
-  };
-
-  const dropScraps = () => {
-    if (!scrapsRoot || flipped < 1) return;
-    SKETCHBOOK_SCRAPS.forEach((scrap, index) => {
-      const at = clamp(Math.round(scrap.at * maxFlipped), 1, maxFlipped);
-      if (flipped < at || droppedScraps.has(index)) return;
-      droppedScraps.add(index);
-      const rand = seeded(index * 131 + 7);
-      const node = element("div", `book-scrap book-scrap--${scrap.kind}`);
-      const paper = element("div", "book-scrap-paper");
-      const outline = tornOutline(rand, { rough: scrap.kind === "sticker" ? 0.5 : 2.4, corner: scrap.kind === "drawing" ? "bottom" : null });
-      // A scrap is torn on all four sides: reuse the outline with a ragged spine edge.
-      const ragged = [...outline, [rand() * 2.4, 66], [rand() * 2.4, 34]];
-      node.style.setProperty("--scrap-x", `${scrap.wideX}%`);
-      node.style.setProperty("--scrap-y", `${scrap.y}%`);
-      node.style.setProperty("--scrap-tilt", `${scrap.tilt}deg`);
-      node.style.setProperty("--scrap-w", `${scrap.width}%`);
-      paper.style.setProperty("--scrap-ratio", scrap.ratio);
-      paper.style.setProperty("--scrap-clip", clipPath(ragged));
-      if (scrap.color) paper.style.setProperty("--scrap-color", scrap.color);
-      if (scrap.src) {
-        paper.style.setProperty("--scrap-image", `url("${scrap.src}")`);
-        paper.style.setProperty("--scrap-focus", scrap.focus);
-      }
-      (scrap.dabs ?? []).forEach((color) => {
-        const dab = element("i");
-        dab.style.setProperty("--dab", color);
-        paper.append(dab);
-      });
-      if (scrap.text) paper.insertAdjacentHTML("beforeend", `<span>${scrap.text}</span>`);
-      node.append(paper);
-      scrapsRoot.append(node);
-      if (reduceMotion || !node.animate) return;
-      // Slips out of the gutter, tumbles and lands.
-      node.animate(
-        [
-          { opacity: 0, transform: `translate(-50%, -50%) translate(0, ${-((scrap.y - 45) / 100) * book.offsetHeight}px) rotate(${scrap.tilt - 38}deg) scale(0.82)` },
-          { opacity: 1, offset: 0.2 },
-          { opacity: 1, transform: `translate(-50%, -50%) rotate(${scrap.tilt + 5}deg) scale(1.02)`, offset: 0.82 },
-          { opacity: 1, transform: `translate(-50%, -50%) rotate(${scrap.tilt}deg) scale(1)` },
-        ],
-        { duration: 900, delay: 320, easing: "cubic-bezier(0.3, 0.1, 0.3, 1)", fill: "backwards" },
-      );
     });
   };
 
@@ -2643,7 +2588,7 @@ const SKETCHBOOK_SHEETS = ["#f6f1e3", "#f2c6d0", "#cfe2c5", "#c9d7ec", "#f2e0a0"
         };
         leaf.dataset.lift = String(serial);
         if (reduceMotion) land();
-        else setTimeout(land, 860);
+        else setTimeout(land, pageTurnMs() + 40);
       } else if (!leaf.dataset.lift || reduceMotion) {
         settle(leaf, index);
       }
@@ -2657,7 +2602,6 @@ const SKETCHBOOK_SHEETS = ["#f6f1e3", "#f2c6d0", "#cfe2c5", "#c9d7ec", "#f2e0a0"
     nextButton.disabled = flipped === maxFlipped;
     counter.textContent = flipped === SIDE ? "Блокнот" : flipped === 0 ? "Обложка" : `${flipped} / ${maxFlipped}`;
     syncStacks();
-    dropScraps();
     loadNearbyImages();
   };
 
@@ -2671,7 +2615,7 @@ const SKETCHBOOK_SHEETS = ["#f6f1e3", "#f2c6d0", "#cfe2c5", "#c9d7ec", "#f2e0a0"
     book.classList.add("is-turning");
     clearTimeout(turnTimer);
     // The transition's own end is the signal; the timer only covers a transition that never ran.
-    turnTimer = setTimeout(endTurn, reduceMotion ? 0 : TURN_MS + 600);
+    turnTimer = setTimeout(endTurn, reduceMotion ? 0 : turnMs() + 600);
   };
   turnBox?.addEventListener("transitionend", (event) => {
     if (event.target === turnBox && event.propertyName === "transform") endTurn();
@@ -2690,7 +2634,7 @@ const SKETCHBOOK_SHEETS = ["#f6f1e3", "#f2c6d0", "#cfe2c5", "#c9d7ec", "#f2e0a0"
       if (opening) {
         setTimeout(() => {
           if (serial === openSerial && flipped === 0) go(1);
-        }, reduceMotion ? 0 : TURN_MS + 380);
+        }, reduceMotion ? 0 : turnMs() + 380);
       }
       return;
     }
@@ -2723,8 +2667,6 @@ const SKETCHBOOK_SHEETS = ["#f6f1e3", "#f2c6d0", "#cfe2c5", "#c9d7ec", "#f2e0a0"
     leavesRoot.replaceChildren(...leaves);
     buildStack(stacks.right, 3);
     buildStack(stacks.left, 5);
-    scrapsRoot?.replaceChildren();
-    droppedScraps = new Set();
     openSerial += 1;
     flipped = SIDE;
     maxFlipped = leaves.length - 1;
