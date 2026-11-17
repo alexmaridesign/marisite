@@ -4744,14 +4744,19 @@ textarea.brief-input {
   z-index: 1;
 }
 
+/* Mirrored to the left. It belongs to the turned pages: it fades in over the second half of the
+   first page turn, as the page comes down on the left, and fades out as soon as it lifts again. */
 .book-stack--left {
   left: calc(-100% + var(--page-inset-x));
   right: 100%;
   transform: scaleX(-1);
+  transition: opacity calc(var(--motion-page) * 0.5) var(--motion-ease) calc(var(--motion-page) * 0.5);
 }
 
 .book-stack.is-hidden {
-  visibility: hidden;
+  opacity: 0;
+  transition-delay: 0s;
+  transition-duration: calc(var(--motion-page) * 0.4);
 }
 
 .book.is-closed .book-stack {

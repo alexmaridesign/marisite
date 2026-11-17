@@ -61,7 +61,6 @@ const SKETCHBOOK_STUFFING = [
   let liftSerial = 0;
   let openSerial = 0;
   let turnTimer = 0;
-  let leftStackTimer = 0;
 
   const element = (tag, className, html) => {
     const node = document.createElement(tag);
@@ -200,14 +199,11 @@ const SKETCHBOOK_STUFFING = [
     leaf.style.zIndex = String(10 + 2 * (index < flipped ? index : leaves.length - index));
   };
 
-  // The left stack lies under the opened cover: it shows once the cover has landed on it
-  // and goes the moment the cover lifts off again.
-  const syncLeftStack = (movedIndex) => {
-    clearTimeout(leftStackTimer);
-    const show = (on) => stacks.left?.classList.toggle("is-hidden", !on);
-    if (flipped < 1) show(false);
-    else if (movedIndex === 0 && !reduceMotion) leftStackTimer = setTimeout(() => show(true), pageTurnMs() + 40);
-    else show(true);
+  // On the first spread only the cover lies on the left, and nothing sticks out from behind it.
+  // The loose sheets on the left belong to turned pages: they fade in while the first page turns
+  // over (CSS transition) and fade out as it turns back.
+  const syncLeftStack = () => {
+    stacks.left?.classList.toggle("is-hidden", flipped < 2);
   };
 
   const sync = (movedIndex = -1) => {
@@ -237,7 +233,7 @@ const SKETCHBOOK_STUFFING = [
     prevButton.disabled = flipped === SIDE;
     nextButton.disabled = flipped === maxFlipped;
     counter.textContent = flipped === SIDE ? "Блокнот" : flipped === 0 ? "Обложка" : `${flipped} / ${maxFlipped}`;
-    syncLeftStack(movedIndex);
+    syncLeftStack();
     loadNearbyImages();
   };
 
