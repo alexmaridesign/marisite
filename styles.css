@@ -4746,18 +4746,19 @@ textarea.brief-input {
 /* Mirrored to the left. It belongs to the turned pages, which lie on the inside of the cover:
    so it sits above the cover leaf (z-index 10) and below the turned pages (12 and up).
    Its middle, where the pages lie, is cut out: only the torn edges past the pages ever show,
-   and the note inside the cover is never covered, even while the first page turns over.
-   It fades in over the second half of that turn and out as soon as the page lifts again. */
+   and the note inside the cover is never covered, even while the first page turns over. */
 .book-stack--left {
   clip-path: polygon(evenodd, -30% -30%, 130% -30%, 130% 130%, -30% 130%, -30% -30%, 0% 2%, 94% 2%, 94% 98%, 0% 98%, 0% 2%);
   left: calc(-100% + var(--page-inset-x));
   right: 100%;
   transform: scaleX(-1);
-  transition: opacity calc(var(--motion-page) * 0.5) var(--motion-ease) calc(var(--motion-page) * 0.5);
   z-index: 11;
 }
 
-.book-stack.is-hidden {
+/* A stack with no pages over it (left on the first spread, right on the last) hides its sheets:
+   they fade in over the second half of a turn, as the page comes down on them,
+   and fade out as soon as the page lifts off. The stack itself only hides while the book is shut. */
+.book-stack.is-hidden .book-sheet {
   opacity: 0;
   transition-delay: 0s;
   transition-duration: calc(var(--motion-page) * 0.4);
@@ -4775,6 +4776,7 @@ textarea.brief-input {
   position: absolute;
   transform: rotate(var(--sheet-tilt, 0deg));
   transform-origin: left center;
+  transition: opacity calc(var(--motion-page) * 0.5) var(--motion-ease) calc(var(--motion-page) * 0.5);
 }
 
 .book-ribbon {

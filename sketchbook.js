@@ -232,9 +232,11 @@ const SKETCHBOOK_STUFFING = [
         sheet.style.setProperty("--sheet-focus", `${Math.round(rand() * 100)}% ${Math.round(rand() * 100)}%`);
       }
       // Negative insets push the sheet out past the page block, as far as on the photo.
-      sheet.style.setProperty("--sheet-top", `${(-1.5 - rand() * 7).toFixed(2)}%`);
-      sheet.style.setProperty("--sheet-right", `${(-1 - rand() * 6.5).toFixed(2)}%`);
-      sheet.style.setProperty("--sheet-bottom", `${(-1.2 - rand() * 5.5).toFixed(2)}%`);
+      // Drawings stick out further than plain paper, so a plain sheet never hides them.
+      const reach = index % 2 === 0 ? 1 : 0.45;
+      sheet.style.setProperty("--sheet-top", `${(-1.5 - (2 + rand() * 5) * reach).toFixed(2)}%`);
+      sheet.style.setProperty("--sheet-right", `${(-1 - (1.5 + rand() * 5) * reach).toFixed(2)}%`);
+      sheet.style.setProperty("--sheet-bottom", `${(-1.2 - (1.5 + rand() * 4) * reach).toFixed(2)}%`);
       sheet.style.setProperty("--sheet-tilt", `${((rand() - 0.5) * 2.6).toFixed(2)}deg`);
       return sheet;
     });
@@ -283,11 +285,12 @@ const SKETCHBOOK_STUFFING = [
     leaf.style.zIndex = String(10 + 2 * (index < flipped ? index : leaves.length - index));
   };
 
-  // On the first spread only the cover lies on the left, and nothing sticks out from behind it.
-  // The loose sheets on the left belong to turned pages: they fade in while the first page turns
-  // over (CSS transition) and fade out as it turns back.
-  const syncLeftStack = () => {
+  // Loose sheets stick out only where pages lie. On the first spread only the cover is on the left,
+  // on the last one only the last page is on the right (on the back cover): nothing sticks out there.
+  // The sheets fade in and out with the turn (CSS transitions on .book-sheet).
+  const syncStacks = () => {
     stacks.left?.classList.toggle("is-hidden", flipped < 2);
+    stacks.right?.classList.toggle("is-hidden", flipped >= maxFlipped);
   };
 
   const sync = (movedIndex = -1) => {
@@ -317,7 +320,7 @@ const SKETCHBOOK_STUFFING = [
     prevButton.disabled = flipped === SIDE;
     nextButton.disabled = flipped === maxFlipped;
     counter.textContent = flipped === SIDE ? "Блокнот" : flipped === 0 ? "Обложка" : `${flipped} / ${maxFlipped}`;
-    syncLeftStack();
+    syncStacks();
     loadNearbyImages();
   };
 
