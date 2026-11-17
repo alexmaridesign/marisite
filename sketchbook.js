@@ -77,56 +77,140 @@ const SKETCHBOOK_STUFFING = [
     return ((value ^ (value >>> 14)) >>> 0) / 4294967296;
   };
 
-  // Outline of a hand-torn sheet in % of its box. The spine edge (x = 0) stays straight;
-  // `rough` is how ragged the other three are, `corner` tears one off, `bite` rips a chunk out.
-  const tornOutline = (rand, { rough = 0.4, corner = null, bite = false } = {}) => {
+  // Outline of a worn sheet in % of its box. The spine edge (x = 0) stays straight.
+  // rough: fine jitter of the torn fibres; wave: slow waviness of a crumpled edge;
+  // steps: how many points per edge (more = finer tears); corner: a corner torn off ("top" / "bottom"),
+  // cornerSize scales it; bite: a chunk ripped out of the outer edge, biteDepth scales it;
+  // dogEar: a corner folded over ("top" / "bottom") — cut straight, the flap is drawn separately.
+  const tornOutline = (rand, { rough = 0.4, wave = 0, steps: stepCount, corner = null, cornerSize = 1, bite = false, biteDepth = 1, dogEar = null } = {}) => {
     const points = [];
-    const steps = rough > 1 ? 16 : 9;
+    const steps = stepCount ?? (rough > 1 ? 16 : 9);
     const jitter = () => rand() * rough;
-    const top = corner === "top" ? { w: 8 + rand() * 12, h: 6 + rand() * 9 } : null;
-    const bottom = corner === "bottom" ? { w: 8 + rand() * 12, h: 6 + rand() * 9 } : null;
+    // Two slow sine waves per edge: a crumpled sheet never has a straight line.
+    const waviness = () => {
+      const [p1, p2, f1, f2] = [rand() * Math.PI * 2, rand() * Math.PI * 2, 0.8 + rand() * 1.6, 2.5 + rand() * 3];
+      return (t) => (wave * ((Math.sin(p1 + t * f1 * Math.PI * 2) + 1) * 0.6 + (Math.sin(p2 + t * f2 * Math.PI * 2) + 1) * 0.4)) / 2;
+    };
+    const [topWave, rightWave, bottomWave] = [waviness(), waviness(), waviness()];
+    const tear = () => ({ w: (8 + rand() * 12) * cornerSize, h: (6 + rand() * 9) * cornerSize });
+    const fold = () => ({ w: 11 + rand() * 9, h: 8 + rand() * 8 });
+    const top = corner === "top" ? tear() : dogEar === "top" ? fold() : null;
+    const bottom = corner === "bottom" ? tear() : dogEar === "bottom" ? fold() : null;
     const topEnd = 100 - (top?.w ?? 0);
     const bottomEnd = 100 - (bottom?.w ?? 0);
     const rightStart = top?.h ?? 0;
     const rightEnd = 100 - (bottom?.h ?? 0);
     const biteAt = bite ? 22 + rand() * 46 : -1;
-    const biteSize = 7 + rand() * 7;
+    const biteSize = (7 + rand() * 7) * Math.sqrt(biteDepth);
+    // A torn-off corner is a ragged diagonal; a folded one is a clean crease.
+    const cornerPoints = (from, to, folded) => {
+      const out = [];
+      for (let i = 1; i < 6; i += 1) {
+        const t = i / 6;
+        const noise = folded ? 0 : (rand() - 0.5) * 2.4 * cornerSize;
+        out.push([from[0] + (to[0] - from[0]) * t + noise, from[1] + (to[1] - from[1]) * t + noise]);
+      }
+      return out;
+    };
 
-    for (let i = 0; i <= steps; i += 1) points.push([(topEnd * i) / steps, jitter()]);
-    if (top) {
-      for (let i = 1; i < 5; i += 1) points.push([topEnd + (top.w * i) / 5 + (rand() - 0.5) * 2, (top.h * i) / 5 + (rand() - 0.5) * 2]);
-    }
     for (let i = 0; i <= steps; i += 1) {
-      const y = rightStart + ((rightEnd - rightStart) * i) / steps;
+      const t = i / steps;
+      points.push([topEnd * t, jitter() + topWave(t)]);
+    }
+    if (top) points.push(...cornerPoints([topEnd, 0], [100, top.h], dogEar === "top"));
+    for (let i = 0; i <= steps; i += 1) {
+      const t = i / steps;
+      const y = rightStart + (rightEnd - rightStart) * t;
       const inBite = bite && Math.abs(y - biteAt) < biteSize;
-      const depth = inBite ? Math.cos(((y - biteAt) / biteSize) * (Math.PI / 2)) * (4 + rand() * 3) : 0;
-      points.push([100 - jitter() - depth, y]);
+      const depth = inBite ? Math.cos(((y - biteAt) / biteSize) * (Math.PI / 2)) * (4 + rand() * 3) * biteDepth : 0;
+      points.push([100 - jitter() - rightWave(t) - depth, y]);
     }
-    if (bottom) {
-      for (let i = 1; i < 5; i += 1) points.push([100 - (bottom.w * i) / 5 + (rand() - 0.5) * 2, rightEnd + (bottom.h * i) / 5 + (rand() - 0.5) * 2]);
+    if (bottom) points.push(...cornerPoints([100, rightEnd], [bottomEnd, 100], dogEar === "bottom"));
+    for (let i = 0; i <= steps; i += 1) {
+      const t = i / steps;
+      points.push([bottomEnd - bottomEnd * t, 100 - jitter() - bottomWave(t)]);
     }
-    for (let i = 0; i <= steps; i += 1) points.push([bottomEnd - (bottomEnd * i) / steps, 100 - jitter()]);
-    return points.map(([x, y]) => [clamp(x, 0, 100), clamp(y, 0, 100)]);
+    const outline = points.map(([x, y]) => [clamp(x, 0, 100), clamp(y, 0, 100)]);
+    if (dogEar) outline.fold = { side: dogEar, ...(dogEar === "top" ? top : bottom) };
+    return outline;
   };
 
   const clipPath = (points, mirror = false) =>
     `polygon(${points.map(([x, y]) => `${(mirror ? 100 - x : x).toFixed(2)}% ${y.toFixed(2)}%`).join(", ")})`;
 
-  // Most pages are only a little uneven; some are ragged, a few lost a corner or a chunk.
+  // The folded-over corner: the cut-off triangle mirrored across the crease, in % of the leaf.
+  // The leaf is about 1.16 times taller than wide, so the mirroring is done in real proportions.
+  const LEAF_RATIO = 1.16;
+  const foldFlap = ({ side, w, h }) => {
+    const sy = side === "top" ? 1 : -1;
+    const y0 = side === "top" ? 0 : 100;
+    const a = [100 - w, y0];
+    const b = [100, y0 + sy * h];
+    const corner = [100, y0];
+    const toUnits = ([x, y]) => [x / 100, (y / 100) * LEAF_RATIO];
+    const [ax, ay] = toUnits(a);
+    const [bx, by] = toUnits(b);
+    const [px, py] = toUnits(corner);
+    const [dx, dy] = [bx - ax, by - ay];
+    const k = ((px - ax) * dx + (py - ay) * dy) / (dx * dx + dy * dy);
+    const [fx, fy] = [ax + k * dx, ay + k * dy];
+    const reflected = [(2 * fx - px) * 100, ((2 * fy - py) / LEAF_RATIO) * 100];
+    return [a, b, reflected];
+  };
+
+  // Every page of this old diary is worn its own way, and no two neighbours the same way:
+  // crumpled (wavy edges, creases), torn (ragged fibres), a corner torn off, a chunk ripped out,
+  // or a dog-eared corner.
+  const WEAR = {
+    crumpled: (rand) => ({ rough: 0.7, wave: 2.4, steps: 14, creases: 4 + Math.floor(rand() * 3), blotches: 3 }),
+    torn: () => ({ rough: 2.6, wave: 0.9, steps: 26, creases: 1 }),
+    corner: (rand) => ({ rough: 1.4, wave: 1.1, steps: 18, corner: rand() < 0.5 ? "top" : "bottom", cornerSize: 1.6, creases: 2 }),
+    bite: () => ({ rough: 1.2, wave: 1, steps: 18, bite: true, biteDepth: 1.6, creases: 1 }),
+    dogEar: (rand) => ({ rough: 0.9, wave: 1.3, steps: 14, dogEar: rand() < 0.6 ? "top" : "bottom", creases: 2 }),
+  };
+  const WEAR_KINDS = Object.keys(WEAR);
+  let lastWear = "";
+
+  // Creases and soft rubbed patches over the paper (and over the drawing, as on a real worn page).
+  const creaseLayers = (rand, creases, blotches = 0) => {
+    const layers = [];
+    for (let i = 0; i < creases; i += 1) {
+      const angle = Math.round(rand() * 180);
+      const at = 15 + rand() * 70;
+      const dark = (0.05 + rand() * 0.06).toFixed(3);
+      const light = (0.1 + rand() * 0.1).toFixed(3);
+      layers.push(`linear-gradient(${angle}deg, transparent ${(at - 1.4).toFixed(1)}%, rgba(61, 58, 51, ${dark}) ${at.toFixed(1)}%, rgba(255, 255, 255, ${light}) ${(at + 0.5).toFixed(1)}%, transparent ${(at + 1.8).toFixed(1)}%)`);
+    }
+    for (let i = 0; i < blotches; i += 1) {
+      layers.push(`radial-gradient(ellipse at ${Math.round(rand() * 100)}% ${Math.round(rand() * 100)}%, rgba(61, 58, 51, 0.07), transparent ${Math.round(18 + rand() * 18)}%)`);
+    }
+    return layers.join(", ");
+  };
+
   const wearLeaf = (leaf, index) => {
     const rand = seeded(index * 7919 + 13);
-    const roll = rand();
-    const rough = roll < 0.55 ? 0.35 : roll < 0.82 ? 0.9 : 1.9;
-    const cornerRoll = rand();
-    const corner = cornerRoll < 0.12 ? "top" : cornerRoll < 0.26 ? "bottom" : null;
-    const outline = tornOutline(rand, { rough, corner, bite: !corner && rand() < 0.16 });
+    const choices = WEAR_KINDS.filter((kind) => kind !== lastWear);
+    const kind = choices[Math.floor(rand() * choices.length)];
+    lastWear = kind;
+    const wear = WEAR[kind](rand);
+    const outline = tornOutline(rand, wear);
+    leaf.dataset.wear = kind;
     leaf.style.setProperty("--leaf-clip", clipPath(outline));
     leaf.style.setProperty("--leaf-clip-back", clipPath(outline, true));
+    leaf.style.setProperty("--leaf-creases", creaseLayers(rand, wear.creases, wear.blotches));
     leaf.style.setProperty("--leaf-tilt", `${((rand() - 0.5) * 0.9).toFixed(2)}deg`);
     leaf.style.setProperty("--leaf-width", (1 - rand() * 0.035).toFixed(3));
     leaf.style.setProperty("--leaf-top", `${(rand() * 1.2).toFixed(2)}%`);
     leaf.style.setProperty("--leaf-bottom", `${(rand() * 1.2).toFixed(2)}%`);
     leaf.style.setProperty("--leaf-paper", SKETCHBOOK_PAPERS[Math.floor(rand() * SKETCHBOOK_PAPERS.length)]);
+    if (outline.fold) {
+      const flap = foldFlap(outline.fold);
+      leaf.querySelectorAll(".book-face").forEach((face) => {
+        const node = element("span", "book-fold");
+        node.style.setProperty("--fold-clip", clipPath(flap, face.classList.contains("book-face--back")));
+        face.append(node);
+      });
+    }
   };
 
   const buildStack = (stack, seed) => {
@@ -286,14 +370,15 @@ const SKETCHBOOK_STUFFING = [
       return list;
     }, []);
 
+    lastWear = "";
     leaves = sheets.map(([front, back], index) => {
       const leaf = element("div", `book-leaf${index === 0 ? " book-leaf--cover" : ""}`);
       const frontFace = element("div", "book-face book-face--front");
       const backFace = element("div", "book-face book-face--back");
       renderPage(frontFace, front);
       renderPage(backFace, back);
-      if (index > 0) wearLeaf(leaf, index);
       leaf.append(frontFace, backFace);
+      if (index > 0) wearLeaf(leaf, index);
       return leaf;
     });
     leavesRoot.replaceChildren(...leaves);

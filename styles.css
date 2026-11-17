@@ -4840,6 +4840,7 @@ textarea.brief-input {
 /* Paper grain, the gutter shadow on the spine side and a worn outer edge. */
 .book-face::after {
   background:
+    var(--leaf-creases, none),
     var(--paper-grain),
     linear-gradient(90deg, rgba(61, 58, 51, 0.24), rgba(61, 58, 51, 0.06) 7%, transparent 16%),
     linear-gradient(270deg, rgba(61, 58, 51, 0.12), transparent 5%);
@@ -4847,6 +4848,18 @@ textarea.brief-input {
   inset: 0;
   pointer-events: none;
   position: absolute;
+}
+
+/* A dog-eared corner: the folded flap shows the plain back of the paper, darker towards the crease. */
+.book-fold {
+  background:
+    linear-gradient(to bottom left, transparent 40%, rgba(61, 58, 51, 0.18)),
+    var(--leaf-paper, var(--paper));
+  clip-path: var(--fold-clip);
+  inset: 0;
+  pointer-events: none;
+  position: absolute;
+  z-index: 1;
 }
 
 .book-face--back::after {
