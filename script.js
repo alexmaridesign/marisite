@@ -238,6 +238,32 @@ const pairs = [
     short: "Pinhead",
     copy: "Постеры Pinhead.",
   },
+  {
+    slug: "krai",
+    company: "Край",
+    label: "нео бистро",
+    type: "упаковка",
+    count: "1 превью",
+    companyImage: "./assets/company-krai.png",
+    caseImage: "./assets/case-krai.png",
+    companyArtwork: true,
+    title: "Край",
+    short: "Край",
+    copy: "Стаканы и упаковка для нео бистро «Край».",
+  },
+  {
+    slug: "matter-and-me",
+    company: "Matter and Me",
+    label: "блокнот",
+    type: "иллюстрация",
+    count: "1 превью",
+    companyImage: "./assets/company-matter-and-me.png",
+    caseImage: "./assets/case-matter-and-me.png",
+    companyArtwork: true,
+    title: "Matter and Me",
+    short: "Matter and Me",
+    copy: "Блокнот Matter and Me с иллюстрациями.",
+  },
 ];
 
 const ORBIT_DENSITY = 1;
