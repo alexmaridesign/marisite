@@ -1,12 +1,15 @@
 :root {
-  --cream: #f6f2e5;
-  --paper: #fbfaf6;
   --section-paper: #f8f8ff;
   --ink: #171614;
-  --muted: #756f64;
   --line: rgba(23, 22, 20, 0.13);
   --glass: rgba(255, 255, 255, 0.58);
   --violet: #8794eb;
+  --accent: #828ac4;
+  --accent-text: #626daa;
+  --tap-target: 44px;
+  --font-display: "Dela Gothic One", Inter, sans-serif;
+  --field-border: rgba(130, 138, 196, 0.34);
+  --chip-surface: #eceefb;
   --heading-letter-spacing: 0.02em;
   --motion-fast: 160ms;
   --motion-ui: 220ms;
@@ -123,7 +126,7 @@ body.case-dialog-is-open {
 
 .case-dialog {
   --reader-ink: #535774;
-  --reader-violet: #828ac4;
+  --reader-violet: var(--accent);
   --reader-accent: #626daa;
   background: transparent;
   border: 0;
@@ -214,7 +217,7 @@ body.case-dialog-is-open {
 [data-case-stack-next-title],
 .case-dialog-transition-card span {
   color: var(--reader-violet);
-  font-family: "Dela Gothic One", Inter, sans-serif;
+  font-family: var(--font-display);
   font-size: 18px;
   text-align: center;
 }
@@ -330,9 +333,8 @@ body.case-dialog-is-open {
 }
 
 .case-dialog-card {
+  /* The dialog backdrop already blurs the page; a second blur here was invisible at 96% opacity. */
   background: rgba(248, 248, 255, 0.96);
-  backdrop-filter: blur(24px);
-  -webkit-backdrop-filter: blur(24px);
   border: 1px solid rgba(255, 255, 255, 0.96);
   border-radius: 34px;
   box-shadow:
@@ -381,7 +383,7 @@ body.case-dialog-is-open {
 
 .case-dialog-topbar [data-case-dialog-title] {
   color: var(--reader-violet);
-  font-family: "Dela Gothic One", Inter, sans-serif;
+  font-family: var(--font-display);
   font-size: 18px;
   font-weight: 400;
   line-height: 1.2;
@@ -551,7 +553,7 @@ body.case-dialog-is-open {
 .case-reader-section h3,
 .case-reader-section h4 {
   color: var(--reader-violet);
-  font-family: "Dela Gothic One", Inter, sans-serif;
+  font-family: var(--font-display);
   font-weight: 400;
   letter-spacing: 0;
   overflow-wrap: break-word;
@@ -1035,8 +1037,8 @@ body.case-dialog-is-open {
 }
 
 .brand-title {
-  color: #828ac4;
-  font-family: "Dela Gothic One", Inter, sans-serif;
+  color: var(--accent);
+  font-family: var(--font-display);
   font-size: clamp(42px, 4.5vw, 58px);
   font-weight: 400;
   letter-spacing: var(--heading-letter-spacing);
@@ -1045,8 +1047,8 @@ body.case-dialog-is-open {
 }
 
 .brand-subtitle {
-  color: #828ac4;
-  font-family: "Dela Gothic One", Inter, sans-serif;
+  color: var(--accent);
+  font-family: var(--font-display);
   font-size: clamp(12px, 1.35vw, 18px);
   font-weight: 400;
   letter-spacing: 0.03em;
@@ -1081,7 +1083,7 @@ body.case-dialog-is-open {
 .screen-nav button {
   align-items: center;
   background: transparent;
-  color: #828ac4;
+  color: var(--accent-text);
   display: inline-flex;
   font-size: clamp(10.5px, 1.05vw, 13px);
   font-weight: 500;
@@ -1118,7 +1120,7 @@ body.case-dialog-is-open {
   box-shadow:
     0 24px 52px rgba(67, 75, 130, 0.18),
     inset 0 1px 0 rgba(255, 255, 255, 0.92);
-  color: #828ac4;
+  color: var(--accent-text);
   left: 0;
   padding: 24px 28px;
   pointer-events: auto;
@@ -1182,16 +1184,6 @@ body.case-dialog-is-open {
   top: 54%;
   writing-mode: vertical-rl;
   z-index: 30;
-}
-
-.side-left {
-  left: clamp(24px, 3vw, 48px);
-  transform: translateY(-50%) rotate(180deg);
-}
-
-.side-right {
-  right: clamp(24px, 3vw, 48px);
-  transform: translateY(-50%);
 }
 
 .center-logo {
@@ -1430,12 +1422,13 @@ body.case-dialog-is-open {
   border-radius: var(--lens-radius, clamp(18px, 2vw, 28px));
   box-shadow: 0 18px 34px rgba(38, 31, 21, 0.2);
   height: clamp(120px, 12vw, 154px);
-  left: 50%;
+  left: 0;
   overflow: hidden;
   position: absolute;
-  top: 50%;
+  top: 0;
   transform-origin: center;
-  /* Orbit positions and scale are interpolated together by the motion loop. */
+  /* Orbit positions and scale are interpolated together by the motion loop;
+     left/top stay 0 and the loop moves the node with translate3d. */
   transition: none;
   width: clamp(120px, 12vw, 154px);
 }
@@ -1448,11 +1441,11 @@ body.case-dialog-is-open {
   display: flex;
   height: clamp(36px, 3.6vw, 50px);
   justify-content: center;
-  left: 50%;
+  left: 0;
   overflow: visible;
   pointer-events: none;
   position: absolute;
-  top: 50%;
+  top: 0;
   transform-origin: center;
   transition: none;
   width: clamp(36px, 3.6vw, 50px);
@@ -1634,8 +1627,8 @@ body.case-dialog-is-open {
 }
 
 .spotlight h2 {
-  color: #828ac4;
-  font-family: "Dela Gothic One", Inter, sans-serif;
+  color: var(--accent);
+  font-family: var(--font-display);
   font-size: clamp(21px, 2.25vw, 30px);
   font-weight: 400;
   letter-spacing: var(--heading-letter-spacing);
@@ -1731,8 +1724,7 @@ body.case-dialog-is-open {
   }
 }
 
-.black-button,
-.email {
+.black-button {
   align-items: center;
   background: #191815;
   border-radius: 999px;
@@ -1751,22 +1743,14 @@ body.case-dialog-is-open {
 }
 
 .black-button:hover,
-.black-button:focus-visible,
-.email:hover,
-.email:focus-visible {
+.black-button:focus-visible {
   background: #000;
   transform: translateY(-2px);
 }
 
-.black-button svg,
-.email svg {
+.black-button svg {
   height: 16px;
   width: 16px;
-}
-
-.email .telegram-icon {
-  fill: currentColor;
-  stroke: none;
 }
 
 .screen-actions {
@@ -1788,13 +1772,13 @@ body.case-dialog-is-open {
   border-radius: 50%;
   color: rgba(23, 22, 20, 0.58);
   display: inline-flex;
-  height: 36px;
+  height: var(--tap-target);
   justify-content: center;
   transition:
     background var(--motion-ui) var(--motion-ease),
     color var(--motion-ui) var(--motion-ease),
     transform var(--motion-ui) var(--motion-ease);
-  width: 36px;
+  width: var(--tap-target);
 }
 
 .screen-actions a:hover,
@@ -1884,18 +1868,9 @@ body.case-dialog-is-open {
   margin-bottom: clamp(28px, 4vw, 48px);
 }
 
-.pricing-kicker {
-  color: #626daa;
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 0.14em;
-  margin: 0 0 16px;
-  text-transform: uppercase;
-}
-
 .pricing-heading h2 {
-  color: #828ac4;
-  font-family: "Dela Gothic One", Inter, sans-serif;
+  color: var(--accent);
+  font-family: var(--font-display);
   font-size: clamp(32px, 4.3vw, 58px);
   font-weight: 400;
   letter-spacing: var(--heading-letter-spacing);
@@ -1973,7 +1948,7 @@ body.case-dialog-is-open {
 }
 
 .pricing-name {
-  font-family: "Dela Gothic One", Inter, sans-serif;
+  font-family: var(--font-display);
   font-size: clamp(18px, 2vw, 24px);
   font-weight: 400;
   letter-spacing: var(--heading-letter-spacing);
@@ -2066,44 +2041,6 @@ body.case-dialog-is-open {
   max-width: 490px;
 }
 
-.pricing-options {
-  margin: 0;
-  min-width: 0;
-}
-
-.pricing-options > div {
-  align-items: baseline;
-  border-bottom: 1px solid #dfe1ef;
-  display: grid;
-  gap: 16px;
-  grid-template-columns: minmax(0, 1fr) auto;
-  padding: 11px 0;
-}
-
-.pricing-options > div:first-child {
-  padding-top: 0;
-}
-
-.pricing-options > div:last-child {
-  border-bottom: 0;
-  padding-bottom: 0;
-}
-
-.pricing-options dt {
-  color: #575c78;
-  font-size: 12px;
-  line-height: 1.5;
-}
-
-.pricing-options dd {
-  color: #575c78;
-  font-size: 13px;
-  font-variant-numeric: tabular-nums;
-  font-weight: 600;
-  margin: 0;
-  white-space: nowrap;
-}
-
 .pricing-footer {
   align-items: center;
   display: flex;
@@ -2124,7 +2061,7 @@ body.case-dialog-is-open {
 }
 
 .pricing-note-marker {
-  color: #828ac4;
+  color: var(--accent);
   font-size: 20px;
   font-weight: 600;
   line-height: 1;
@@ -2235,7 +2172,7 @@ body.case-dialog-is-open {
 
 /* Process: stacked cards and suspended artwork, following the supplied layout. */
 .panel.process {
-  --process-accent: #828ac4;
+  --process-accent: var(--accent);
   aspect-ratio: 888 / 469;
   background: var(--section-paper);
   border: 1px solid rgba(255, 255, 255, 0.82);
@@ -2256,7 +2193,7 @@ body.case-dialog-is-open {
 
 .process .panel-heading h2 {
   color: var(--process-accent);
-  font-family: "Dela Gothic One", Inter, sans-serif;
+  font-family: var(--font-display);
   font-size: clamp(32px, 4.55vw, 66px);
   font-weight: 400;
   letter-spacing: var(--heading-letter-spacing);
@@ -2433,6 +2370,12 @@ body.case-dialog-is-open {
   }
 }
 
+/* script.js toggles .is-offscreen so the looping artwork rests while the section is out of view. */
+.process.is-offscreen .process-keychain *,
+.process.is-offscreen .process-star {
+  animation-play-state: paused;
+}
+
 @keyframes keychain-sway {
   0%, 100% { transform: rotate(-2.4deg); }
   50% { transform: rotate(2.4deg); }
@@ -2460,43 +2403,6 @@ body.case-dialog-is-open {
   50% { transform: translateY(4px) rotate(5deg); }
 }
 
-.case-grid {
-  display: grid;
-  gap: 15px;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
-}
-
-.case-card {
-  border-radius: 10px;
-  min-width: 0;
-  overflow: hidden;
-  transition: transform var(--motion-panel) var(--motion-ease);
-}
-
-.case-card:hover {
-  box-shadow: 0 26px 58px rgba(0, 0, 0, 0.19);
-  transform: translateY(-7px);
-}
-
-.case-card img {
-  aspect-ratio: 1 / 1.02;
-  object-fit: cover;
-  width: 100%;
-}
-
-.case-card div {
-  padding: 14px 14px 18px;
-}
-
-.case-card h3 {
-  font-size: 18px;
-  font-weight: 850;
-  line-height: 1;
-  margin: 0 0 7px;
-  text-transform: uppercase;
-}
-
-.case-card p,
 .step p,
 .contact p {
   color: rgba(23, 22, 20, 0.66);
@@ -2515,7 +2421,7 @@ body.case-dialog-is-open {
 }
 
 .step-stack {
-  --step-accent: #828ac4;
+  --step-accent: var(--accent);
   --step-radius: 6cqi;
   --step-peek: 16cqi;
   --step-card-height: 96cqi;
@@ -2607,7 +2513,7 @@ body.case-dialog-is-open {
 }
 
 .step-title {
-  font-family: "Dela Gothic One", Inter, sans-serif;
+  font-family: var(--font-display);
   font-size: 8cqi;
   font-weight: 400;
   letter-spacing: var(--heading-letter-spacing);
@@ -2638,7 +2544,7 @@ body.case-dialog-is-open {
 .step-brief-link {
   background: #dedfff;
   border-radius: 999px;
-  color: #828ac4;
+  color: var(--accent);
   display: inline-block;
   font: inherit;
   padding: 0.02em 0.24em 0.04em;
@@ -2860,7 +2766,7 @@ body.case-dialog-is-open {
   --skill-soft: #eceefb;
   --skill-selected: #e5e8fb;
   --skill-shadow: #36386924;
-  background: #828ac4;
+  background: var(--accent);
   border-radius: 28px;
   box-shadow: 0 18px 48px rgba(40, 34, 24, 0.16);
   color: var(--skill-ink);
@@ -2886,7 +2792,7 @@ body.case-dialog-is-open {
 }
 
 .skills-heading h2 {
-  font-family: "Dela Gothic One", Inter, sans-serif;
+  font-family: var(--font-display);
   font-size: clamp(29px, 5.1vw, 42px);
   font-weight: 400;
   letter-spacing: var(--heading-letter-spacing);
@@ -2972,7 +2878,7 @@ body.case-dialog-is-open {
 }
 
 .skill-title {
-  font-family: "Dela Gothic One", Inter, sans-serif;
+  font-family: var(--font-display);
   font-size: clamp(24px, 4.6vw, 34px);
   font-weight: 400;
   letter-spacing: var(--heading-letter-spacing);
@@ -3155,7 +3061,7 @@ body.case-dialog-is-open {
 
 .contact h2 {
   color: #171614;
-  font-family: "Dela Gothic One", Inter, sans-serif;
+  font-family: var(--font-display);
   font-size: clamp(34px, 4.4vw, 60px);
   font-weight: 400;
   letter-spacing: var(--heading-letter-spacing);
@@ -3277,7 +3183,7 @@ body.case-dialog-is-open {
 }
 
 .contact-actions {
-  --process-accent: #828ac4;
+  --process-accent: var(--accent);
   display: grid;
   gap: 12px;
   width: min(100%, 436px);
@@ -3414,10 +3320,6 @@ body.case-dialog-is-open {
 
   .spotlight {
     width: min(280px, 34vw);
-  }
-
-  .case-grid {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 
   .contact {
@@ -3610,10 +3512,6 @@ body.case-dialog-is-open {
     align-items: start;
     grid-template-columns: 1fr;
   }
-
-  .case-grid {
-    grid-template-columns: 1fr;
-  }
 }
 
 @media (max-width: 520px) {
@@ -3760,12 +3658,6 @@ body.case-dialog-is-open {
     align-items: flex-start;
     flex-direction: column;
     gap: 10px;
-  }
-}
-
-@media (min-width: 521px) and (max-width: 820px) {
-  .case-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 
@@ -3930,5 +3822,265 @@ body.case-dialog-is-open {
     scroll-behavior: auto !important;
     transition-duration: 0.001ms !important;
     transition-delay: 0ms !important;
+  }
+}
+
+/* Invisible hit-area extension: keeps the visual size, gives touch a 44px target. */
+.spotlight .black-button,
+.step-brief-link,
+.site-footer a {
+  position: relative;
+}
+
+.spotlight .black-button::after,
+.step-brief-link::after,
+.site-footer a::after {
+  content: "";
+  left: 0;
+  min-height: var(--tap-target);
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+/* Brief form dialog */
+.brief-dialog {
+  background: transparent;
+  border: 0;
+  color: #535774;
+  margin: auto;
+  max-height: 100dvh;
+  max-width: 100%;
+  overflow: visible;
+  padding: 12px;
+  width: min(600px, 100%);
+}
+
+.brief-dialog::backdrop {
+  background: rgba(242, 243, 255, 0.72);
+  backdrop-filter: blur(20px) saturate(0.95);
+  -webkit-backdrop-filter: blur(20px) saturate(0.95);
+}
+
+.brief-card {
+  background: var(--section-paper);
+  border: 1px solid rgba(255, 255, 255, 0.88);
+  border-radius: clamp(22px, 3vw, 34px);
+  box-shadow: 0 30px 80px rgba(67, 75, 130, 0.22);
+  display: grid;
+  gap: 22px;
+  max-height: calc(100dvh - 24px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: clamp(20px, 4vw, 34px);
+}
+
+.brief-header {
+  align-items: flex-start;
+  display: flex;
+  gap: 16px;
+  justify-content: space-between;
+}
+
+.brief-header h2 {
+  color: var(--accent);
+  font-family: var(--font-display);
+  font-size: clamp(30px, 5vw, 42px);
+  font-weight: 400;
+  letter-spacing: var(--heading-letter-spacing);
+  line-height: 1;
+  margin: 0 0 10px;
+}
+
+.brief-header p,
+.brief-note,
+.brief-status {
+  font-size: 14px;
+  line-height: 1.5;
+  margin: 0;
+  text-wrap: pretty;
+}
+
+.brief-close {
+  color: var(--accent-text);
+}
+
+.brief-fields {
+  display: grid;
+  gap: 18px;
+}
+
+.brief-field {
+  border: 0;
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  min-width: 0;
+  padding: 0;
+}
+
+.brief-label {
+  color: var(--accent-text);
+  font-size: 13px;
+  font-weight: 700;
+  padding: 0;
+}
+
+.brief-label small {
+  font-size: 12px;
+  font-weight: 500;
+  margin-left: 6px;
+  opacity: 0.72;
+}
+
+.brief-input {
+  background: #fff;
+  border: 1px solid var(--field-border);
+  border-radius: 14px;
+  color: var(--ink);
+  font: inherit;
+  font-size: 16px;
+  line-height: 1.4;
+  min-height: var(--tap-target);
+  padding: 10px 14px;
+  transition: border-color var(--motion-ui) var(--motion-ease), box-shadow var(--motion-ui) var(--motion-ease);
+  width: 100%;
+}
+
+textarea.brief-input {
+  min-height: 108px;
+  resize: vertical;
+}
+
+.brief-input::placeholder {
+  color: rgba(83, 87, 116, 0.56);
+}
+
+.brief-input:focus-visible {
+  border-color: var(--accent-text);
+  box-shadow: 0 0 0 3px rgba(130, 138, 196, 0.26);
+  outline: 0;
+}
+
+.brief-input.is-invalid {
+  border-color: #c2566b;
+}
+
+.brief-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.brief-chip {
+  cursor: pointer;
+  position: relative;
+}
+
+.brief-chip input {
+  appearance: none;
+  inset: 0;
+  margin: 0;
+  opacity: 0;
+  position: absolute;
+}
+
+.brief-chip span {
+  align-items: center;
+  background: var(--chip-surface);
+  border: 1px solid transparent;
+  border-radius: 999px;
+  color: var(--accent-text);
+  display: inline-flex;
+  font-size: 14px;
+  font-weight: 600;
+  min-height: 40px;
+  padding: 0 16px;
+  transition: background var(--motion-fast) var(--motion-ease), color var(--motion-fast) var(--motion-ease);
+}
+
+.brief-chip input:checked + span {
+  background: var(--accent-text);
+  color: #fff;
+}
+
+.brief-chip input:focus-visible + span {
+  outline: 2px solid var(--accent-text);
+  outline-offset: 2px;
+}
+
+.brief-status:empty {
+  display: none;
+}
+
+.brief-status {
+  background: var(--chip-surface);
+  border-radius: 14px;
+  color: var(--accent-text);
+  font-weight: 600;
+  padding: 12px 14px;
+}
+
+.brief-status.is-error {
+  background: #fbecef;
+  color: #a13f54;
+}
+
+.brief-footer {
+  display: grid;
+  gap: 14px;
+}
+
+.brief-actions {
+  --process-accent: var(--accent);
+  display: grid;
+  gap: 10px;
+  grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);
+}
+
+.brief-actions .process-button {
+  cursor: pointer;
+  font-size: 15px;
+  min-height: 48px;
+}
+
+.brief-note {
+  font-size: 12px;
+  opacity: 0.86;
+}
+
+.brief-note a {
+  color: var(--accent-text);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+@media (max-width: 520px) {
+  .brief-actions {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .brief-dialog[open] .brief-card {
+    animation: brief-card-in var(--motion-panel) var(--motion-ease);
+  }
+
+  .brief-dialog[open]::backdrop {
+    animation: brief-backdrop-in var(--motion-ui) var(--motion-ease);
+  }
+}
+
+@keyframes brief-card-in {
+  from {
+    opacity: 0;
+    transform: translateY(18px) scale(0.985);
+  }
+}
+
+@keyframes brief-backdrop-in {
+  from {
+    opacity: 0;
   }
 }

@@ -25,7 +25,7 @@
 
 ## О сайте
 
-Адаптивный сайт на HTML, CSS и JavaScript. Для типографики используются Inter и Dela Gothic One из Google Fonts.
+Адаптивный сайт на HTML, CSS и JavaScript. Для типографики используются Inter и Dela Gothic One; файлы шрифтов лежат в `assets/fonts`.
 
 Сайт размещён на GitHub Pages с доменом `alexmaridesign.ru`.
 

@@ -112,6 +112,7 @@ document.addEventListener("visibilitychange", () => {
 
 const pairs = [
   {
+    slug: "meren-coffee",
     company: "МеренКофе",
     label: "кофейный бренд",
     type: "айдентика / упаковка",
@@ -124,6 +125,7 @@ const pairs = [
     copy: "Я\u00a0собираю знак, упаковку, визуалы и\u00a0правила кампании.",
   },
   {
+    slug: "mirai",
     company: "Mirai",
     label: "логотип",
     type: "логотип",
@@ -135,6 +137,7 @@ const pairs = [
     copy: "Логотип Mirai.",
   },
   {
+    slug: "round",
     company: "Round",
     label: "логотип",
     type: "логотип",
@@ -146,6 +149,7 @@ const pairs = [
     copy: "Логотип Round.",
   },
   {
+    slug: "sofacinic",
     company: "Sofacinic",
     label: "бренд ухода",
     type: "бренд / digital",
@@ -157,6 +161,7 @@ const pairs = [
     copy: "Я\u00a0проектирую визуальный язык, лендинг и\u00a0digital-носители.",
   },
   {
+    slug: "pinhead-tee",
     company: "Pinhead",
     label: "креативная студия",
     type: "мерч",
@@ -169,6 +174,7 @@ const pairs = [
     copy: "Футболка с\u00a0принтом Forever Sexy Forever Busy.",
   },
   {
+    slug: "pinhead-shoes",
     company: "Pinhead",
     label: "мерч",
     type: "мерч",
@@ -181,6 +187,7 @@ const pairs = [
     copy: "Обувь Pinhead.",
   },
   {
+    slug: "drug-shirt",
     company: "Друг",
     label: "теннис",
     type: "мерч",
@@ -193,6 +200,7 @@ const pairs = [
     copy: "Футболка «Друг».",
   },
   {
+    slug: "meren-coffee-mascot",
     company: "МеренКофе",
     label: "кофейный бренд",
     type: "иллюстрация",
@@ -205,6 +213,7 @@ const pairs = [
     copy: "Иллюстрация для кофейного бренда МеренКофе.",
   },
   {
+    slug: "drug-award",
     company: "Друг",
     label: "теннис",
     type: "печатная продукция",
@@ -217,6 +226,7 @@ const pairs = [
     copy: "Печатные материалы «Друг».",
   },
   {
+    slug: "pinhead-posters",
     company: "Pinhead",
     label: "проект",
     type: "постеры",
@@ -470,11 +480,11 @@ function setNodePosition(node, angle, lane, index, isActive, positionOptions = {
   const baseTilt = -12 + Math.sin(angle) * 10;
   const tilt = baseTilt * (1 - focus);
 
-  node.style.left = `${x}%`;
-  node.style.top = `${y}%`;
+  // Position by transform only (CSS pins left/top to 0), so frames never trigger layout.
+  const { laneWidth = 0, laneHeight = 0 } = positionOptions;
   node.style.opacity = opacity.toFixed(3);
   node.style.zIndex = String(z);
-  node.style.transform = `translate(-50%, -50%) rotate(${tilt}deg) scale(${scale.toFixed(3)})`;
+  node.style.transform = `translate3d(${((x / 100) * laneWidth).toFixed(2)}px, ${((y / 100) * laneHeight).toFixed(2)}px, 0) translate(-50%, -50%) rotate(${tilt}deg) scale(${scale.toFixed(3)})`;
 
   return { x, y, opacity, z, tilt, scale, focus };
 }
@@ -751,7 +761,25 @@ function renderCaseDialog(index) {
   setActiveCaseSection("about");
 }
 
-function openCaseDialog(opener) {
+// Case addresses: #case/<slug>. One history entry per opened case; switching cases
+// inside the dialog replaces it, closing steps back (or strips the hash on a direct load).
+const CASE_HASH_PREFIX = "#case/";
+let caseHistoryPushed = false;
+let caseClosedByHistory = false;
+
+function caseIndexFromHash() {
+  if (!location.hash.startsWith(CASE_HASH_PREFIX)) return -1;
+  let slug;
+  try { slug = decodeURIComponent(location.hash.slice(CASE_HASH_PREFIX.length)); } catch { return -1; }
+  return pairs.findIndex((pair) => pair.slug === slug);
+}
+
+function syncCaseHash(index) {
+  const hash = `${CASE_HASH_PREFIX}${pairs[normalizePairIndex(index)].slug}`;
+  if (location.hash !== hash) history.replaceState(history.state, "", hash);
+}
+
+function openCaseDialog(opener, { index = renderedPairIndex < 0 ? 0 : renderedPairIndex, fromHistory = false } = {}) {
   if (!caseDialog) return;
   if (caseDialog.open) {
     if (caseDialog.classList.contains("is-closing")) {
@@ -775,7 +803,12 @@ function openCaseDialog(opener) {
   caseDialogAutoWasPaused = orbitPicker.autoPausedByUser;
   caseDialogSelectionChanged = false;
   orbitPicker.pauseAutoByUser();
-  renderCaseDialog(renderedPairIndex < 0 ? 0 : renderedPairIndex);
+  renderCaseDialog(index);
+  caseHistoryPushed = false;
+  if (!fromHistory) {
+    history.pushState(null, "", `${CASE_HASH_PREFIX}${pairs[normalizePairIndex(index)].slug}`);
+    caseHistoryPushed = true;
+  }
 
   const scrollbarGap = Math.max(0, window.innerWidth - document.documentElement.clientWidth);
   document.body.style.setProperty("--case-dialog-scrollbar-gap", `${scrollbarGap}px`);
@@ -840,6 +873,7 @@ function stepCaseDialog(direction) {
   if (reduceMotion || !caseDialogCard.animate) {
     caseDialog.classList.add("has-switched");
     renderCaseDialog(nextIndex);
+    syncCaseHash(nextIndex);
     orbitPicker.select(nextIndex);
     caseReaderHeading.focus({ preventScroll: true });
     return Promise.resolve();
@@ -910,6 +944,7 @@ function stepCaseDialog(direction) {
       await ((promotion ?? outgoing)?.finished.catch(() => {}) ?? Promise.resolve());
       if (serial !== caseSwitchSerial || !caseDialog.open) return;
       renderCaseDialog(nextIndex);
+      syncCaseHash(nextIndex);
       orbitPicker.select(nextIndex);
       const incoming = playUiMotion(caseDialogCard, [
         { opacity: 0, transform: `translateX(${hasSideCards ? 0 : direction * 24}px) scale(0.99)` },
@@ -1088,11 +1123,9 @@ class LiquidGlassLens {
     };
     this.nodeMotion.set(node, motion);
 
-    node.style.left = `${motion.x.toFixed(2)}px`;
-    node.style.top = `${motion.y.toFixed(2)}px`;
     node.style.opacity = motion.opacity.toFixed(3);
     node.style.zIndex = String(state.z + 20);
-    node.style.transform = `translate(-50%, -50%) rotate(${motion.tilt.toFixed(2)}deg) scale(${motion.scale.toFixed(3)}) scaleX(${motion.stretchX.toFixed(3)}) scaleY(${motion.stretchY.toFixed(3)})`;
+    node.style.transform = `translate3d(${motion.x.toFixed(2)}px, ${motion.y.toFixed(2)}px, 0) translate(-50%, -50%) rotate(${motion.tilt.toFixed(2)}deg) scale(${motion.scale.toFixed(3)}) scaleX(${motion.stretchX.toFixed(3)}) scaleY(${motion.stretchY.toFixed(3)})`;
     node.style.filter = `saturate(${(1.04 + motion.focus * 0.07).toFixed(3)}) brightness(${(1.01 + motion.focus * 0.02).toFixed(3)}) contrast(1.02)`;
     node.classList.toggle("is-active", isActive);
   }
@@ -1148,6 +1181,8 @@ class OrbitalPicker {
     this.nodes = [];
     this.lensNodes = [];
     this.decorations = [];
+    this.geometry = null;
+    this.geometryDirty = true;
 
     this.mount();
     this.bind();
@@ -1213,13 +1248,20 @@ class OrbitalPicker {
     window.addEventListener("blur", () => this.cancelGesture());
     window.addEventListener("resize", () => {
       this.cancelGesture();
-      this.wake();
+      this.markGeometryDirty();
     });
     document.addEventListener("visibilitychange", () => {
       if (document.hidden) this.suspendRendering();
-      else this.wake();
+      else this.markGeometryDirty();
     });
-    document.fonts?.ready.then(() => this.wake());
+    document.fonts?.ready.then(() => this.markGeometryDirty());
+    if (typeof ResizeObserver === "function") {
+      // Cached rects are re-read only when one of these boxes changes size.
+      const geometryObserver = new ResizeObserver(() => this.markGeometryDirty());
+      [this.surface, this.lens?.root, spotlightNode, ...this.lanes.map((lane) => lane.root)]
+        .filter(Boolean)
+        .forEach((element) => geometryObserver.observe(element));
+    }
     this.surface?.addEventListener("dragstart", (event) => event.preventDefault());
     this.surface?.addEventListener("click", (event) => {
       // Block the click generated after a swipe, including swipes over the CTA.
@@ -1327,7 +1369,7 @@ class OrbitalPicker {
 
   setRenderInViewport(isVisible) {
     this.renderInViewport = isVisible;
-    if (isVisible) this.wake();
+    if (isVisible) this.markGeometryDirty();
     else this.suspendRendering();
   }
 
@@ -1478,28 +1520,42 @@ class OrbitalPicker {
     lane.ringGeometryKey = geometryKey;
   }
 
-  update() {
-    const nextVisualIndex = this.nearestIndex();
+  markGeometryDirty() {
+    this.geometryDirty = true;
+    this.wake();
+  }
+
+  // Read layout once per change, not per frame. All rects come from one read and
+  // are only compared with each other, so page scroll and the reveal shift cancel out.
+  measureGeometry() {
+    this.geometryDirty = false;
     const lensFrame = this.lens?.readFrame();
     const lensLaneFrames = this.lanes.map((lane) =>
       lane.lensRoot && lensFrame ? this.lens.readLane(lane.root, lensFrame) : null,
     );
-    const lensCenterDrops = lensLaneFrames.map((frame) => {
-      if (!frame) return null;
-
-      const laneCenter = frame.laneRect.top + frame.laneRect.height / 2;
-      const lensCenter = frame.lensRect.top + frame.lensRect.height / 2;
-      return ((lensCenter - laneCenter) / frame.laneRect.height) * 100;
+    const laneSizes = this.lanes.map((lane, index) => {
+      const rect = lensLaneFrames[index]?.laneRect ?? lane.root.getBoundingClientRect();
+      return { laneWidth: rect.width, laneHeight: rect.height };
     });
     const lanePositions = this.lanes.map((lane, laneIndex) => {
       const frame = lensLaneFrames[laneIndex];
-      const position = {
-        centerDrop: lensCenterDrops[laneIndex],
+      const centerDrop = frame
+        ? ((frame.lensRect.top + frame.lensRect.height / 2 - (frame.laneRect.top + frame.laneRect.height / 2)) / frame.laneRect.height) * 100
+        : null;
+      return {
+        centerDrop,
         focusX: frame ? ((frame.slotCenter - frame.laneRect.left) / frame.laneRect.width) * 100 : undefined,
+        ...laneSizes[laneIndex],
       };
-      return position;
     });
     const sourceBaseSizes = this.nodes.map((nodes) => nodes[0]?.offsetHeight || 0);
+    this.geometry = { lensLaneFrames, lanePositions, sourceBaseSizes };
+  }
+
+  update() {
+    const nextVisualIndex = this.nearestIndex();
+    if (this.geometryDirty || !this.geometry) this.measureGeometry();
+    const { lensLaneFrames, lanePositions, sourceBaseSizes } = this.geometry;
     if (nextVisualIndex !== this.visualIndex) this.onPreview?.(this.values[nextVisualIndex], nextVisualIndex);
     this.visualIndex = nextVisualIndex;
     this.lanes.forEach((lane, index) => this.updateRing(lane, lanePositions[index]));
@@ -1620,8 +1676,16 @@ const orbitPicker = new OrbitalPicker({
       mirror: true,
     },
   ],
-  onChange: (_, index) => renderPair(index % pairs.length),
-  onPreview: (_, index) => renderPair(index % pairs.length),
+  onChange: (_, index) => {
+    renderPair(index % pairs.length);
+    // The spotlight text changed; re-read on the next frame (no wake: may run inside a frame).
+    orbitPicker.geometryDirty = true;
+  },
+  onPreview: (_, index) => {
+    renderPair(index % pairs.length);
+    // The spotlight text changed; re-read on the next frame (no wake: may run inside a frame).
+    orbitPicker.geometryDirty = true;
+  },
 });
 
 const topSection = document.querySelector("#top");
@@ -1636,6 +1700,15 @@ if (topSection) {
   );
 
   autoObserver.observe(topSection);
+}
+
+// Pause the process section's decorative loops while it is off screen.
+const processSection = document.querySelector("section.process");
+if (processSection && "IntersectionObserver" in window) {
+  new IntersectionObserver(
+    (entries) => processSection.classList.toggle("is-offscreen", !entries[entries.length - 1].isIntersecting),
+    { rootMargin: "120px 0px" },
+  ).observe(processSection);
 }
 
 document.querySelectorAll("[data-step]").forEach((button) => {
@@ -1823,6 +1896,13 @@ if (caseDialogOpenButton && caseDialog && caseDialogCloseButton) {
     document.body.classList.remove("case-dialog-is-open");
     document.body.style.removeProperty("--case-dialog-scrollbar-gap");
     orbitPicker.autoPausedByUser = caseDialogSelectionChanged || caseDialogAutoWasPaused;
+    if (!caseClosedByHistory && location.hash.startsWith(CASE_HASH_PREFIX)) {
+      // Drop the case address without leaving a stray entry, so Back never reopens it.
+      if (caseHistoryPushed) history.back();
+      else history.replaceState(null, "", location.pathname + location.search);
+    }
+    caseClosedByHistory = false;
+    caseHistoryPushed = false;
     caseDialogReturnFocus?.focus({ preventScroll: true });
     caseDialogReturnFocus = null;
     orbitPicker.wake();
@@ -2094,3 +2174,100 @@ if (processStack) {
 })();
 
 renderPair(0, { animate: false });
+
+if (caseDialog) {
+  window.addEventListener("popstate", () => {
+    const index = caseIndexFromHash();
+    if (index < 0) {
+      if (!caseDialog.open) return;
+      // The browser already moved back; close without touching history again.
+      caseClosedByHistory = true;
+      closeCaseDialog();
+      return;
+    }
+    if (!caseDialog.open || caseDialog.classList.contains("is-closing")) {
+      openCaseDialog(null, { index, fromHistory: true });
+      if (activeCaseDialogIndex !== index) renderCaseDialog(index);
+      caseHistoryPushed = true;
+      caseDialogSelectionChanged = true;
+      caseClosedByHistory = false;
+      orbitPicker.select(index, { immediate: true });
+    } else if (index !== activeCaseDialogIndex) {
+      renderCaseDialog(index);
+      caseDialogSelectionChanged = true;
+      orbitPicker.select(index, { immediate: true });
+    }
+  });
+
+  const initialCaseIndex = caseIndexFromHash();
+  if (initialCaseIndex >= 0) {
+    openCaseDialog(null, { index: initialCaseIndex, fromHistory: true });
+    orbitPicker.select(initialCaseIndex, { immediate: true });
+    orbitPicker.autoPausedByUser = false;
+  } else if (location.hash.startsWith(CASE_HASH_PREFIX)) {
+    history.replaceState(null, "", location.pathname + location.search);
+  }
+}
+
+const briefDialog = document.querySelector("[data-brief-dialog]");
+const briefForm = document.querySelector("[data-brief-form]");
+const briefStatus = document.querySelector("[data-brief-status]");
+const BRIEF_TELEGRAM = "https://t.me/alexmari_a";
+const BRIEF_EMAIL = "i@alexmaria.ru";
+
+if (briefDialog && briefForm && typeof briefDialog.showModal === "function") {
+  const setBriefStatus = (text, isError = false) => {
+    briefStatus.textContent = text;
+    briefStatus.classList.toggle("is-error", isError);
+  };
+
+  const composeBrief = () => {
+    const data = new FormData(briefForm);
+    const value = (name) => String(data.get(name) ?? "").trim();
+    const services = data.getAll("service");
+    return [
+      `Здравствуйте, Мария! Меня зовут ${value("name")}.`,
+      services.length ? `Что нужно: ${services.join(", ").toLowerCase()}.` : "",
+      `О проекте: ${value("about")}`,
+      value("deadline") ? `Сроки: ${value("deadline").toLowerCase()}.` : "",
+      value("budget") ? `Бюджет: ${value("budget")}.` : "",
+    ].filter(Boolean).join("\n\n");
+  };
+
+  document.addEventListener("click", (event) => {
+    const opener = event.target.closest?.("[data-brief-open]");
+    if (!opener || briefDialog.open) return;
+    setBriefStatus("");
+    briefDialog.showModal();
+  });
+
+  briefDialog.querySelector("[data-brief-close]")?.addEventListener("click", () => briefDialog.close());
+  briefDialog.addEventListener("click", (event) => {
+    if (event.target === briefDialog) briefDialog.close();
+  });
+
+  briefForm.addEventListener("input", (event) => {
+    event.target.classList?.remove("is-invalid");
+  });
+
+  briefForm.addEventListener("submit", (event) => {
+    event.preventDefault();
+    const required = Array.from(briefForm.querySelectorAll("[required]"));
+    const invalid = required.filter((field) => !field.value.trim());
+    required.forEach((field) => field.classList.toggle("is-invalid", invalid.includes(field)));
+    if (invalid.length) {
+      setBriefStatus("Заполните имя и пару слов о проекте — остальное по желанию.", true);
+      invalid[0].focus();
+      return;
+    }
+
+    const text = composeBrief();
+    if (event.submitter?.dataset.briefSend === "mail") {
+      window.location.href = `mailto:${BRIEF_EMAIL}?subject=${encodeURIComponent("Бриф на дизайн")}&body=${encodeURIComponent(text)}`;
+      setBriefStatus("Письмо открылось в почтовой программе — осталось нажать «Отправить».");
+      return;
+    }
+    window.open(`${BRIEF_TELEGRAM}?text=${encodeURIComponent(text)}`, "_blank", "noopener");
+    setBriefStatus("Сообщение открылось в Telegram — осталось нажать «Отправить».");
+  });
+}
