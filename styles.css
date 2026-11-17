@@ -4628,7 +4628,7 @@ textarea.brief-input {
   display: grid;
   justify-items: center;
   /* Room for the pages sticking out above and the ribbon below. */
-  padding: calc(var(--book-w) * 0.2) 0 calc(var(--book-w) * 0.26);
+  padding: calc(var(--book-w) * 0.2) 0 calc(var(--book-w) * 0.4);
 }
 
 /* The closed cover's footprint. Everything else is positioned against it. */
@@ -4779,14 +4779,21 @@ textarea.brief-input {
   transition: opacity calc(var(--motion-page) * 0.5) var(--motion-ease) calc(var(--motion-page) * 0.5);
 }
 
+/* The bookmark: a worn satin ribbon, not a tidy one. It twists and narrows as it hangs,
+   bends a little, and its end is frayed into loose threads (the shape is an SVG mask). */
 .book-ribbon {
-  background: linear-gradient(90deg, #a877bd, var(--book-ribbon) 45%, #d3a6e2 60%, #a877bd);
-  clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 88%, 0 100%);
-  height: 17%;
-  left: 6.2%;
+  background:
+    linear-gradient(180deg, transparent 52%, rgba(60, 30, 90, 0.22) 58%, transparent 66%),
+    linear-gradient(100deg, #9c6db2, var(--book-ribbon) 40%, #d9b0e8 54%, var(--book-ribbon) 68%, #9c6db2);
+  height: 30%;
+  left: 4.8%;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 160' preserveAspectRatio='none'%3E%3Cpath d='M4 0H36C38 30 30 58 32 88C33 110 38 128 35 146L34 160L32 149L30.5 158L28.5 147L26 157L24.5 145L21.5 154L21 143L18.5 152L18 142C17 124 9 110 8 90C6 60 2 30 4 0Z'/%3E%3C/svg%3E") center / 100% 100% no-repeat;
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 160' preserveAspectRatio='none'%3E%3Cpath d='M4 0H36C38 30 30 58 32 88C33 110 38 128 35 146L34 160L32 149L30.5 158L28.5 147L26 157L24.5 145L21.5 154L21 143L18.5 152L18 142C17 124 9 110 8 90C6 60 2 30 4 0Z'/%3E%3C/svg%3E") center / 100% 100% no-repeat;
   position: absolute;
-  top: 98.6%;
-  width: 5.4%;
+  top: 98.2%;
+  transform: rotate(-4deg);
+  transform-origin: 50% 0;
+  width: 8.4%;
 }
 
 .book.is-closed .book-ribbon {
