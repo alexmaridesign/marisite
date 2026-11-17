@@ -4476,10 +4476,14 @@ textarea.brief-input {
   visibility: hidden;
 }
 
+/* Flattened on purpose: Safari ignores z-index between the 3D-turned leaves and the loose
+   sheets unless this layer has its own transform, and covers the right page with a sheet. */
 .book-body {
   inset: 0;
   isolation: isolate;
   position: absolute;
+  transform: translateZ(0);
+  transform-style: flat;
 }
 
 /* The photographed closed notebook: its cover sits exactly under the cover leaf,
@@ -4785,6 +4789,8 @@ textarea.brief-input {
   display: inline-flex;
   height: var(--tap-target);
   justify-content: center;
+  /* Quick taps turn pages instead of zooming the page on iOS. */
+  touch-action: manipulation;
   transition: background var(--motion-ui) var(--motion-ease), opacity var(--motion-ui) var(--motion-ease);
   width: var(--tap-target);
 }
@@ -4822,10 +4828,36 @@ textarea.brief-input {
   text-align: center;
 }
 
-/* Phones: the same open spread as on desktop. It is wider than the screen,
-   so both pages run off the edges; the panel clips them. */
+/* Phones: the same open spread as on desktop, sized to the screen width (each page is half of it),
+   so the loose sheets peek past the edges but the pages stay whole. Notes get tighter type,
+   and the fallen scraps are left out: there is no table around the book to land on. */
 @media (max-width: 700px) {
   .book-stage {
-    --book-w: min(300px, 66vw);
+    --book-w: calc(50vw - 10px);
+    padding-bottom: calc(var(--book-w) * 0.3);
+  }
+
+  .book-note {
+    gap: 6px;
+    padding: 11% 10%;
+  }
+
+  .book-note strong {
+    font-size: 13px;
+  }
+
+  .book-note p {
+    font-size: 11px;
+    line-height: 1.4;
+  }
+
+  .book-note .process-button {
+    font-size: 12px;
+    min-height: 34px;
+    padding-inline: 12px;
+  }
+
+  .book-scraps {
+    display: none;
   }
 }
