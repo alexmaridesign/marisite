@@ -30,6 +30,7 @@
   --book-cover: #b397bc;
   --book-ribbon: #bc88ce;
   --book-elastic: #a47bd6;
+  --book-elastic-peek: 7%;
   --motion-turn: 1000ms;
   --motion-page: 820ms;
   --motion-page-ease: cubic-bezier(0.45, 0.05, 0.2, 1);
@@ -4894,7 +4895,7 @@ textarea.brief-input {
 }
 
 /* The elastic band: on the cover it runs at 82–88% of the width, so from inside it sits mirrored
-   near the outer edge, top to bottom, and the note starts to the right of it. */
+   near the outer edge. It wraps round the board, so only a short piece shows at the top and the bottom. */
 .book-elastic {
   background:
     repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.12) 0 1px, transparent 1px 3px),
@@ -4904,6 +4905,8 @@ textarea.brief-input {
   box-shadow: 2px 0 4px rgba(51, 54, 80, 0.22);
   left: 12%;
   position: absolute;
+  mask: linear-gradient(#000 0 var(--book-elastic-peek), transparent var(--book-elastic-peek) calc(100% - var(--book-elastic-peek)), #000 0);
+  -webkit-mask: linear-gradient(#000 0 var(--book-elastic-peek), transparent var(--book-elastic-peek) calc(100% - var(--book-elastic-peek)), #000 0);
   top: 0;
   width: 6.3%;
   z-index: 1;
@@ -4912,7 +4915,6 @@ textarea.brief-input {
 .book-face--inside .book-note {
   height: auto;
   inset: var(--page-inset-y) 0 var(--page-inset-y) var(--page-inset-x);
-  padding-left: 22%;
   position: absolute;
 }
 
