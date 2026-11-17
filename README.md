@@ -13,6 +13,8 @@
 
 Также на сайте есть услуги и стоимость, процесс работы, инструменты дизайнера и контакты для обсуждения проекта.
 
+У каждого направления своя страница с кейсами — их открывает меню «Кейсы»: [все кейсы](https://alexmaridesign.ru/cases.html), [айдентика](https://alexmaridesign.ru/identity.html), [мерч](https://alexmaridesign.ru/merch.html), [иллюстрации](https://alexmaridesign.ru/illustrations.html) (там же листается скетчбук) и [соцсети](https://alexmaridesign.ru/social.html).
+
 ## Направления работы
 
 - Айдентика и ребрендинг.
@@ -25,7 +27,7 @@
 
 ## О сайте
 
-Адаптивный сайт на HTML, CSS и JavaScript. Для типографики используются Inter и Dela Gothic One; файлы шрифтов лежат в `assets/fonts`.
+Адаптивный сайт на HTML, CSS и JavaScript. Список кейсов и их разделы лежат в `cases-data.js` — его читают и главная, и страницы разделов. Для типографики используются Inter и Dela Gothic One; файлы шрифтов лежат в `assets/fonts`.
 
 Сайт размещён на GitHub Pages с доменом `alexmaridesign.ru`.
 

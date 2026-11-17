@@ -3,6 +3,8 @@
   --ink: #171614;
   --line: rgba(23, 22, 20, 0.13);
   --glass: rgba(255, 255, 255, 0.58);
+  /* Lighter glass for menus that float over the page: more of it shows through. */
+  --glass-popover: rgba(248, 249, 255, 0.42);
   --violet: #8794eb;
   --accent: #828ac4;
   --accent-text: #626daa;
@@ -27,6 +29,7 @@
   --paper-grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .24 0 0 0 0 .22 0 0 0 0 .18 0 0 0 .13 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
   --book-cover: #b397bc;
   --book-ribbon: #bc88ce;
+  --book-elastic: #a47bd6;
   --motion-turn: 1000ms;
   --motion-page: 820ms;
   --motion-page-ease: cubic-bezier(0.45, 0.05, 0.2, 1);
@@ -1132,10 +1135,10 @@ body.case-dialog-is-open {
 
 .cases-popover {
   animation: cases-popover-in var(--motion-ui) var(--motion-ease) both;
-  background: rgba(248, 249, 255, 0.82);
-  backdrop-filter: blur(26px) saturate(1.08);
-  -webkit-backdrop-filter: blur(26px) saturate(1.08);
-  border: 1px solid rgba(255, 255, 255, 0.88);
+  background: var(--glass-popover);
+  backdrop-filter: blur(22px) saturate(1.5);
+  -webkit-backdrop-filter: blur(22px) saturate(1.5);
+  border: 1px solid rgba(255, 255, 255, 0.7);
   border-radius: 25px;
   box-shadow:
     0 24px 52px rgba(67, 75, 130, 0.18),
@@ -1174,6 +1177,22 @@ body.case-dialog-is-open {
   letter-spacing: -0.025em;
   line-height: 1;
   text-transform: uppercase;
+}
+
+.cases-popover a {
+  border-radius: 8px;
+  display: block;
+  text-decoration: none;
+  transition: color var(--motion-ui) var(--motion-ease);
+}
+
+.cases-popover a:hover {
+  color: var(--accent-hover);
+}
+
+.cases-popover a:focus-visible {
+  outline: 2px solid var(--accent-text);
+  outline-offset: 4px;
 }
 
 @keyframes cases-popover-out {
@@ -4366,16 +4385,49 @@ textarea.brief-input {
   }
 }
 
-/* Sketchbook: a worn, overstuffed notebook on the light section paper.
-   It first shows its fore-edge (how thick and stuffed it is), turns to the cover, then opens.
-   Closed views are the photographed notebook; the open book is built from leaves with torn edges. */
-.panel.sketchbook {
-  background: var(--section-paper);
-  color: var(--text-muted);
-  overflow: hidden;
+/* Subpages (illustrations.html, privacy.html): the brand on the left, the way back on the right. */
+.subpage-header {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  justify-content: space-between;
+  margin-inline: auto;
+  max-width: 1080px;
+  padding: clamp(14px, 3vw, 32px) 4px clamp(26px, 4vw, 48px);
 }
 
-.sketchbook-heading {
+.subpage-header .brand-title {
+  font-size: clamp(36px, 5vw, 52px);
+}
+
+.subpage-header--wide {
+  max-width: 1380px;
+}
+
+.subpage-back {
+  align-items: center;
+  background: #e3e5fb;
+  border-radius: 999px;
+  color: #535c92;
+  display: inline-flex;
+  font-size: 14px;
+  font-weight: 600;
+  min-height: var(--tap-target);
+  padding: 12px 20px;
+}
+
+.subpage-back:hover {
+  background: #d8dcf6;
+}
+
+.subpage-back:focus-visible {
+  outline: 3px solid var(--accent-text);
+  outline-offset: 5px;
+}
+
+/* Page heading on subpages: display title on the left, a short intro on the right. */
+.page-heading {
   align-items: end;
   display: flex;
   flex-wrap: wrap;
@@ -4384,7 +4436,7 @@ textarea.brief-input {
   margin-bottom: clamp(18px, 3vw, 36px);
 }
 
-.sketchbook-heading h2 {
+.page-heading h1 {
   color: var(--accent);
   font-family: var(--font-display);
   font-size: clamp(32px, 4.3vw, 58px);
@@ -4394,13 +4446,178 @@ textarea.brief-input {
   margin: 0;
 }
 
-.sketchbook-heading p {
+.page-heading p {
   color: var(--text-muted);
   font-size: var(--text-body);
   line-height: 1.6;
   margin: 0 0 6px;
   max-width: 320px;
   text-wrap: pretty;
+}
+
+/* Case sections: the same five links as the «Кейсы» menu, as pills. */
+.case-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0 0 clamp(22px, 3vw, 36px);
+  padding: 0;
+}
+
+.case-nav a {
+  align-items: center;
+  background: var(--chip-surface);
+  border-radius: 999px;
+  color: var(--accent-text);
+  display: inline-flex;
+  font-size: var(--text-caption);
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  min-height: var(--tap-target);
+  padding: 0 18px;
+  text-decoration: none;
+  text-transform: uppercase;
+  transition: background var(--motion-ui) var(--motion-ease), color var(--motion-ui) var(--motion-ease);
+}
+
+.case-nav a:hover {
+  background: var(--hairline);
+}
+
+.case-nav a[aria-current="page"] {
+  background: var(--accent-text);
+  color: #fff;
+}
+
+.case-nav a:focus-visible,
+.case-card:focus-visible {
+  outline: 2px solid var(--accent-text);
+  outline-offset: 3px;
+}
+
+/* Case cards: picture, kind, name and one line; a card opens the case on the main page. */
+.case-grid {
+  display: grid;
+  gap: clamp(14px, 2vw, 24px);
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.case-card {
+  background: #fff;
+  border-radius: var(--radius-card);
+  box-shadow: 0 1px 0 var(--hairline);
+  color: var(--ink-violet);
+  display: grid;
+  grid-template-rows: auto 1fr;
+  overflow: hidden;
+  text-decoration: none;
+  transition: transform var(--motion-ui) var(--motion-ease), box-shadow var(--motion-ui) var(--motion-ease);
+}
+
+.case-card:hover {
+  box-shadow: 0 18px 40px rgba(67, 75, 130, 0.14);
+  transform: translateY(-3px);
+}
+
+.case-card-media {
+  aspect-ratio: 4 / 3;
+  background: var(--surface-tint);
+  display: block;
+}
+
+.case-card-media img {
+  display: block;
+  height: 100%;
+  object-fit: cover;
+  width: 100%;
+}
+
+.case-card-body {
+  display: grid;
+  gap: 6px;
+  padding: 18px 20px 22px;
+}
+
+.case-card-type {
+  color: var(--accent-text);
+  font-size: var(--text-caption);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.case-card-title {
+  font-family: var(--font-display);
+  font-size: 22px;
+  letter-spacing: var(--heading-letter-spacing);
+  line-height: 1.15;
+}
+
+.case-card-copy {
+  color: var(--text-muted);
+  font-size: var(--text-body);
+  line-height: 1.5;
+  text-wrap: pretty;
+}
+
+.case-grid-empty {
+  background: var(--surface-tint);
+  grid-column: 1 / -1;
+  border-radius: var(--radius-card);
+  display: grid;
+  gap: 16px;
+  justify-items: start;
+  padding: clamp(24px, 4vw, 44px);
+}
+
+.case-grid-empty p {
+  color: var(--text-muted);
+  font-size: var(--text-body);
+  margin: 0;
+}
+
+/* Below the sketchbook the illustration cases get their own heading. */
+.case-section-title {
+  color: var(--accent);
+  font-family: var(--font-display);
+  font-size: clamp(24px, 2.8vw, 36px);
+  font-weight: 400;
+  letter-spacing: var(--heading-letter-spacing);
+  margin: 0 0 clamp(16px, 2vw, 24px);
+}
+
+.case-panel {
+  background: var(--section-paper);
+}
+
+.subpage .panel:first-child {
+  margin-top: 0;
+}
+
+.subpage .site-footer {
+  margin-inline: auto;
+  max-width: 1380px;
+}
+
+@media (max-width: 900px) {
+  .case-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 520px) {
+  .case-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Sketchbook: a worn, overstuffed notebook on the light section paper.
+   It first shows its fore-edge (how thick and stuffed it is), turns to the cover, then opens.
+   Closed views are the photographed notebook; the open book is built from leaves with torn edges. */
+.panel.sketchbook {
+  background: var(--section-paper);
+  color: var(--text-muted);
+  overflow: hidden;
 }
 
 .book-stage {
@@ -4488,8 +4705,9 @@ textarea.brief-input {
 }
 
 /* The photographed closed notebook: its cover sits exactly under the cover leaf,
-   its stuffed pages and ribbon stick out around it. The swap to the built book on opening
-   is quick (--motion-fast), so the two never show half-faded over each other. */
+   its stuffed pages and ribbon stick out around it. On opening the built sheets and ribbon
+   are there at once and the photo fades out under them over the whole turn, so the stuffing
+   never blinks out; on closing the photo fades back first and the built parts go after it. */
 .book-photo {
   height: 129.5%;
   left: -0.75%;
@@ -4497,7 +4715,7 @@ textarea.brief-input {
   pointer-events: none;
   position: absolute;
   top: -10.8%;
-  transition: opacity var(--motion-fast) var(--motion-ease);
+  transition: opacity var(--motion-page) var(--motion-ease);
   width: 106.34%;
 }
 
@@ -4522,7 +4740,6 @@ textarea.brief-input {
   inset: var(--page-inset-y) var(--page-inset-x) var(--page-inset-y) 0;
   pointer-events: none;
   position: absolute;
-  transition: opacity var(--motion-fast) var(--motion-ease);
   z-index: 1;
 }
 
@@ -4530,11 +4747,15 @@ textarea.brief-input {
   left: calc(-100% + var(--page-inset-x));
   right: 100%;
   transform: scaleX(-1);
-  z-index: 11;
+}
+
+.book-stack.is-hidden {
+  visibility: hidden;
 }
 
 .book.is-closed .book-stack {
   opacity: 0;
+  transition: opacity 0s linear var(--motion-page);
 }
 
 .book-sheet {
@@ -4544,11 +4765,6 @@ textarea.brief-input {
   position: absolute;
   transform: rotate(var(--sheet-tilt, 0deg));
   transform-origin: left center;
-  transition: opacity var(--motion-panel) var(--motion-ease);
-}
-
-.book-sheet.is-gone {
-  opacity: 0;
 }
 
 .book-ribbon {
@@ -4558,12 +4774,12 @@ textarea.brief-input {
   left: 6.2%;
   position: absolute;
   top: 98.6%;
-  transition: opacity var(--motion-fast) var(--motion-ease);
   width: 5.4%;
 }
 
 .book.is-closed .book-ribbon {
   opacity: 0;
+  transition: opacity 0s linear var(--motion-page);
 }
 
 .book-leaves {
@@ -4677,9 +4893,26 @@ textarea.brief-input {
   padding: 14%;
 }
 
+/* The elastic band: on the cover it runs at 82–88% of the width, so from inside it sits mirrored
+   near the outer edge, top to bottom, and the note starts to the right of it. */
+.book-elastic {
+  background:
+    repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.12) 0 1px, transparent 1px 3px),
+    linear-gradient(90deg, rgba(60, 30, 90, 0.28), transparent 22%, transparent 70%, rgba(60, 30, 90, 0.24)),
+    var(--book-elastic);
+  bottom: 0;
+  box-shadow: 2px 0 4px rgba(51, 54, 80, 0.22);
+  left: 12%;
+  position: absolute;
+  top: 0;
+  width: 6.3%;
+  z-index: 1;
+}
+
 .book-face--inside .book-note {
   height: auto;
   inset: var(--page-inset-y) 0 var(--page-inset-y) var(--page-inset-x);
+  padding-left: 22%;
   position: absolute;
 }
 

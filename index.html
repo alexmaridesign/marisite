@@ -179,7 +179,7 @@
     <link rel="preload" href="./assets/fonts/inter-cyrillic-wght-normal.woff2" as="font" type="font/woff2" crossorigin />
     <link rel="preload" href="./assets/fonts/dela-gothic-one-cyrillic-400-normal.woff2" as="font" type="font/woff2" crossorigin />
     <link rel="stylesheet" href="./fonts.css?v=20261117-02" />
-    <link rel="stylesheet" href="./styles.css?v=20261117-10" />
+    <link rel="stylesheet" href="./styles.css?v=20261118-01" />
   </head>
   <body>
     <svg class="liquid-filter-defs" aria-hidden="true" focusable="false">
@@ -222,10 +222,11 @@
 
             <div class="cases-popover" id="cases-popover" data-cases-popover hidden>
               <ul aria-label="Направления работ">
-                <li>Айдентика</li>
-                <li>Мерч</li>
-                <li><a href="#sketchbook">Иллюстрации</a></li>
-                <li>Соцсети</li>
+                <li><a href="./cases.html">Все</a></li>
+                <li><a href="./identity.html">Айдентика</a></li>
+                <li><a href="./merch.html">Мерч</a></li>
+                <li><a href="./illustrations.html">Иллюстрации</a></li>
+                <li><a href="./social.html">Соцсети</a></li>
               </ul>
             </div>
           </div>
@@ -285,39 +286,6 @@
               <path d="M12 4v16M5 13l7 7 7-7" />
             </svg>
           </a>
-        </div>
-      </section>
-
-      <section class="panel sketchbook" id="sketchbook" aria-labelledby="sketchbook-heading" data-sketchbook>
-        <header class="sketchbook-heading reveal">
-          <h2 id="sketchbook-heading">Скетчбук</h2>
-          <p>Иллюстрации, персонажи и&nbsp;наброски. Откройте и&nbsp;листайте.</p>
-        </header>
-
-        <div class="book-stage reveal">
-          <div class="book is-side is-closed" data-book tabindex="0" role="group" aria-roledescription="блокнот" aria-label="Скетчбук Мари: листайте стрелками влево и вправо">
-            <div class="book-turn">
-              <div class="book-body">
-                <img class="book-photo" src="./assets/sketchbook/book-front.webp" alt="" width="570" height="816" decoding="async" draggable="false" />
-                <div class="book-board" aria-hidden="true"></div>
-                <div class="book-stack book-stack--right" data-book-stack="right" aria-hidden="true"></div>
-                <span class="book-ribbon" aria-hidden="true"></span>
-                <div class="book-leaves" data-book-leaves></div>
-                <div class="book-stack book-stack--left" data-book-stack="left" aria-hidden="true"></div>
-              </div>
-              <img class="book-side" src="./assets/sketchbook/book-side.webp" alt="" width="252" height="810" decoding="async" draggable="false" />
-            </div>
-          </div>
-        </div>
-
-        <div class="book-controls reveal" role="group" aria-label="Листать скетчбук">
-          <button class="book-arrow" type="button" aria-label="Предыдущая страница" data-book-prev>
-            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m15 18-6-6 6-6" /></svg>
-          </button>
-          <span class="book-counter" aria-live="polite" data-book-counter>Блокнот</span>
-          <button class="book-arrow" type="button" aria-label="Следующая страница" data-book-next>
-            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6" /></svg>
-          </button>
         </div>
       </section>
 
@@ -1105,6 +1073,7 @@
       </form>
     </dialog>
 
+    <script src="./cases-data.js?v=20261118-01"></script>
     <script src="./script.js?v=20261118-01"></script>
   </body>
 </html>

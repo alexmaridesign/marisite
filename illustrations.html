@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="Иллюстрации Мари: скетчбук с набросками, персонажами и иллюстрациями разных лет и кейсы по иллюстрации для брендов." />
+    <title>Иллюстрации — Мари</title>
+    <link rel="canonical" href="https://alexmaridesign.ru/illustrations.html" />
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content="ru_RU" />
+    <meta property="og:site_name" content="Мари" />
+    <meta property="og:title" content="Иллюстрации — Мари" />
+    <meta property="og:url" content="https://alexmaridesign.ru/illustrations.html" />
+    <meta property="og:image" content="https://alexmaridesign.ru/assets/og-mari-v1.jpg" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <link rel="icon" href="./favicon.ico?v=20260916-01" sizes="16x16 32x32 48x48" type="image/x-icon" />
+    <link rel="icon" href="./favicon.svg?v=20260916-01" type="image/svg+xml" sizes="any" />
+    <link rel="apple-touch-icon" href="./apple-touch-icon.png?v=20260916-01" sizes="180x180" />
+    <link rel="preload" href="./assets/fonts/inter-cyrillic-wght-normal.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="./assets/fonts/dela-gothic-one-cyrillic-400-normal.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="./assets/sketchbook/book-side.webp" as="image" />
+    <link rel="stylesheet" href="./fonts.css?v=20261118-01" />
+    <link rel="stylesheet" href="./styles.css?v=20261118-01" />
+  </head>
+  <body>
+    <div class="site subpage">
+      <header class="subpage-header subpage-header--wide">
+        <a class="brand-title" href="./" aria-label="Мари — на главную">Мари</a>
+        <a class="subpage-back" href="./">← На&nbsp;главную</a>
+      </header>
+
+      <main>
+        <section class="panel sketchbook" id="sketchbook" aria-labelledby="sketchbook-heading" data-sketchbook>
+          <nav class="case-nav" aria-label="Разделы кейсов">
+            <a href="./cases.html">Все</a>
+            <a href="./identity.html">Айдентика</a>
+            <a href="./merch.html">Мерч</a>
+            <a href="./illustrations.html" aria-current="page">Иллюстрации</a>
+            <a href="./social.html">Соцсети</a>
+          </nav>
+
+          <header class="page-heading">
+            <h1 id="sketchbook-heading">Иллюстрации</h1>
+            <p>Скетчбук с&nbsp;набросками, персонажами и&nbsp;иллюстрациями разных лет. Откройте и&nbsp;листайте.</p>
+          </header>
+
+          <div class="book-stage">
+            <div class="book is-side is-closed" data-book tabindex="0" role="group" aria-roledescription="блокнот" aria-label="Скетчбук Мари: листайте стрелками влево и вправо">
+              <div class="book-turn">
+                <div class="book-body">
+                  <img class="book-photo" src="./assets/sketchbook/book-front.webp" alt="" width="570" height="816" decoding="async" draggable="false" />
+                  <div class="book-board" aria-hidden="true"></div>
+                  <div class="book-stack book-stack--right" data-book-stack="right" aria-hidden="true"></div>
+                  <span class="book-ribbon" aria-hidden="true"></span>
+                  <div class="book-leaves" data-book-leaves></div>
+                  <div class="book-stack book-stack--left" data-book-stack="left" aria-hidden="true"></div>
+                </div>
+                <img class="book-side" src="./assets/sketchbook/book-side.webp" alt="" width="252" height="810" decoding="async" draggable="false" />
+              </div>
+            </div>
+          </div>
+
+          <div class="book-controls" role="group" aria-label="Листать скетчбук">
+            <button class="book-arrow" type="button" aria-label="Предыдущая страница" data-book-prev>
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m15 18-6-6 6-6" /></svg>
+            </button>
+            <span class="book-counter" aria-live="polite" data-book-counter>Блокнот</span>
+            <button class="book-arrow" type="button" aria-label="Следующая страница" data-book-next>
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6" /></svg>
+            </button>
+          </div>
+        </section>
+
+        <section class="panel case-panel" aria-labelledby="illustration-cases-heading">
+          <h2 class="case-section-title" id="illustration-cases-heading">Иллюстрации для&nbsp;брендов</h2>
+          <div class="case-grid" data-case-grid data-category="illustrations"></div>
+        </section>
+      </main>
+
+      <footer class="site-footer">
+        <span>2026 Все права защищены</span>
+        <a href="./privacy.html">Политика конфиденциальности</a>
+        <span>Сайт разработан <a href="https://alkislovdev.ru/" target="_blank" rel="noopener">alkislovdev</a></span>
+      </footer>
+    </div>
+
+    <script src="./sketchbook.js?v=20261118-01"></script>
+    <script src="./cases-data.js?v=20261118-01"></script>
+    <script src="./cases.js?v=20261118-01"></script>
+  </body>
+</html>

@@ -1,36 +1,6 @@
-.privacy-header,
 .privacy-document {
   margin-inline: auto;
   max-width: 1080px;
-}
-
-.privacy-header {
-  align-items: center;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 20px;
-  justify-content: space-between;
-  padding: clamp(14px, 3vw, 32px) 4px clamp(26px, 4vw, 48px);
-}
-
-.privacy-header .brand-title {
-  font-size: clamp(36px, 5vw, 52px);
-}
-
-.privacy-back {
-  align-items: center;
-  background: #e3e5fb;
-  border-radius: 999px;
-  color: #535c92;
-  display: inline-flex;
-  font-size: 14px;
-  font-weight: 600;
-  min-height: 44px;
-  padding: 12px 20px;
-}
-
-.privacy-back:hover {
-  background: #d8dcf6;
 }
 
 .privacy-site a:focus-visible {
@@ -114,13 +84,13 @@
   margin-top: 10px;
 }
 
-.privacy-document a:not(.privacy-back) {
+.privacy-document a:not(.subpage-back) {
   color: #535c92;
   text-decoration: underline;
   text-underline-offset: 3px;
 }
 
-.privacy-back--bottom {
+.subpage-back--bottom {
   margin-top: 36px;
 }
 
