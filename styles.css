@@ -4538,7 +4538,7 @@ textarea.brief-input {
 }
 
 .book-sheet {
-  background: var(--paper-grain), var(--sheet-color, var(--paper));
+  background: var(--paper-grain), var(--sheet-image, none) var(--sheet-focus, center) / 170% no-repeat, var(--sheet-color, var(--paper));
   clip-path: var(--sheet-clip);
   inset: var(--sheet-top, 0%) var(--sheet-right, 0%) var(--sheet-bottom, 0%) 0;
   position: absolute;

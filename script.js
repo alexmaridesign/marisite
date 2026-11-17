@@ -2410,6 +2410,14 @@ const SKETCHBOOK_PAGES = [
 
 const SKETCHBOOK_PAPERS = ["#f6f1e3", "#f6f1e3", "#f3ead9", "#f7dfe3", "#e3ecd9", "#dfe7f2", "#f6ecc4"];
 const SKETCHBOOK_SHEETS = ["#f6f1e3", "#f2c6d0", "#cfe2c5", "#c9d7ec", "#f2e0a0", "#efe6d2", "#e7c9ea", "#fbf7ee"];
+// Loose drawings stuffed between the pages, like on the photo of the closed notebook:
+// only their torn edges show above, below and beside the page block.
+const SKETCHBOOK_STUFFING = [
+  "./assets/sketchbook/sketch-09-picnic.webp",
+  "./assets/sketchbook/sketch-05-sea-rocks.webp",
+  "./assets/sketchbook/sketch-17-book-stack.webp",
+  "./assets/sketchbook/sketch-10-pink-outfit.webp",
+];
 
 (() => {
   const root = document.querySelector("[data-sketchbook]");
@@ -2513,10 +2521,16 @@ const SKETCHBOOK_SHEETS = ["#f6f1e3", "#f2c6d0", "#cfe2c5", "#c9d7ec", "#f2e0a0"
       });
       sheet.style.setProperty("--sheet-clip", clipPath(outline));
       sheet.style.setProperty("--sheet-color", SKETCHBOOK_SHEETS[(index + seed) % SKETCHBOOK_SHEETS.length]);
-      // Negative insets push the sheet out past the page block.
-      sheet.style.setProperty("--sheet-top", `${(-0.8 - rand() * 4.6).toFixed(2)}%`);
+      // Every other sheet is a drawing; a random patch of it shows where it sticks out.
+      if (index % 2 === 0) {
+        const drawing = SKETCHBOOK_STUFFING[(index / 2 + seed) % SKETCHBOOK_STUFFING.length];
+        sheet.style.setProperty("--sheet-image", `url("${drawing}")`);
+        sheet.style.setProperty("--sheet-focus", `${Math.round(rand() * 100)}% ${Math.round(rand() * 100)}%`);
+      }
+      // Negative insets push the sheet out past the page block, as far as on the photo.
+      sheet.style.setProperty("--sheet-top", `${(-1.5 - rand() * 7).toFixed(2)}%`);
       sheet.style.setProperty("--sheet-right", `${(-1 - rand() * 6.5).toFixed(2)}%`);
-      sheet.style.setProperty("--sheet-bottom", `${(-0.8 - rand() * 3.6).toFixed(2)}%`);
+      sheet.style.setProperty("--sheet-bottom", `${(-1.2 - rand() * 5.5).toFixed(2)}%`);
       sheet.style.setProperty("--sheet-tilt", `${((rand() - 0.5) * 2.6).toFixed(2)}deg`);
       return sheet;
     });
