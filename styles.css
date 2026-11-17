@@ -30,7 +30,6 @@
   --book-cover: #b397bc;
   --book-ribbon: #bc88ce;
   --book-elastic: #a47bd6;
-  --book-elastic-peek: 7%;
   --motion-turn: 1000ms;
   --motion-page: 820ms;
   --motion-page-ease: cubic-bezier(0.45, 0.05, 0.2, 1);
@@ -4744,13 +4743,18 @@ textarea.brief-input {
   z-index: 1;
 }
 
-/* Mirrored to the left. It belongs to the turned pages: it fades in over the second half of the
-   first page turn, as the page comes down on the left, and fades out as soon as it lifts again. */
+/* Mirrored to the left. It belongs to the turned pages, which lie on the inside of the cover:
+   so it sits above the cover leaf (z-index 10) and below the turned pages (12 and up).
+   Its middle, where the pages lie, is cut out: only the torn edges past the pages ever show,
+   and the note inside the cover is never covered, even while the first page turns over.
+   It fades in over the second half of that turn and out as soon as the page lifts again. */
 .book-stack--left {
+  clip-path: polygon(evenodd, -30% -30%, 130% -30%, 130% 130%, -30% 130%, -30% -30%, 0% 2%, 94% 2%, 94% 98%, 0% 98%, 0% 2%);
   left: calc(-100% + var(--page-inset-x));
   right: 100%;
   transform: scaleX(-1);
   transition: opacity calc(var(--motion-page) * 0.5) var(--motion-ease) calc(var(--motion-page) * 0.5);
+  z-index: 11;
 }
 
 .book-stack.is-hidden {
@@ -4885,6 +4889,8 @@ textarea.brief-input {
   content: "";
   inset: var(--page-inset-y) 0 var(--page-inset-y) var(--page-inset-x);
   position: absolute;
+  /* The glued page lies over the elastic band. */
+  z-index: 1;
 }
 
 .book-face--inside::after {
@@ -4900,7 +4906,8 @@ textarea.brief-input {
 }
 
 /* The elastic band: on the cover it runs at 82–88% of the width, so from inside it sits mirrored
-   near the outer edge. It wraps round the board, so only a short piece shows at the top and the bottom. */
+   near the outer edge. It lies on the board under the glued page, so it shows only on the board's
+   margins above and below the page and never crosses the paper. */
 .book-elastic {
   background:
     repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.12) 0 1px, transparent 1px 3px),
@@ -4910,17 +4917,15 @@ textarea.brief-input {
   box-shadow: 2px 0 4px rgba(51, 54, 80, 0.22);
   left: 12%;
   position: absolute;
-  mask: linear-gradient(#000 0 var(--book-elastic-peek), transparent var(--book-elastic-peek) calc(100% - var(--book-elastic-peek)), #000 0);
-  -webkit-mask: linear-gradient(#000 0 var(--book-elastic-peek), transparent var(--book-elastic-peek) calc(100% - var(--book-elastic-peek)), #000 0);
   top: 0;
   width: 6.3%;
-  z-index: 1;
 }
 
 .book-face--inside .book-note {
   height: auto;
   inset: var(--page-inset-y) 0 var(--page-inset-y) var(--page-inset-x);
   position: absolute;
+  z-index: 2;
 }
 
 .book-note strong {
