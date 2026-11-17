@@ -4406,8 +4406,8 @@ textarea.brief-input {
 .book-stage {
   --book-w: clamp(250px, 33vw, 420px);
   --book-thickness: calc(var(--book-w) * 0.47);
-  /* Depth of the 3D turns scales with the book: a small book on a phone still bends, not squashes. */
-  --book-perspective: calc(var(--book-w) * 5.5);
+  /* Depth of the 3D turns, matched to the book size: a small book on a phone still bends, not squashes. */
+  --book-perspective: 2300px;
   display: grid;
   justify-items: center;
   /* Room for the pages sticking out above and the ribbon below. */
@@ -4770,6 +4770,7 @@ textarea.brief-input {
 @media (max-width: 700px) {
   .book-stage {
     --book-w: calc(50vw - 10px);
+    --book-perspective: 1000px;
   }
 
   .sketchbook {

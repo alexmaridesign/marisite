@@ -2441,6 +2441,7 @@ const SKETCHBOOK_STUFFING = [
   let liftSerial = 0;
   let openSerial = 0;
   let turnTimer = 0;
+  let stackTimer = 0;
 
   const element = (tag, className, html) => {
     const node = document.createElement(tag);
@@ -2578,14 +2579,22 @@ const SKETCHBOOK_STUFFING = [
     leaf.style.zIndex = String(10 + 2 * (index < flipped ? index : leaves.length - index));
   };
 
-  const syncStacks = () => {
+  const showSheets = (side, count) => {
+    Array.from(stacks[side]?.children ?? []).forEach((sheet, index) => sheet.classList.toggle("is-gone", index >= count));
+  };
+
+  // A page turned forward lands on the left stack. Sheets added there wait until it has landed:
+  // the stack lies above the inside of the cover, so a sheet shown earlier would flash
+  // over the whole left page while the turning page is still on its way.
+  const syncStacks = (turningForward = false) => {
     const turned = clamp(flipped, 0, maxFlipped) / Math.max(maxFlipped, 1);
     // The first spread keeps the left side clear: the note inside the cover is read there.
     const turnedPages = clamp(flipped - 1, 0, maxFlipped) / Math.max(maxFlipped - 1, 1);
-    const visible = { right: Math.ceil(STACK_SHEETS * (1 - turned)), left: Math.ceil(STACK_SHEETS * turnedPages) };
-    Object.entries(stacks).forEach(([side, stack]) => {
-      Array.from(stack?.children ?? []).forEach((sheet, index) => sheet.classList.toggle("is-gone", index >= visible[side]));
-    });
+    const left = Math.ceil(STACK_SHEETS * turnedPages);
+    clearTimeout(stackTimer);
+    showSheets("right", Math.ceil(STACK_SHEETS * (1 - turned)));
+    if (turningForward && !reduceMotion) stackTimer = setTimeout(() => showSheets("left", left), pageTurnMs() + 40);
+    else showSheets("left", left);
   };
 
   const sync = (movedIndex = -1) => {
@@ -2615,7 +2624,7 @@ const SKETCHBOOK_STUFFING = [
     prevButton.disabled = flipped === SIDE;
     nextButton.disabled = flipped === maxFlipped;
     counter.textContent = flipped === SIDE ? "Блокнот" : flipped === 0 ? "Обложка" : `${flipped} / ${maxFlipped}`;
-    syncStacks();
+    syncStacks(movedIndex >= 0 && movedIndex === flipped - 1);
     loadNearbyImages();
   };
 
