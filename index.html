@@ -178,8 +178,8 @@
     </script>
     <link rel="preload" href="./assets/fonts/inter-cyrillic-wght-normal.woff2" as="font" type="font/woff2" crossorigin />
     <link rel="preload" href="./assets/fonts/dela-gothic-one-cyrillic-400-normal.woff2" as="font" type="font/woff2" crossorigin />
-    <link rel="stylesheet" href="./fonts.css?v=20261117-01" />
-    <link rel="stylesheet" href="./styles.css?v=20261117-03" />
+    <link rel="stylesheet" href="./fonts.css?v=20261117-02" />
+    <link rel="stylesheet" href="./styles.css?v=20261117-10" />
   </head>
   <body>
     <svg class="liquid-filter-defs" aria-hidden="true" focusable="false">
@@ -224,7 +224,7 @@
               <ul aria-label="Направления работ">
                 <li>Айдентика</li>
                 <li>Мерч</li>
-                <li>Иллюстрации</li>
+                <li><a href="#sketchbook">Иллюстрации</a></li>
                 <li>Соцсети</li>
               </ul>
             </div>
@@ -288,123 +288,248 @@
         </div>
       </section>
 
-      <section class="panel pricing" id="pricing" aria-labelledby="pricing-heading">
-        <header class="pricing-heading reveal">
-          <div>
-            <h2 id="pricing-heading">Услуги<br /> и&nbsp;стоимость</h2>
-          </div>
+      <section class="panel sketchbook" id="sketchbook" aria-labelledby="sketchbook-heading" data-sketchbook>
+        <header class="sketchbook-heading reveal">
+          <h2 id="sketchbook-heading">Скетчбук</h2>
+          <p>Иллюстрации, персонажи и&nbsp;наброски. Откройте и&nbsp;листайте.</p>
         </header>
 
-        <div class="pricing-list">
-          <details class="pricing-service reveal">
-            <summary>
-              <span class="pricing-name">Айдентика / ребрендинг<span class="pricing-caption">Рабочая визуальная система</span></span>
-              <span class="pricing-price"><span>от</span>&nbsp;120&nbsp;000&nbsp;₽</span>
-              <span class="pricing-toggle" aria-hidden="true"></span>
-            </summary>
-            <div class="pricing-details">
-              <p>Разрабатываю айдентику, которая отражает ценности бренда и&nbsp;формирует его узнаваемый образ. От&nbsp;концепции и&nbsp;логотипа до&nbsp;типографики, цветовой палитры, фирменной графики и&nbsp;маскота. Объединяю элементы в&nbsp;целостную систему с&nbsp;понятными правилами использования.</p>
+        <div class="book-stage reveal">
+          <div class="book is-side is-closed" data-book tabindex="0" role="group" aria-roledescription="блокнот" aria-label="Скетчбук Мари: листайте стрелками влево и вправо">
+            <div class="book-turn">
+              <div class="book-body">
+                <img class="book-photo" src="./assets/sketchbook/book-front.webp" alt="" width="570" height="816" decoding="async" draggable="false" />
+                <div class="book-board" aria-hidden="true"></div>
+                <div class="book-stack book-stack--right" data-book-stack="right" aria-hidden="true"></div>
+                <span class="book-ribbon" aria-hidden="true"></span>
+                <div class="book-leaves" data-book-leaves></div>
+                <div class="book-stack book-stack--left" data-book-stack="left" aria-hidden="true"></div>
+                <div class="book-scraps" data-book-scraps aria-hidden="true"></div>
+              </div>
+              <img class="book-side" src="./assets/sketchbook/book-side.webp" alt="" width="252" height="810" decoding="async" draggable="false" />
             </div>
-          </details>
-
-          <details class="pricing-service reveal">
-            <summary>
-              <span class="pricing-name">Дизайн мерча<span class="pricing-caption">Который будут носить</span></span>
-              <span class="pricing-price"><span>от</span>&nbsp;16&nbsp;000&nbsp;₽</span>
-              <span class="pricing-toggle" aria-hidden="true"></span>
-            </summary>
-            <div class="pricing-details">
-              <p>Создаю мерч на&nbsp;пересечении брендинга, моды и&nbsp;визуальной культуры. Разрабатываю концепции и&nbsp;дизайн одежды, аксессуаров и&nbsp;брендированной продукции с&nbsp;учётом материалов, технологий нанесения и&nbsp;особенностей производства.</p>
-            </div>
-          </details>
-
-          <details class="pricing-service reveal">
-            <summary>
-              <span class="pricing-name">Линейка мерча<span class="pricing-caption">Разные айтемы, объединённые одной идеей</span></span>
-              <span class="pricing-price"><span>от</span>&nbsp;35&nbsp;000&nbsp;₽</span>
-              <span class="pricing-toggle" aria-hidden="true"></span>
-            </summary>
-            <div class="pricing-details">
-              <p>Разрабатываю коллекции мерча, объединённые общей концепцией и&nbsp;визуальным языком. Продумываю ассортимент, графику, цветовые сочетания и&nbsp;адаптацию дизайна под&nbsp;разные носители.</p>
-            </div>
-          </details>
-
-          <details class="pricing-service reveal">
-            <summary>
-              <span class="pricing-name">Дизайн упаковки<span class="pricing-caption">Первое впечатление о&nbsp;продукте</span></span>
-              <span class="pricing-price"><span>от</span>&nbsp;15&nbsp;000&nbsp;₽</span>
-              <span class="pricing-toggle" aria-hidden="true"></span>
-            </summary>
-            <div class="pricing-details">
-              <p>Создаю упаковку, которая выделяет продукт и&nbsp;транслирует характер бренда. Работаю с&nbsp;визуальной концепцией, композицией, типографикой и&nbsp;графикой, учитывая особенности носителя и&nbsp;требования производства.</p>
-            </div>
-          </details>
-
-          <details class="pricing-service reveal">
-            <summary>
-              <span class="pricing-name">Оформление соцсетей<span class="pricing-caption">Единый визуальный язык бренда в&nbsp;digital</span></span>
-              <span class="pricing-price"><span>от</span>&nbsp;35&nbsp;000&nbsp;₽</span>
-              <span class="pricing-toggle" aria-hidden="true"></span>
-            </summary>
-            <div class="pricing-details">
-              <p>Формирую целостный визуальный стиль социальных сетей: от&nbsp;оформления профиля до&nbsp;системы шаблонов и&nbsp;графических элементов. Создаю гибкие решения, которые помогают бренду сохранять узнаваемость и&nbsp;последовательно развивать коммуникацию.</p>
-            </div>
-          </details>
-
-          <details class="pricing-service reveal">
-            <summary>
-              <span class="pricing-name">Контент для&nbsp;соцсетей<span class="pricing-caption">Полное визуальное сопровождение или единичные посты</span></span>
-              <span class="pricing-price"><span>от</span>&nbsp;5&nbsp;000&nbsp;₽</span>
-              <span class="pricing-toggle" aria-hidden="true"></span>
-            </summary>
-            <div class="pricing-details">
-              <p>Разрабатываю графику для&nbsp;социальных сетей и&nbsp;digital-коммуникаций: от&nbsp;отдельных публикаций и&nbsp;сторис до&nbsp;рекламных креативов и&nbsp;серий контента. Адаптирую визуальные решения под&nbsp;формат, площадку и&nbsp;задачи бренда.</p>
-            </div>
-          </details>
-
-          <details class="pricing-service reveal">
-            <summary>
-              <span class="pricing-name">Печатная продукция<span class="pricing-caption">Дизайн за&nbsp;пределами экрана</span></span>
-              <span class="pricing-price"><span>от</span>&nbsp;7&nbsp;000&nbsp;₽</span>
-              <span class="pricing-toggle" aria-hidden="true"></span>
-            </summary>
-            <div class="pricing-details">
-              <p>Разрабатываю дизайн полиграфии и&nbsp;рекламных материалов: от&nbsp;визиток и&nbsp;буклетов до&nbsp;каталогов, плакатов и&nbsp;POSM. Работаю с&nbsp;композицией, типографикой и&nbsp;визуальной иерархией, подготавливаю макеты к&nbsp;печати с&nbsp;учётом технических требований.</p>
-            </div>
-          </details>
-
-          <details class="pricing-service reveal">
-            <summary>
-              <span class="pricing-name">Дизайн приложений<span class="pricing-caption">Эстетика, логика и&nbsp;удобство</span></span>
-              <span class="pricing-price"><span>от</span>&nbsp;60&nbsp;000&nbsp;₽</span>
-              <span class="pricing-toggle" aria-hidden="true"></span>
-            </summary>
-            <div class="pricing-details">
-              <p>Проектирую пользовательские сценарии и&nbsp;интерфейсы цифровых продуктов. Продумываю структуру экранов, навигацию и&nbsp;визуальную систему, объединяя функциональность, удобство использования и&nbsp;характер бренда.</p>
-            </div>
-          </details>
-
-          <details class="pricing-service reveal">
-            <summary>
-              <span class="pricing-name">Авторские иллюстрации<span class="pricing-caption">Уникальная графика с&nbsp;характером</span></span>
-              <span class="pricing-price"><span>от</span>&nbsp;10&nbsp;000&nbsp;₽</span>
-              <span class="pricing-toggle" aria-hidden="true"></span>
-            </summary>
-            <div class="pricing-details">
-              <p>Создаю авторские иллюстрации для&nbsp;брендов, продуктов и&nbsp;digital-проектов. Разрабатываю персонажей, графические элементы и&nbsp;иллюстративные серии, которые передают характер бренда и&nbsp;формируют узнаваемый визуальный язык.</p>
-            </div>
-          </details>
+          </div>
         </div>
 
-        <footer class="pricing-footer reveal">
-          <p>
-            <span class="pricing-note-marker" aria-hidden="true">*</span>
-            <span>Цены — ориентир для&nbsp;старта.<br /> Точную стоимость и&nbsp;состав работы согласуем после знакомства с&nbsp;задачей.</span>
-          </p>
-          <a class="pricing-cta" href="#contact">
-            Обсудить проект
-          </a>
-        </footer>
+        <div class="book-controls reveal" role="group" aria-label="Листать скетчбук">
+          <button class="book-arrow" type="button" aria-label="Предыдущая страница" data-book-prev>
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m15 18-6-6 6-6" /></svg>
+          </button>
+          <span class="book-counter" aria-live="polite" data-book-counter>Блокнот</span>
+          <button class="book-arrow" type="button" aria-label="Следующая страница" data-book-next>
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6" /></svg>
+          </button>
+        </div>
+      </section>
+
+      <section class="panel pricing" id="pricing" aria-labelledby="pricing-heading" data-pricing>
+        <header class="pricing-heading reveal">
+          <h2 id="pricing-heading">Услуги<br /> и&nbsp;стоимость</h2>
+          <p class="pricing-lead">Цены&nbsp;— ориентир для&nbsp;старта. Точную стоимость и&nbsp;состав работы согласуем после знакомства с&nbsp;задачей.</p>
+        </header>
+
+        <div class="pricing-body reveal">
+          <div class="pricing-list">
+            <details class="pricing-service" data-brief-service="Айдентика">
+              <summary>
+                <span class="pricing-index" aria-hidden="true">01</span>
+                <span class="pricing-title">
+                  <span class="pricing-name">Айдентика / ребрендинг</span>
+                  <span class="pricing-caption">Рабочая визуальная система</span>
+                </span>
+                <span class="pricing-leader" aria-hidden="true"></span>
+                <span class="pricing-price"><span>от</span>&nbsp;120&nbsp;000&nbsp;₽</span>
+                <span class="pricing-toggle" aria-hidden="true"></span>
+              </summary>
+              <div class="pricing-details">
+                <p>Разрабатываю айдентику, которая отражает ценности бренда и&nbsp;формирует его узнаваемый образ. От&nbsp;концепции и&nbsp;логотипа до&nbsp;типографики, цветовой палитры, фирменной графики и&nbsp;маскота. Объединяю элементы в&nbsp;целостную систему с&nbsp;понятными правилами использования.</p>
+                <button class="pricing-order" type="button" aria-haspopup="dialog" data-brief-open data-brief-service="Айдентика">
+                  Обсудить проект
+                  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8" /></svg>
+                </button>
+              </div>
+            </details>
+            <details class="pricing-service" data-brief-service="Мерч">
+              <summary>
+                <span class="pricing-index" aria-hidden="true">02</span>
+                <span class="pricing-title">
+                  <span class="pricing-name">Дизайн мерча</span>
+                  <span class="pricing-caption">Который будут носить</span>
+                </span>
+                <span class="pricing-leader" aria-hidden="true"></span>
+                <span class="pricing-price"><span>от</span>&nbsp;16&nbsp;000&nbsp;₽</span>
+                <span class="pricing-toggle" aria-hidden="true"></span>
+              </summary>
+              <div class="pricing-details">
+                <p>Создаю мерч на&nbsp;пересечении брендинга, моды и&nbsp;визуальной культуры. Разрабатываю концепции и&nbsp;дизайн одежды, аксессуаров и&nbsp;брендированной продукции с&nbsp;учётом материалов, технологий нанесения и&nbsp;особенностей производства.</p>
+                <button class="pricing-order" type="button" aria-haspopup="dialog" data-brief-open data-brief-service="Мерч">
+                  Обсудить проект
+                  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8" /></svg>
+                </button>
+              </div>
+            </details>
+            <details class="pricing-service" data-brief-service="Мерч">
+              <summary>
+                <span class="pricing-index" aria-hidden="true">03</span>
+                <span class="pricing-title">
+                  <span class="pricing-name">Линейка мерча</span>
+                  <span class="pricing-caption">Разные айтемы, объединённые одной идеей</span>
+                </span>
+                <span class="pricing-leader" aria-hidden="true"></span>
+                <span class="pricing-price"><span>от</span>&nbsp;35&nbsp;000&nbsp;₽</span>
+                <span class="pricing-toggle" aria-hidden="true"></span>
+              </summary>
+              <div class="pricing-details">
+                <p>Разрабатываю коллекции мерча, объединённые общей концепцией и&nbsp;визуальным языком. Продумываю ассортимент, графику, цветовые сочетания и&nbsp;адаптацию дизайна под&nbsp;разные носители.</p>
+                <button class="pricing-order" type="button" aria-haspopup="dialog" data-brief-open data-brief-service="Мерч">
+                  Обсудить проект
+                  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8" /></svg>
+                </button>
+              </div>
+            </details>
+            <details class="pricing-service" data-brief-service="Упаковка">
+              <summary>
+                <span class="pricing-index" aria-hidden="true">04</span>
+                <span class="pricing-title">
+                  <span class="pricing-name">Дизайн упаковки</span>
+                  <span class="pricing-caption">Первое впечатление о&nbsp;продукте</span>
+                </span>
+                <span class="pricing-leader" aria-hidden="true"></span>
+                <span class="pricing-price"><span>от</span>&nbsp;15&nbsp;000&nbsp;₽</span>
+                <span class="pricing-toggle" aria-hidden="true"></span>
+              </summary>
+              <div class="pricing-details">
+                <p>Создаю упаковку, которая выделяет продукт и&nbsp;транслирует характер бренда. Работаю с&nbsp;визуальной концепцией, композицией, типографикой и&nbsp;графикой, учитывая особенности носителя и&nbsp;требования производства.</p>
+                <button class="pricing-order" type="button" aria-haspopup="dialog" data-brief-open data-brief-service="Упаковка">
+                  Обсудить проект
+                  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8" /></svg>
+                </button>
+              </div>
+            </details>
+            <details class="pricing-service" data-brief-service="Соцсети">
+              <summary>
+                <span class="pricing-index" aria-hidden="true">05</span>
+                <span class="pricing-title">
+                  <span class="pricing-name">Оформление соцсетей</span>
+                  <span class="pricing-caption">Единый визуальный язык бренда в&nbsp;digital</span>
+                </span>
+                <span class="pricing-leader" aria-hidden="true"></span>
+                <span class="pricing-price"><span>от</span>&nbsp;35&nbsp;000&nbsp;₽</span>
+                <span class="pricing-toggle" aria-hidden="true"></span>
+              </summary>
+              <div class="pricing-details">
+                <p>Формирую целостный визуальный стиль социальных сетей: от&nbsp;оформления профиля до&nbsp;системы шаблонов и&nbsp;графических элементов. Создаю гибкие решения, которые помогают бренду сохранять узнаваемость и&nbsp;последовательно развивать коммуникацию.</p>
+                <button class="pricing-order" type="button" aria-haspopup="dialog" data-brief-open data-brief-service="Соцсети">
+                  Обсудить проект
+                  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8" /></svg>
+                </button>
+              </div>
+            </details>
+            <details class="pricing-service" data-brief-service="Соцсети">
+              <summary>
+                <span class="pricing-index" aria-hidden="true">06</span>
+                <span class="pricing-title">
+                  <span class="pricing-name">Контент для&nbsp;соцсетей</span>
+                  <span class="pricing-caption">Полное визуальное сопровождение или единичные посты</span>
+                </span>
+                <span class="pricing-leader" aria-hidden="true"></span>
+                <span class="pricing-price"><span>от</span>&nbsp;5&nbsp;000&nbsp;₽</span>
+                <span class="pricing-toggle" aria-hidden="true"></span>
+              </summary>
+              <div class="pricing-details">
+                <p>Разрабатываю графику для&nbsp;социальных сетей и&nbsp;digital-коммуникаций: от&nbsp;отдельных публикаций и&nbsp;сторис до&nbsp;рекламных креативов и&nbsp;серий контента. Адаптирую визуальные решения под&nbsp;формат, площадку и&nbsp;задачи бренда.</p>
+                <button class="pricing-order" type="button" aria-haspopup="dialog" data-brief-open data-brief-service="Соцсети">
+                  Обсудить проект
+                  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8" /></svg>
+                </button>
+              </div>
+            </details>
+            <details class="pricing-service" data-brief-service="Полиграфия">
+              <summary>
+                <span class="pricing-index" aria-hidden="true">07</span>
+                <span class="pricing-title">
+                  <span class="pricing-name">Печатная продукция</span>
+                  <span class="pricing-caption">Дизайн за&nbsp;пределами экрана</span>
+                </span>
+                <span class="pricing-leader" aria-hidden="true"></span>
+                <span class="pricing-price"><span>от</span>&nbsp;7&nbsp;000&nbsp;₽</span>
+                <span class="pricing-toggle" aria-hidden="true"></span>
+              </summary>
+              <div class="pricing-details">
+                <p>Разрабатываю дизайн полиграфии и&nbsp;рекламных материалов: от&nbsp;визиток и&nbsp;буклетов до&nbsp;каталогов, плакатов и&nbsp;POSM. Работаю с&nbsp;композицией, типографикой и&nbsp;визуальной иерархией, подготавливаю макеты к&nbsp;печати с&nbsp;учётом технических требований.</p>
+                <button class="pricing-order" type="button" aria-haspopup="dialog" data-brief-open data-brief-service="Полиграфия">
+                  Обсудить проект
+                  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8" /></svg>
+                </button>
+              </div>
+            </details>
+            <details class="pricing-service" data-brief-service="Приложение">
+              <summary>
+                <span class="pricing-index" aria-hidden="true">08</span>
+                <span class="pricing-title">
+                  <span class="pricing-name">Дизайн приложений</span>
+                  <span class="pricing-caption">Эстетика, логика и&nbsp;удобство</span>
+                </span>
+                <span class="pricing-leader" aria-hidden="true"></span>
+                <span class="pricing-price"><span>от</span>&nbsp;60&nbsp;000&nbsp;₽</span>
+                <span class="pricing-toggle" aria-hidden="true"></span>
+              </summary>
+              <div class="pricing-details">
+                <p>Проектирую пользовательские сценарии и&nbsp;интерфейсы цифровых продуктов. Продумываю структуру экранов, навигацию и&nbsp;визуальную систему, объединяя функциональность, удобство использования и&nbsp;характер бренда.</p>
+                <button class="pricing-order" type="button" aria-haspopup="dialog" data-brief-open data-brief-service="Приложение">
+                  Обсудить проект
+                  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8" /></svg>
+                </button>
+              </div>
+            </details>
+            <details class="pricing-service" data-brief-service="Иллюстрации">
+              <summary>
+                <span class="pricing-index" aria-hidden="true">09</span>
+                <span class="pricing-title">
+                  <span class="pricing-name">Авторские иллюстрации</span>
+                  <span class="pricing-caption">Уникальная графика с&nbsp;характером</span>
+                </span>
+                <span class="pricing-leader" aria-hidden="true"></span>
+                <span class="pricing-price"><span>от</span>&nbsp;10&nbsp;000&nbsp;₽</span>
+                <span class="pricing-toggle" aria-hidden="true"></span>
+              </summary>
+              <div class="pricing-details">
+                <p>Создаю авторские иллюстрации для&nbsp;брендов, продуктов и&nbsp;digital-проектов. Разрабатываю персонажей, графические элементы и&nbsp;иллюстративные серии, которые передают характер бренда и&nbsp;формируют узнаваемый визуальный язык.</p>
+                <button class="pricing-order" type="button" aria-haspopup="dialog" data-brief-open data-brief-service="Иллюстрации">
+                  Обсудить проект
+                  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8" /></svg>
+                </button>
+              </div>
+            </details>
+          </div>
+
+          <div class="book-controls pricing-controls" role="group" aria-label="Листать услуги" data-pricing-controls hidden>
+            <button class="book-arrow" type="button" aria-label="Предыдущая услуга" data-pricing-prev>
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m15 18-6-6 6-6" /></svg>
+            </button>
+            <span class="book-counter" aria-live="polite" data-pricing-counter>01 / 09</span>
+            <button class="book-arrow" type="button" aria-label="Следующая услуга" data-pricing-next>
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6" /></svg>
+            </button>
+          </div>
+
+          <aside class="pricing-card" aria-live="polite" data-pricing-card hidden>
+            <div class="pricing-card-body" data-pricing-card-body>
+              <span class="pricing-card-ghost" aria-hidden="true" data-pricing-card-ghost></span>
+              <p class="pricing-card-count" data-pricing-card-count></p>
+              <h3 class="pricing-card-name" data-pricing-card-name></h3>
+              <p class="pricing-card-caption" data-pricing-card-caption></p>
+              <p class="pricing-card-text" data-pricing-card-text></p>
+              <div class="pricing-card-footer">
+                <p class="pricing-card-price" data-pricing-card-price></p>
+                <button class="pricing-card-cta" type="button" aria-haspopup="dialog" data-brief-open data-pricing-card-cta>
+                  Обсудить проект
+                  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8" /></svg>
+                </button>
+              </div>
+            </div>
+          </aside>
+        </div>
       </section>
 
       <section class="panel process" id="process">
@@ -981,6 +1106,6 @@
       </form>
     </dialog>
 
-    <script src="./script.js?v=20261117-02"></script>
+    <script src="./script.js?v=20261117-10"></script>
   </body>
 </html>

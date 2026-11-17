@@ -1910,43 +1910,148 @@ if (caseDialogOpenButton && caseDialog && caseDialogCloseButton) {
 }
 
 
-// Preserve native details behavior while animating the surrounding document flow.
-document.querySelectorAll(".pricing-service").forEach((details) => {
-  const summary = details.querySelector("summary");
-  const content = details.querySelector(".pricing-details");
-  if (!summary || !content) return;
-  let state = null;
-  summary.addEventListener("click", (event) => {
-    if (reduceMotion || !details.animate) return;
-    event.preventDefault();
-    const expanded = !(state ? state.expanded : details.open);
-    const from = details.getBoundingClientRect().height;
-    const style = getComputedStyle(details);
-    const border = parseFloat(style.borderTopWidth) + parseFloat(style.borderBottomWidth);
-    const nextState = { expanded };
-    state = nextState;
-    runningUiAnimations.get(details)?.cancel();
-    details.open = true;
-    details.style.height = "auto";
-    const to = expanded ? details.getBoundingClientRect().height : summary.getBoundingClientRect().height + border;
-    details.style.height = from + "px";
-    details.style.overflow = "hidden";
-    details.classList.toggle("is-closing", !expanded);
-    content.inert = !expanded;
-    const animation = playUiMotion(details, [{ height: from + "px" }, { height: to + "px" }], {
-      duration: expanded ? 360 : 260,
+// Services. Wide screens: the list selects a service and the card shows it ("split").
+// Narrow screens: every service is a card in a swipeable deck ("deck").
+// Without this script the same <details> stay a plain accordion.
+const pricing = document.querySelector("[data-pricing]");
+
+if (pricing) {
+  const pricingList = pricing.querySelector(".pricing-list");
+  const pricingServices = Array.from(pricing.querySelectorAll(".pricing-service"));
+  const pricingCard = pricing.querySelector("[data-pricing-card]");
+  const pricingCardBody = pricing.querySelector("[data-pricing-card-body]");
+  const pricingControls = pricing.querySelector("[data-pricing-controls]");
+  const pricingPrev = pricing.querySelector("[data-pricing-prev]");
+  const pricingNext = pricing.querySelector("[data-pricing-next]");
+  const pricingCounter = pricing.querySelector("[data-pricing-counter]");
+  const pricingField = (name) => pricing.querySelector(`[data-pricing-card-${name}]`);
+  const pricingSplitQuery = window.matchMedia("(min-width: 901px)");
+  const pricingHoverQuery = window.matchMedia("(hover: hover) and (pointer: fine)");
+  const pricingNumber = (value) => String(value).padStart(2, "0");
+  let pricingActiveIndex = -1;
+  let pricingDeckIndex = 0;
+  let pricingDeckFrame = 0;
+
+  const isPricingSplit = () => Boolean(pricingCard && pricingCardBody) && pricingSplitQuery.matches;
+
+  const movePricingMarker = () => {
+    const row = pricingServices[pricingActiveIndex];
+    if (!row) return;
+    pricingList.style.setProperty("--pricing-marker-y", row.offsetTop + "px");
+    pricingList.style.setProperty("--pricing-marker-h", row.offsetHeight + "px");
+  };
+
+  const selectPricingService = (index, animate = true) => {
+    const service = pricingServices[index];
+    if (!service || index === pricingActiveIndex) return;
+    const direction = index > pricingActiveIndex ? 1 : -1;
+    pricingActiveIndex = index;
+    pricingServices.forEach((item, itemIndex) => item.classList.toggle("is-active", itemIndex === index));
+    movePricingMarker();
+
+    pricingField("ghost").textContent = pricingNumber(index + 1);
+    pricingField("count").textContent = `${pricingNumber(index + 1)} / ${pricingNumber(pricingServices.length)}`;
+    pricingField("name").innerHTML = service.querySelector(".pricing-name").innerHTML;
+    pricingField("caption").innerHTML = service.querySelector(".pricing-caption").innerHTML;
+    pricingField("text").innerHTML = service.querySelector(".pricing-details p").innerHTML;
+    pricingField("price").innerHTML = service.querySelector(".pricing-price").innerHTML;
+    pricingField("cta").dataset.briefService = service.dataset.briefService || "";
+
+    if (animate && !reduceMotion && pricingCardBody.animate) {
+      pricingCardBody.animate(
+        [
+          { opacity: 0, transform: `translateY(${direction * 12}px)` },
+          { opacity: 1, transform: "translateY(0)" },
+        ],
+        { duration: 340, easing: "cubic-bezier(0.22, 1, 0.36, 1)" },
+      );
+    }
+  };
+
+  // Deck: the card nearest to the left edge of the track is the current one.
+  const readPricingDeck = () => {
+    const origin = pricingServices[0].offsetLeft;
+    let nearest = 0;
+    pricingServices.forEach((service, index) => {
+      const distance = Math.abs(service.offsetLeft - origin - pricingList.scrollLeft);
+      if (distance < Math.abs(pricingServices[nearest].offsetLeft - origin - pricingList.scrollLeft)) nearest = index;
     });
-    (animation?.finished.catch(() => {}) ?? Promise.resolve()).then(() => {
-      if (state !== nextState) return;
-      details.open = expanded;
-      content.inert = false;
-      details.classList.remove("is-closing");
-      details.style.removeProperty("height");
-      details.style.removeProperty("overflow");
-      state = null;
+    // The last cards can never reach the left edge once the track hits its end.
+    if (pricingList.scrollLeft >= pricingList.scrollWidth - pricingList.clientWidth - 2) {
+      nearest = Math.max(nearest, pricingServices.length - 1);
+    }
+    pricingDeckIndex = nearest;
+    if (pricingCounter) {
+      pricingCounter.textContent = `${pricingNumber(nearest + 1)} / ${pricingNumber(pricingServices.length)}`;
+    }
+    if (pricingPrev) pricingPrev.disabled = nearest === 0;
+    if (pricingNext) pricingNext.disabled = nearest === pricingServices.length - 1;
+  };
+
+  const showPricingDeckCard = (index) => {
+    const service = pricingServices[Math.min(Math.max(index, 0), pricingServices.length - 1)];
+    pricingList.scrollTo({
+      left: service.offsetLeft - pricingServices[0].offsetLeft,
+      behavior: reduceMotion ? "auto" : "smooth",
+    });
+  };
+
+  pricingList.addEventListener(
+    "scroll",
+    () => {
+      if (pricingDeckFrame || !pricing.classList.contains("is-deck")) return;
+      pricingDeckFrame = requestAnimationFrame(() => {
+        pricingDeckFrame = 0;
+        readPricingDeck();
+      });
+    },
+    { passive: true },
+  );
+  pricingPrev?.addEventListener("click", () => showPricingDeckCard(pricingDeckIndex - 1));
+  pricingNext?.addEventListener("click", () => showPricingDeckCard(pricingDeckIndex + 1));
+
+  const syncPricingMode = () => {
+    const split = isPricingSplit();
+    pricing.classList.toggle("is-split", split);
+    pricing.classList.toggle("is-deck", !split);
+    if (pricingCard) pricingCard.hidden = !split;
+    if (pricingControls) pricingControls.hidden = split;
+    // Deck cards show everything at once; in split mode the text lives in the side card.
+    pricingServices.forEach((service) => {
+      service.open = !split;
+    });
+    if (split) {
+      pricingList.scrollLeft = 0;
+      if (pricingActiveIndex < 0) selectPricingService(0, false);
+      movePricingMarker();
+    } else {
+      readPricingDeck();
+    }
+  };
+
+  pricingSplitQuery.addEventListener("change", syncPricingMode);
+  if ("ResizeObserver" in window) new ResizeObserver(movePricingMarker).observe(pricingList);
+  document.fonts?.ready.then(movePricingMarker);
+
+  pricingServices.forEach((details, index) => {
+    const summary = details.querySelector("summary");
+    if (!summary) return;
+
+    summary.addEventListener("pointerenter", () => {
+      if (isPricingSplit() && pricingHoverQuery.matches) selectPricingService(index);
+    });
+    summary.addEventListener("focus", () => {
+      if (isPricingSplit()) selectPricingService(index);
+    });
+    // The script owns open/closed in both modes, so a click never toggles the details.
+    summary.addEventListener("click", (event) => {
+      event.preventDefault();
+      if (isPricingSplit()) selectPricingService(index);
     });
   });
-});
+
+  syncPricingMode();
+}
 
 const processStack = document.querySelector("[data-process-stack]");
 
@@ -2238,6 +2343,13 @@ if (briefDialog && briefForm && typeof briefDialog.showModal === "function") {
     const opener = event.target.closest?.("[data-brief-open]");
     if (!opener || briefDialog.open) return;
     setBriefStatus("");
+    // Opened from a service: tick the matching chip so the brief starts filled in.
+    const service = opener.dataset.briefService;
+    if (service) {
+      briefForm.querySelectorAll('input[name="service"]').forEach((input) => {
+        if (input.value === service) input.checked = true;
+      });
+    }
     briefDialog.showModal();
   });
 
@@ -2271,3 +2383,399 @@ if (briefDialog && briefForm && typeof briefDialog.showModal === "function") {
     setBriefStatus("Сообщение открылось в Telegram — осталось нажать «Отправить».");
   });
 }
+
+// Sketchbook pages in reading order: { src, alt, fit? }. Drawings fill the page;
+// fit: "contain" keeps small artwork centered on paper. Files live in assets/sketchbook.
+const SKETCHBOOK_PAGES = [
+  { src: "./assets/sketchbook/sketch-01-sea-window.webp", alt: "Открытое окно с видом на море" },
+  { src: "./assets/sketchbook/sketch-02-swimwear.webp", alt: "Купальники, панама и надувной круг" },
+  { src: "./assets/sketchbook/sketch-03-beach-blanket.webp", alt: "Покрывало на пляже с сумкой и панамой" },
+  { src: "./assets/sketchbook/sketch-04-gelato-cart.webp", alt: "Тележка с мороженым у моря" },
+  { src: "./assets/sketchbook/sketch-05-sea-rocks.webp", alt: "Плед на скалах у моря" },
+  { src: "./assets/sketchbook/sketch-06-summer-outfit.webp", alt: "Летний комплект, панама и акварель" },
+  { src: "./assets/sketchbook/sketch-07-suitcase.webp", alt: "Раскрытый чемодан с детскими вещами" },
+  { src: "./assets/sketchbook/sketch-08-bicycle.webp", alt: "Велосипед и красный летний костюм" },
+  { src: "./assets/sketchbook/sketch-09-picnic.webp", alt: "Пикник под розовым зонтом" },
+  { src: "./assets/sketchbook/sketch-10-pink-outfit.webp", alt: "Розовая блузка, сандалии и корзина" },
+  { src: "./assets/sketchbook/sketch-11-easter-table.webp", alt: "Пасхальный стол с кроликом и вербой" },
+  { src: "./assets/sketchbook/sketch-12-field-window.webp", alt: "Окно с видом на поле и деревню" },
+  { src: "./assets/sketchbook/sketch-13-autumn-city.webp", alt: "Осенний город с высоткой" },
+  { src: "./assets/sketchbook/sketch-14-autumn-table.webp", alt: "Столик с чаем у окна осенью" },
+  { src: "./assets/sketchbook/sketch-15-autumn-outfit.webp", alt: "Осенний комплект с зонтом и листьями" },
+  { src: "./assets/sketchbook/sketch-16-autumn-pajamas.webp", alt: "Пижама, фотоаппарат и осенние листья" },
+  { src: "./assets/sketchbook/sketch-17-book-stack.webp", alt: "Стопка книг на зелёном фоне" },
+  { src: "./assets/sketchbook/sketch-18-pajamas-door.webp", alt: "Пижама на дверце шкафа" },
+  { src: "./assets/sketchbook/sketch-19-wardrobe.webp", alt: "Шкаф с платьями и плюшевым зайцем" },
+];
+
+// Loose bits that fall out while the pages turn. `at` is how far through the book (0–1) it happens;
+// x/y are the resting spot in % of the closed cover (y > 100 is the table below the book);
+// wideX is where it lands next to the open spread.
+const SKETCHBOOK_SCRAPS = [
+  { at: 0.14, kind: "drawing", src: "./assets/sketchbook/sketch-04-gelato-cart.webp", focus: "38% 62%", x: 74, wideX: 58, y: 108, tilt: -11, width: 30, ratio: "5 / 4" },
+  { at: 0.25, kind: "note", text: "не забыть:<br>панамка, сандалии, море", color: "#f6ecc4", x: 28, wideX: -76, y: 105, tilt: -5, width: 44, ratio: "2 / 1" },
+  { at: 0.36, kind: "swatches", dabs: ["#f3b8c6", "#f6dd8d", "#a9d3b0", "#b9a2d8"], x: 30, wideX: -36, y: 124, tilt: 7, width: 38, ratio: "5 / 2" },
+  { at: 0.58, kind: "drawing", src: "./assets/sketchbook/sketch-11-easter-table.webp", focus: "60% 30%", x: 78, wideX: 84, y: 96, tilt: 14, width: 24, ratio: "3 / 4" },
+  { at: 0.69, kind: "note", text: "больше розового!", color: "#f7dfe3", x: 68, wideX: 34, y: 126, tilt: 8, width: 36, ratio: "5 / 2" },
+  { at: 0.8, kind: "sticker", color: "#b784d5", x: 8, wideX: -6, y: 97, tilt: -6, width: 20, ratio: "1 / 1" },
+];
+
+const SKETCHBOOK_PAPERS = ["#f6f1e3", "#f6f1e3", "#f3ead9", "#f7dfe3", "#e3ecd9", "#dfe7f2", "#f6ecc4"];
+const SKETCHBOOK_SHEETS = ["#f6f1e3", "#f2c6d0", "#cfe2c5", "#c9d7ec", "#f2e0a0", "#efe6d2", "#e7c9ea", "#fbf7ee"];
+
+(() => {
+  const root = document.querySelector("[data-sketchbook]");
+  const book = root?.querySelector("[data-book]");
+  const leavesRoot = root?.querySelector("[data-book-leaves]");
+  const scrapsRoot = root?.querySelector("[data-book-scraps]");
+  const stacks = {
+    right: root?.querySelector('[data-book-stack="right"]'),
+    left: root?.querySelector('[data-book-stack="left"]'),
+  };
+  const prevButton = root?.querySelector("[data-book-prev]");
+  const nextButton = root?.querySelector("[data-book-next]");
+  const counter = root?.querySelector("[data-book-counter]");
+  if (!book || !leavesRoot || !prevButton || !nextButton || !counter) return;
+
+  const PRELOAD_LEAVES = 2;
+  const SIDE = -1; // Fore-edge view: before the cover.
+  const TURN_MS = 1000;
+  const STACK_SHEETS = 8;
+  let leaves = [];
+  let flipped = SIDE;
+  let maxFlipped = 0;
+  let liftSerial = 0;
+  let openSerial = 0;
+  let turnTimer = 0;
+  let droppedScraps = new Set();
+
+  const element = (tag, className, html) => {
+    const node = document.createElement(tag);
+    if (className) node.className = className;
+    if (html) node.innerHTML = html;
+    return node;
+  };
+
+  // Small seeded generator: the book looks the same on every visit.
+  const seeded = (seed) => () => {
+    seed = (seed + 0x6d2b79f5) | 0;
+    let value = Math.imul(seed ^ (seed >>> 15), 1 | seed);
+    value = (value + Math.imul(value ^ (value >>> 7), 61 | value)) ^ value;
+    return ((value ^ (value >>> 14)) >>> 0) / 4294967296;
+  };
+
+  // Outline of a hand-torn sheet in % of its box. The spine edge (x = 0) stays straight;
+  // `rough` is how ragged the other three are, `corner` tears one off, `bite` rips a chunk out.
+  const tornOutline = (rand, { rough = 0.4, corner = null, bite = false } = {}) => {
+    const points = [];
+    const steps = rough > 1 ? 16 : 9;
+    const jitter = () => rand() * rough;
+    const top = corner === "top" ? { w: 8 + rand() * 12, h: 6 + rand() * 9 } : null;
+    const bottom = corner === "bottom" ? { w: 8 + rand() * 12, h: 6 + rand() * 9 } : null;
+    const topEnd = 100 - (top?.w ?? 0);
+    const bottomEnd = 100 - (bottom?.w ?? 0);
+    const rightStart = top?.h ?? 0;
+    const rightEnd = 100 - (bottom?.h ?? 0);
+    const biteAt = bite ? 22 + rand() * 46 : -1;
+    const biteSize = 7 + rand() * 7;
+
+    for (let i = 0; i <= steps; i += 1) points.push([(topEnd * i) / steps, jitter()]);
+    if (top) {
+      for (let i = 1; i < 5; i += 1) points.push([topEnd + (top.w * i) / 5 + (rand() - 0.5) * 2, (top.h * i) / 5 + (rand() - 0.5) * 2]);
+    }
+    for (let i = 0; i <= steps; i += 1) {
+      const y = rightStart + ((rightEnd - rightStart) * i) / steps;
+      const inBite = bite && Math.abs(y - biteAt) < biteSize;
+      const depth = inBite ? Math.cos(((y - biteAt) / biteSize) * (Math.PI / 2)) * (4 + rand() * 3) : 0;
+      points.push([100 - jitter() - depth, y]);
+    }
+    if (bottom) {
+      for (let i = 1; i < 5; i += 1) points.push([100 - (bottom.w * i) / 5 + (rand() - 0.5) * 2, rightEnd + (bottom.h * i) / 5 + (rand() - 0.5) * 2]);
+    }
+    for (let i = 0; i <= steps; i += 1) points.push([bottomEnd - (bottomEnd * i) / steps, 100 - jitter()]);
+    return points.map(([x, y]) => [clamp(x, 0, 100), clamp(y, 0, 100)]);
+  };
+
+  const clipPath = (points, mirror = false) =>
+    `polygon(${points.map(([x, y]) => `${(mirror ? 100 - x : x).toFixed(2)}% ${y.toFixed(2)}%`).join(", ")})`;
+
+  // Most pages are only a little uneven; some are ragged, a few lost a corner or a chunk.
+  const wearLeaf = (leaf, index) => {
+    const rand = seeded(index * 7919 + 13);
+    const roll = rand();
+    const rough = roll < 0.55 ? 0.35 : roll < 0.82 ? 0.9 : 1.9;
+    const cornerRoll = rand();
+    const corner = cornerRoll < 0.12 ? "top" : cornerRoll < 0.26 ? "bottom" : null;
+    const outline = tornOutline(rand, { rough, corner, bite: !corner && rand() < 0.16 });
+    leaf.style.setProperty("--leaf-clip", clipPath(outline));
+    leaf.style.setProperty("--leaf-clip-back", clipPath(outline, true));
+    leaf.style.setProperty("--leaf-tilt", `${((rand() - 0.5) * 0.9).toFixed(2)}deg`);
+    leaf.style.setProperty("--leaf-width", (1 - rand() * 0.035).toFixed(3));
+    leaf.style.setProperty("--leaf-top", `${(rand() * 1.2).toFixed(2)}%`);
+    leaf.style.setProperty("--leaf-bottom", `${(rand() * 1.2).toFixed(2)}%`);
+    leaf.style.setProperty("--leaf-paper", SKETCHBOOK_PAPERS[Math.floor(rand() * SKETCHBOOK_PAPERS.length)]);
+  };
+
+  const buildStack = (stack, seed) => {
+    if (!stack) return;
+    const rand = seeded(seed);
+    const sheets = Array.from({ length: STACK_SHEETS }, (_, index) => {
+      const sheet = element("i", "book-sheet");
+      const cornerRoll = rand();
+      const outline = tornOutline(rand, {
+        rough: 1 + rand() * 1.6,
+        corner: cornerRoll < 0.25 ? "top" : cornerRoll < 0.5 ? "bottom" : null,
+      });
+      sheet.style.setProperty("--sheet-clip", clipPath(outline));
+      sheet.style.setProperty("--sheet-color", SKETCHBOOK_SHEETS[(index + seed) % SKETCHBOOK_SHEETS.length]);
+      // Negative insets push the sheet out past the page block.
+      sheet.style.setProperty("--sheet-top", `${(-0.8 - rand() * 4.6).toFixed(2)}%`);
+      sheet.style.setProperty("--sheet-right", `${(-1 - rand() * 6.5).toFixed(2)}%`);
+      sheet.style.setProperty("--sheet-bottom", `${(-0.8 - rand() * 3.6).toFixed(2)}%`);
+      sheet.style.setProperty("--sheet-tilt", `${((rand() - 0.5) * 2.6).toFixed(2)}deg`);
+      return sheet;
+    });
+    stack.replaceChildren(...sheets);
+  };
+
+  const renderPage = (face, page) => {
+    if (!page) return;
+    if (page.type === "cover") {
+      face.classList.add("book-face--cover");
+    } else if (page.type === "intro") {
+      face.classList.add("book-face--inside");
+      face.append(element("div", "book-note", "<strong>Рисую для&nbsp;брендов и&nbsp;для&nbsp;себя</strong><p>Здесь наброски, персонажи и&nbsp;иллюстрации разных лет. Листайте по&nbsp;клику, стрелками или свайпом.</p>"));
+    } else if (page.type === "end") {
+      face.append(element("div", "book-note", '<strong>Нужна иллюстрация или персонаж?</strong><p>Расскажите о&nbsp;задаче&nbsp;— нарисую под&nbsp;ваш бренд.</p><button class="process-button process-button--primary" type="button" aria-haspopup="dialog" data-brief-open><span>Заполнить бриф</span></button>'));
+    } else if (page.src) {
+      const image = document.createElement("img");
+      image.alt = page.alt ?? "";
+      image.decoding = "async";
+      image.draggable = false;
+      image.dataset.src = page.src;
+      if (page.fit) image.dataset.fit = page.fit;
+      face.append(image);
+    }
+  };
+
+  const loadNearbyImages = () => {
+    leaves.forEach((leaf, index) => {
+      if (Math.abs(index - flipped) > PRELOAD_LEAVES) return;
+      leaf.querySelectorAll("img[data-src]").forEach((image) => {
+        image.src = image.dataset.src;
+        delete image.dataset.src;
+      });
+    });
+  };
+
+  // Even steps leave odd slots free: the left stack of loose sheets sits between
+  // the opened cover and the turned pages.
+  const settle = (leaf, index) => {
+    leaf.style.zIndex = String(10 + 2 * (index < flipped ? index : leaves.length - index));
+  };
+
+  const syncStacks = () => {
+    const turned = clamp(flipped, 0, maxFlipped) / Math.max(maxFlipped, 1);
+    // The first spread keeps the left side clear: the note inside the cover is read there.
+    const turnedPages = clamp(flipped - 1, 0, maxFlipped) / Math.max(maxFlipped - 1, 1);
+    const visible = { right: Math.ceil(STACK_SHEETS * (1 - turned)), left: Math.ceil(STACK_SHEETS * turnedPages) };
+    Object.entries(stacks).forEach(([side, stack]) => {
+      Array.from(stack?.children ?? []).forEach((sheet, index) => sheet.classList.toggle("is-gone", index >= visible[side]));
+    });
+  };
+
+  const dropScraps = () => {
+    if (!scrapsRoot || flipped < 1) return;
+    SKETCHBOOK_SCRAPS.forEach((scrap, index) => {
+      const at = clamp(Math.round(scrap.at * maxFlipped), 1, maxFlipped);
+      if (flipped < at || droppedScraps.has(index)) return;
+      droppedScraps.add(index);
+      const rand = seeded(index * 131 + 7);
+      const node = element("div", `book-scrap book-scrap--${scrap.kind}`);
+      const paper = element("div", "book-scrap-paper");
+      const outline = tornOutline(rand, { rough: scrap.kind === "sticker" ? 0.5 : 2.4, corner: scrap.kind === "drawing" ? "bottom" : null });
+      // A scrap is torn on all four sides: reuse the outline with a ragged spine edge.
+      const ragged = [...outline, [rand() * 2.4, 66], [rand() * 2.4, 34]];
+      node.style.setProperty("--scrap-x", `${scrap.wideX}%`);
+      node.style.setProperty("--scrap-y", `${scrap.y}%`);
+      node.style.setProperty("--scrap-tilt", `${scrap.tilt}deg`);
+      node.style.setProperty("--scrap-w", `${scrap.width}%`);
+      paper.style.setProperty("--scrap-ratio", scrap.ratio);
+      paper.style.setProperty("--scrap-clip", clipPath(ragged));
+      if (scrap.color) paper.style.setProperty("--scrap-color", scrap.color);
+      if (scrap.src) {
+        paper.style.setProperty("--scrap-image", `url("${scrap.src}")`);
+        paper.style.setProperty("--scrap-focus", scrap.focus);
+      }
+      (scrap.dabs ?? []).forEach((color) => {
+        const dab = element("i");
+        dab.style.setProperty("--dab", color);
+        paper.append(dab);
+      });
+      if (scrap.text) paper.insertAdjacentHTML("beforeend", `<span>${scrap.text}</span>`);
+      node.append(paper);
+      scrapsRoot.append(node);
+      if (reduceMotion || !node.animate) return;
+      // Slips out of the gutter, tumbles and lands.
+      node.animate(
+        [
+          { opacity: 0, transform: `translate(-50%, -50%) translate(0, ${-((scrap.y - 45) / 100) * book.offsetHeight}px) rotate(${scrap.tilt - 38}deg) scale(0.82)` },
+          { opacity: 1, offset: 0.2 },
+          { opacity: 1, transform: `translate(-50%, -50%) rotate(${scrap.tilt + 5}deg) scale(1.02)`, offset: 0.82 },
+          { opacity: 1, transform: `translate(-50%, -50%) rotate(${scrap.tilt}deg) scale(1)` },
+        ],
+        { duration: 900, delay: 320, easing: "cubic-bezier(0.3, 0.1, 0.3, 1)", fill: "backwards" },
+      );
+    });
+  };
+
+  const sync = (movedIndex = -1) => {
+    const serial = ++liftSerial;
+    leaves.forEach((leaf, index) => {
+      leaf.classList.toggle("is-flipped", index < flipped);
+      if (index === movedIndex) {
+        // Keep the turning leaf above both stacks until it lands.
+        leaf.style.zIndex = String(1000 + (serial % 1000));
+        const land = () => {
+          if (leaf.dataset.lift !== String(serial)) return;
+          delete leaf.dataset.lift;
+          settle(leaf, index);
+        };
+        leaf.dataset.lift = String(serial);
+        if (reduceMotion) land();
+        else setTimeout(land, 860);
+      } else if (!leaf.dataset.lift || reduceMotion) {
+        settle(leaf, index);
+      }
+      // Faces of buried leaves stay out of the tab order and the accessibility tree.
+      leaf.inert = index !== flipped && index !== flipped - 1;
+    });
+    book.classList.toggle("is-side", flipped === SIDE);
+    book.classList.toggle("is-closed", flipped <= 0);
+    book.classList.toggle("is-open", flipped > 0);
+    prevButton.disabled = flipped === SIDE;
+    nextButton.disabled = flipped === maxFlipped;
+    counter.textContent = flipped === SIDE ? "Блокнот" : flipped === 0 ? "Обложка" : `${flipped} / ${maxFlipped}`;
+    syncStacks();
+    dropScraps();
+    loadNearbyImages();
+  };
+
+  // Turning the notebook between its fore-edge and its cover.
+  const turnBox = book.querySelector(".book-turn");
+  const endTurn = () => {
+    clearTimeout(turnTimer);
+    book.classList.remove("is-turning");
+  };
+  const turn = () => {
+    book.classList.add("is-turning");
+    clearTimeout(turnTimer);
+    // The transition's own end is the signal; the timer only covers a transition that never ran.
+    turnTimer = setTimeout(endTurn, reduceMotion ? 0 : TURN_MS + 600);
+  };
+  turnBox?.addEventListener("transitionend", (event) => {
+    if (event.target === turnBox && event.propertyName === "transform") endTurn();
+  });
+
+  const go = (direction) => {
+    const serial = ++openSerial;
+    const next = clamp(flipped + direction, SIDE, maxFlipped);
+    if (next === flipped) return;
+    if (flipped === SIDE || next === SIDE) {
+      const opening = next > flipped;
+      flipped = next;
+      turn();
+      sync();
+      // The first opening carries on by itself: fore-edge, cover, first pages.
+      if (opening) {
+        setTimeout(() => {
+          if (serial === openSerial && flipped === 0) go(1);
+        }, reduceMotion ? 0 : TURN_MS + 380);
+      }
+      return;
+    }
+    const movedIndex = direction > 0 ? flipped : next;
+    flipped = next;
+    sync(movedIndex);
+  };
+
+  const build = () => {
+    const pages = [{ type: "cover" }, { type: "intro" }, ...SKETCHBOOK_PAGES];
+    // The closing note must land on a right-hand page of the spread.
+    if (pages.length % 2) pages.push(null);
+    pages.push({ type: "end" });
+
+    const sheets = pages.reduce((list, page, index) => {
+      if (index % 2 === 0) list.push([page, pages[index + 1] ?? null]);
+      return list;
+    }, []);
+
+    leaves = sheets.map(([front, back], index) => {
+      const leaf = element("div", `book-leaf${index === 0 ? " book-leaf--cover" : ""}`);
+      const frontFace = element("div", "book-face book-face--front");
+      const backFace = element("div", "book-face book-face--back");
+      renderPage(frontFace, front);
+      renderPage(backFace, back);
+      if (index > 0) wearLeaf(leaf, index);
+      leaf.append(frontFace, backFace);
+      return leaf;
+    });
+    leavesRoot.replaceChildren(...leaves);
+    buildStack(stacks.right, 3);
+    buildStack(stacks.left, 5);
+    scrapsRoot?.replaceChildren();
+    droppedScraps = new Set();
+    openSerial += 1;
+    flipped = SIDE;
+    maxFlipped = leaves.length - 1;
+    sync();
+  };
+
+  let pointerStart = null;
+  let swiped = false;
+  book.addEventListener("pointerdown", (event) => {
+    if (!event.isPrimary || event.button !== 0) return;
+    pointerStart = { x: event.clientX, y: event.clientY };
+    swiped = false;
+  });
+  book.addEventListener("pointerup", (event) => {
+    const start = pointerStart;
+    pointerStart = null;
+    if (!start || event.target.closest("a, button")) return;
+    const deltaX = event.clientX - start.x;
+    const deltaY = event.clientY - start.y;
+    // A horizontal drag turns the page; touch swipes never produce a click.
+    if (Math.abs(deltaX) < 28 || Math.abs(deltaX) < Math.abs(deltaY)) return;
+    swiped = true;
+    go(deltaX < 0 ? 1 : -1);
+  });
+  book.addEventListener("pointercancel", () => { pointerStart = null; });
+  book.addEventListener("click", (event) => {
+    if (event.target.closest("a, button")) return;
+    if (swiped) {
+      swiped = false;
+      return;
+    }
+    if (event.detail === 0) return;
+    if (flipped <= 0) {
+      go(1);
+      return;
+    }
+    // The footprint is the right-hand page: its left edge is the spine of the open spread.
+    const rect = book.getBoundingClientRect();
+    go(event.clientX > rect.left ? 1 : -1);
+  });
+  book.addEventListener("keydown", (event) => {
+    if (event.target !== book) return;
+    if (event.key === "ArrowRight" || event.key === "Enter" || event.key === " ") {
+      event.preventDefault();
+      go(1);
+    } else if (event.key === "ArrowLeft") {
+      event.preventDefault();
+      go(-1);
+    }
+  });
+  prevButton.addEventListener("click", () => go(-1));
+  nextButton.addEventListener("click", () => go(1));
+  build();
+})();
