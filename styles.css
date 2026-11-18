@@ -22,6 +22,7 @@
   --radius-thumb: 12px;
   --row-marker-inset: 6px;
   --tap-target: 44px;
+  --section-gap: clamp(22px, 3vw, 44px);
   --brief-width: 1000px;
   --brief-aside-width: clamp(260px, 28vw, 320px);
   --pricing-card-head: clamp(44px, 4.4vw, 60px);
@@ -1041,6 +1042,9 @@ body.case-dialog-is-open {
   position: relative;
   width: 100vw;
   z-index: 1;
+  /* The orbit ends exactly at the top edge of «Услуги» (one section gap below the hero):
+     nothing of it shows beside or under that block. */
+  clip-path: inset(-100vh -100vw calc(-1 * var(--section-gap)));
 }
 
 .screen-header {
@@ -1856,7 +1860,7 @@ body.case-dialog-is-open {
 .contact {
   background: #fff;
   border-radius: clamp(18px, 2.4vw, 34px);
-  margin: clamp(22px, 3vw, 44px) auto 0;
+  margin: var(--section-gap) auto 0;
   max-width: 1380px;
   padding: clamp(28px, 4.4vw, 58px);
   position: relative;
