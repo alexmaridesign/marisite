@@ -1811,31 +1811,64 @@ if (pricing) {
     pricingList.style.setProperty("--pricing-marker-h", row.offsetHeight + "px");
   };
 
-  const selectPricingService = (index, animate = true) => {
-    const service = pricingServices[index];
-    if (!service || index === pricingActiveIndex) return;
-    const direction = index > pricingActiveIndex ? 1 : -1;
-    pricingActiveIndex = index;
-    pricingServices.forEach((item, itemIndex) => item.classList.toggle("is-active", itemIndex === index));
-    movePricingMarker();
+  // Card parts that fade in one after another when the service changes.
+  const pricingCardParts = ["ghost", "name", "caption", "text", "price"].map(pricingField);
+  let pricingCardOut = null;
+  let pricingCardDirection = 1;
 
+  const fillPricingCard = () => {
+    const index = pricingActiveIndex;
+    const service = pricingServices[index];
     pricingField("ghost").textContent = pricingNumber(index + 1);
-    pricingField("count").textContent = `${pricingNumber(index + 1)} / ${pricingNumber(pricingServices.length)}`;
     pricingField("name").innerHTML = service.querySelector(".pricing-name").innerHTML;
     pricingField("caption").innerHTML = service.querySelector(".pricing-caption").innerHTML;
     pricingField("text").innerHTML = service.querySelector(".pricing-details p").innerHTML;
     pricingField("price").innerHTML = service.querySelector(".pricing-price").innerHTML;
     pricingField("cta").dataset.briefService = service.dataset.briefService || "";
+  };
 
-    if (animate && !reduceMotion && pricingCardBody.animate) {
-      pricingCardBody.animate(
-        [
-          { opacity: 0, transform: `translateY(${direction * 12}px)` },
-          { opacity: 1, transform: "translateY(0)" },
-        ],
-        { duration: 340, easing: "cubic-bezier(0.22, 1, 0.36, 1)" },
-      );
-    }
+  // Old text fades out, the new one fades in part by part. A switch during the fade-out
+  // only changes what comes in, so running the pointer down the list never flickers.
+  const swapPricingCard = () => {
+    if (pricingCardOut) return;
+    const shift = reduceMotion ? 0 : 8;
+    pricingCardOut = pricingCardBody.animate(
+      [{ opacity: 0, transform: `translateY(${-pricingCardDirection * shift * 0.5}px)` }],
+      { duration: 140, easing: "cubic-bezier(0.4, 0, 1, 1)", fill: "forwards" },
+    );
+    pricingCardOut.finished
+      .then(() => {
+        fillPricingCard();
+        pricingCardParts.forEach((part) => part.getAnimations().forEach((animation) => animation.cancel()));
+        pricingCardOut.cancel();
+        pricingCardOut = null;
+        pricingCardParts.forEach((part, order) => {
+          part.animate(
+            [
+              { opacity: 0, transform: `translateY(${pricingCardDirection * shift}px)` },
+              { opacity: 1, transform: "translateY(0)" },
+            ],
+            { duration: 380, delay: order * 45, easing: "cubic-bezier(0.22, 1, 0.36, 1)", fill: "backwards" },
+          );
+        });
+      })
+      .catch(() => {
+        pricingCardOut = null;
+      });
+  };
+
+  const selectPricingService = (index, animate = true) => {
+    const service = pricingServices[index];
+    if (!service || index === pricingActiveIndex) return;
+    pricingCardDirection = index > pricingActiveIndex ? 1 : -1;
+    pricingActiveIndex = index;
+    pricingServices.forEach((item, itemIndex) => item.classList.toggle("is-active", itemIndex === index));
+    movePricingMarker();
+    // The button follows the selection at once, even while the text is still fading.
+    pricingField("cta").dataset.briefService = service.dataset.briefService || "";
+
+    if (animate && pricingCardBody.animate) swapPricingCard();
+    else fillPricingCard();
   };
 
   // Deck: the card nearest to the left edge of the track is the current one.

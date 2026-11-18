@@ -36,7 +36,7 @@
       const empty = element("div", "case-grid-empty");
       empty.append(element("p", "", "Кейсы в этом разделе скоро появятся."));
       const all = element("a", "subpage-back", "Смотреть все кейсы");
-      all.href = "./cases.html";
+      all.href = "./cases";
       empty.append(all);
       grid.replaceChildren(empty);
       return;

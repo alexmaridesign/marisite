@@ -13,7 +13,7 @@
 
 Также на сайте есть услуги и стоимость, процесс работы, инструменты дизайнера и контакты для обсуждения проекта.
 
-У каждого направления своя страница с кейсами — их открывает меню «Кейсы»: [все кейсы](https://alexmaridesign.ru/cases.html), [айдентика](https://alexmaridesign.ru/identity.html), [мерч](https://alexmaridesign.ru/merch.html), [иллюстрации](https://alexmaridesign.ru/illustrations.html) (там же листается скетчбук) и [соцсети](https://alexmaridesign.ru/social.html).
+У каждого направления своя страница с кейсами — их открывает меню «Кейсы»: [все кейсы](https://alexmaridesign.ru/cases), [айдентика](https://alexmaridesign.ru/identity), [мерч](https://alexmaridesign.ru/merch), [иллюстрации](https://alexmaridesign.ru/illustrations) (там же листается скетчбук) и [соцсети](https://alexmaridesign.ru/social).
 
 ## Направления работы
 
@@ -37,4 +37,4 @@
 
 - [Telegram — @alexmari_a](https://t.me/alexmari_a)
 - [Почта — i@alexmaria.ru](mailto:i@alexmaria.ru)
-- [Политика конфиденциальности](https://alexmaridesign.ru/privacy.html)
+- [Политика конфиденциальности](https://alexmaridesign.ru/privacy)

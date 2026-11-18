@@ -19,7 +19,12 @@
   --radius-panel: clamp(28px, 3.2vw, 44px);
   --radius-card: 28px;
   --radius-row: 16px;
+  --row-marker-inset: 6px;
   --tap-target: 44px;
+  --pricing-card-head: clamp(44px, 4.4vw, 60px);
+  --pricing-price-size: clamp(28px, 2.6vw, 34px);
+  --pricing-cta-h: 52px;
+  --pricing-footer-gap: 18px;
   --font-display: "Dela Gothic One", Inter, sans-serif;
   --field-border: rgba(130, 138, 196, 0.34);
   --chip-surface: var(--surface-tint);
@@ -2107,10 +2112,13 @@ body.case-dialog-is-open {
   display: none;
 }
 
+/* The body is the ghost number's anchor at rest too: the switch animation gives it a
+   transform, and a different anchor at rest made the number jump to the card corner. */
 .pricing-card-body {
   display: flex;
   flex-direction: column;
   gap: 12px;
+  position: relative;
   width: 100%;
 }
 
@@ -2125,21 +2133,14 @@ body.case-dialog-is-open {
   top: -6px;
 }
 
-.pricing-card-count {
-  color: rgba(255, 255, 255, 0.78);
-  font-size: var(--text-caption);
-  font-variant-numeric: tabular-nums;
-  font-weight: 600;
-  letter-spacing: 0.06em;
-  margin: 0 0 clamp(20px, 3vw, 44px);
-}
-
+/* The name starts below the ghost number's top band, the same in the card and the deck. */
 .pricing-card-name {
   font-family: var(--font-display);
   font-size: clamp(22px, 2.3vw, 31px);
   font-weight: 400;
   line-height: 1.15;
   margin: 0;
+  padding-top: var(--pricing-card-head);
   position: relative;
 }
 
@@ -2158,19 +2159,18 @@ body.case-dialog-is-open {
   margin: 6px 0 0;
 }
 
+/* Price over a full-width button, pinned to the card bottom: one layout on every screen,
+   so neither moves with the price length or the card width. The deck repeats it below. */
 .pricing-card-footer {
-  align-items: center;
   border-top: 1px solid rgba(255, 255, 255, 0.24);
-  display: flex;
-  flex-wrap: wrap;
-  gap: 14px 18px;
-  justify-content: space-between;
+  display: grid;
+  gap: var(--pricing-footer-gap);
   margin-top: auto;
-  padding-top: clamp(18px, 2vw, 24px);
+  padding-top: var(--pricing-footer-gap);
 }
 
 .pricing-card-price {
-  font-size: clamp(26px, 2.7vw, 36px);
+  font-size: var(--pricing-price-size);
   font-variant-numeric: tabular-nums;
   font-weight: 800;
   line-height: 1;
@@ -2194,7 +2194,7 @@ body.case-dialog-is-open {
   font-weight: 600;
   gap: 8px;
   justify-content: center;
-  min-height: 52px;
+  min-height: var(--pricing-cta-h);
   padding: 14px 22px;
   transition: transform var(--motion-ui) var(--motion-ease), box-shadow var(--motion-ui) var(--motion-ease);
 }
@@ -2214,12 +2214,12 @@ body.case-dialog-is-open {
   background: var(--surface-tint);
   border-radius: var(--radius-row);
   content: "";
-  height: var(--pricing-marker-h, 0);
+  height: calc(var(--pricing-marker-h, 0px) - var(--row-marker-inset) * 2 - 1px);
   left: 0;
   pointer-events: none;
   position: absolute;
   right: 0;
-  top: 0;
+  top: var(--row-marker-inset);
   transform: translateY(var(--pricing-marker-y, 0));
   transition: transform var(--motion-panel) var(--motion-ease);
   z-index: -1;
@@ -2230,8 +2230,12 @@ body.case-dialog-is-open {
   background: none;
 }
 
+.pricing.is-split .pricing-index {
+  display: none;
+}
+
 .pricing.is-split .pricing-service summary {
-  grid-template-columns: 30px auto minmax(12px, 1fr) auto;
+  grid-template-columns: auto minmax(12px, 1fr) auto;
   min-height: 60px;
   padding: 10px 18px;
 }
@@ -2314,7 +2318,9 @@ body.case-dialog-is-open {
   flex: 0 0 min(86%, 340px);
   flex-direction: column;
   overflow: hidden;
-  padding: 24px;
+  /* The bottom holds the price and the button, placed absolutely: a <details> body does not
+     stretch, so in the flow they followed the text and sat at a different height per card. */
+  padding: 24px 24px calc(24px + var(--pricing-cta-h) + var(--pricing-footer-gap) * 3 + var(--pricing-price-size));
   scroll-snap-align: start;
 }
 
@@ -2342,7 +2348,7 @@ body.case-dialog-is-open {
 
 .pricing.is-deck .pricing-title {
   gap: 8px;
-  padding-top: 44px;
+  padding-top: var(--pricing-card-head);
   position: relative;
 }
 
@@ -2362,13 +2368,18 @@ body.case-dialog-is-open {
 }
 
 .pricing.is-deck .pricing-price {
+  border-top: 1px solid rgba(255, 255, 255, 0.24);
+  bottom: calc(24px + var(--pricing-cta-h) + var(--pricing-footer-gap));
   color: #fff;
-  font-size: 30px;
+  font-size: var(--pricing-price-size);
   font-weight: 800;
   grid-column: auto;
   grid-row: auto;
+  left: 24px;
   line-height: 1;
-  margin-top: 10px;
+  padding-top: var(--pricing-footer-gap);
+  position: absolute;
+  right: 24px;
 }
 
 .pricing.is-deck .pricing-price > span {
@@ -2377,14 +2388,11 @@ body.case-dialog-is-open {
 }
 
 .pricing.is-deck .pricing-details {
-  border-top: 1px solid rgba(255, 255, 255, 0.24);
-  flex: 1;
-  gap: 20px;
-  grid-template-rows: 1fr auto;
+  gap: 0;
   justify-items: stretch;
-  margin-top: 20px;
+  margin-top: 18px;
   overflow: visible;
-  padding: 18px 0 0;
+  padding: 0;
 }
 
 .pricing.is-deck .pricing-details p {
@@ -2396,7 +2404,11 @@ body.case-dialog-is-open {
   border-radius: 999px;
   gap: 8px;
   justify-content: center;
-  min-height: 52px;
+  bottom: 24px;
+  left: 24px;
+  min-height: var(--pricing-cta-h);
+  position: absolute;
+  right: 24px;
   padding: 14px 22px;
 }
 
