@@ -1261,25 +1261,13 @@ body.case-dialog-is-open {
 
 .paired-carousel {
   --active-offset: clamp(180px, 18vw, 222px);
-  /* Short fade right at the bottom: the orbit stays solid until just above «Услуги». */
-  --carousel-fade-height: clamp(60px, 6vw, 96px);
   --lens-height: clamp(132px, 15.2vw, 190px);
   --orbit-size: clamp(1040px, 74vw, 1280px);
   background: transparent;
   bottom: calc(50% - min(var(--hero-stage-half), 50%));
-  clip-path: inset(calc(-1 * var(--orbit-size)) 0 0);
+  /* Clipped only at the sides: below, the orbit simply passes under «Услуги», no fade. */
+  clip-path: inset(calc(-1 * var(--orbit-size)) 0);
   left: clamp(-150px, -8vw, -72px);
-  /* Extend the mask upward so only the bottom of the orbit fades out. */
-  -webkit-mask-image: linear-gradient(to bottom, #000 calc(100% - var(--carousel-fade-height)), transparent 100%);
-  mask-image: linear-gradient(to bottom, #000 calc(100% - var(--carousel-fade-height)), transparent 100%);
-  -webkit-mask-size: 100% calc(100% + var(--orbit-size));
-  mask-size: 100% calc(100% + var(--orbit-size));
-  -webkit-mask-position: bottom;
-  mask-position: bottom;
-  -webkit-mask-repeat: no-repeat;
-  mask-repeat: no-repeat;
-  -webkit-mask-clip: no-clip;
-  mask-clip: no-clip;
   position: absolute;
   right: clamp(-150px, -8vw, -72px);
   touch-action: pan-y pinch-zoom;
@@ -1904,7 +1892,10 @@ body.case-dialog-is-open {
   line-height: 1.5;
 }
 
+/* Above the hero, so the orbit's lower cards slide under it. */
 .panel.pricing {
+  position: relative;
+  z-index: 2;
   background: var(--section-paper);
   border: 1px solid rgba(255, 255, 255, 0.92);
   border-radius: var(--radius-panel);
@@ -3797,16 +3788,15 @@ body.case-dialog-is-open {
   .screen {
     --hero-bottom-trim: 115px;
     min-height: calc(var(--hero-stage-half) * 2 - var(--hero-bottom-trim));
-    overflow: hidden;
+    /* Clip the sides only; the orbit's lower cards continue under «Услуги». */
+    overflow-x: clip;
+    overflow-y: visible;
   }
 
   .paired-carousel {
-    /* Keep the orbit geometry; move its fade to the shorter section edge. */
-    --carousel-fade-height: min(clamp(60px, 6vw, 96px), calc(var(--hero-stage-half) * 0.86 - var(--lens-height) / 2 - var(--hero-bottom-trim) - 16px));
+    /* Keep the orbit geometry on the shorter section. */
     bottom: auto;
     height: calc(var(--hero-stage-half) * 2);
-    -webkit-mask-position: 50% calc(100% - var(--hero-bottom-trim));
-    mask-position: 50% calc(100% - var(--hero-bottom-trim));
     top: 0;
   }
 }
@@ -3883,7 +3873,6 @@ body.case-dialog-is-open {
 
   .paired-carousel {
     --active-offset: clamp(104px, 22vw, 145px);
-    --carousel-fade-height: 40px;
     --lens-height: 100px;
     --orbit-size: 400px;
   }
