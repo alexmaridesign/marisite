@@ -3538,20 +3538,19 @@ body.case-dialog-is-open {
 }
 
 /* Footer: the same lilac card as the selected service and the brief panel —
-   a call to write, the sections and contacts, a big wordmark, then the legal line. */
+   a call to write, the sections and contacts, then the legal line. */
 .site-footer {
   background:
     radial-gradient(90% 80% at 100% 0%, rgba(255, 255, 255, 0.18), transparent 60%),
     var(--accent-text);
   border-radius: var(--radius-panel);
   color: #fff;
-  container-type: inline-size;
   display: grid;
   gap: clamp(28px, 4vw, 48px);
   margin: clamp(14px, 2vw, 28px) auto 0;
   max-width: 1380px;
   overflow: hidden;
-  padding: clamp(28px, 4.2vw, 58px) clamp(22px, 4.2vw, 58px) 0;
+  padding: clamp(28px, 4.2vw, 58px) clamp(22px, 4.2vw, 58px) clamp(20px, 2.4vw, 30px);
 }
 
 .footer-top {
@@ -3631,20 +3630,6 @@ body.case-dialog-is-open {
   transition: opacity var(--motion-ui) var(--motion-ease);
 }
 
-/* The wordmark closes the footer at full width (container units); the card's bottom edge
-   cuts through the descender of «р». */
-.footer-wordmark {
-  font-family: var(--font-display);
-  font-size: clamp(64px, 23vw, 340px);
-  font-size: 30.4cqi;
-  letter-spacing: 0;
-  /* Dela Gothic: baseline sits 0.12em above the card edge, the «р» tail (0.23em) is cut. */
-  line-height: 0.76;
-  margin: 0 0 0.17em -0.035em;
-  user-select: none;
-  white-space: nowrap;
-}
-
 .footer-bottom {
   align-items: center;
   border-top: 1px solid rgba(255, 255, 255, 0.24);
@@ -3655,10 +3640,6 @@ body.case-dialog-is-open {
   gap: 10px 24px;
   justify-content: space-between;
   padding-top: clamp(16px, 2vw, 22px);
-}
-
-.site-footer .footer-bottom {
-  margin-bottom: clamp(-12px, -1vw, -4px);
 }
 
 .footer-bottom a {
@@ -3957,7 +3938,7 @@ body.case-dialog-is-open {
 
   .site-footer {
     margin: 18px 0 0;
-    padding: 30px 22px 0;
+    padding: 30px 22px 20px;
   }
 
   .contact {
