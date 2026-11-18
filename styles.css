@@ -3532,7 +3532,7 @@ body.case-dialog-is-open {
 }
 
 /* Footer: the same lilac card as the selected service and the brief panel —
-   a call to write, the sections and contacts, then the legal line. */
+   name, sections and contacts (the brief is a quiet link there), then the legal line. */
 .site-footer {
   background:
     radial-gradient(90% 80% at 100% 0%, rgba(255, 255, 255, 0.18), transparent 60%),
@@ -3554,44 +3554,23 @@ body.case-dialog-is-open {
   grid-template-columns: minmax(0, 1fr) auto;
 }
 
-.footer-cta {
+.footer-brand {
   display: grid;
-  gap: 22px;
-  justify-items: start;
+  gap: 8px;
 }
 
-.footer-title {
+.footer-name {
   font-family: var(--font-display);
-  font-size: clamp(28px, 3.4vw, 46px);
+  font-size: clamp(32px, 3.4vw, 46px);
   letter-spacing: var(--heading-letter-spacing);
-  line-height: 1.1;
+  line-height: 1;
   margin: 0;
 }
 
-.footer-brief {
-  align-items: center;
-  background: #fff;
-  border-radius: 999px;
-  color: var(--accent-text);
-  display: inline-flex;
-  font-size: 15px;
-  font-weight: 600;
-  gap: 8px;
-  min-height: 52px;
-  padding: 14px 24px;
-  text-decoration: none;
-  transition: transform var(--motion-ui) var(--motion-ease), box-shadow var(--motion-ui) var(--motion-ease);
-}
-
-.footer-brief svg {
-  fill: none;
-  height: 16px;
-  stroke: currentColor;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-  stroke-width: 2;
-  transition: transform var(--motion-ui) var(--motion-ease);
-  width: 16px;
+.footer-tagline {
+  color: rgba(255, 255, 255, 0.78);
+  font-size: var(--text-body);
+  margin: 0;
 }
 
 .footer-cols {
@@ -3651,15 +3630,6 @@ body.case-dialog-is-open {
 }
 
 @media (hover: hover) and (pointer: fine) {
-  .footer-brief:hover {
-    box-shadow: 0 12px 26px rgba(40, 46, 90, 0.26);
-    transform: translateY(-2px);
-  }
-
-  .footer-brief:hover svg {
-    transform: translate(2px, -2px);
-  }
-
   .footer-col a:hover {
     opacity: 0.72;
   }
