@@ -81,8 +81,7 @@ p,
 li,
 figcaption,
 .pricing-caption,
-.pricing-lead,
-.site-footer > span {
+.pricing-lead {
   text-wrap: pretty;
 }
 
@@ -3538,34 +3537,172 @@ body.case-dialog-is-open {
   min-height: 56px;
 }
 
+/* Footer: the same lilac card as the selected service and the brief panel —
+   a call to write, the sections and contacts, a big wordmark, then the legal line. */
 .site-footer {
-  align-items: center;
-  background: var(--section-paper);
-  border-radius: clamp(18px, 2.4vw, 34px);
-  color: rgba(23, 22, 20, 0.58);
-  display: flex;
-  flex-wrap: wrap;
-  font-size: 13px;
-  font-weight: 700;
-  gap: 12px 22px;
-  justify-content: space-between;
+  background:
+    radial-gradient(90% 80% at 100% 0%, rgba(255, 255, 255, 0.18), transparent 60%),
+    var(--accent-text);
+  border-radius: var(--radius-panel);
+  color: #fff;
+  container-type: inline-size;
+  display: grid;
+  gap: clamp(28px, 4vw, 48px);
   margin: clamp(14px, 2vw, 28px) auto 0;
   max-width: 1380px;
-  padding: 18px clamp(18px, 3vw, 38px);
+  overflow: hidden;
+  padding: clamp(28px, 4.2vw, 58px) clamp(22px, 4.2vw, 58px) 0;
 }
 
-.site-footer a {
-  color: rgba(23, 22, 20, 0.72);
+.footer-top {
+  align-items: start;
+  display: grid;
+  gap: 32px clamp(24px, 4vw, 64px);
+  grid-template-columns: minmax(0, 1fr) auto;
+}
+
+.footer-cta {
+  display: grid;
+  gap: 22px;
+  justify-items: start;
+}
+
+.footer-title {
+  font-family: var(--font-display);
+  font-size: clamp(28px, 3.4vw, 46px);
+  letter-spacing: var(--heading-letter-spacing);
+  line-height: 1.1;
+  margin: 0;
+}
+
+.footer-brief {
+  align-items: center;
+  background: #fff;
+  border-radius: 999px;
+  color: var(--accent-text);
+  display: inline-flex;
+  font-size: 15px;
+  font-weight: 600;
+  gap: 8px;
+  min-height: 52px;
+  padding: 14px 24px;
+  text-decoration: none;
+  transition: transform var(--motion-ui) var(--motion-ease), box-shadow var(--motion-ui) var(--motion-ease);
+}
+
+.footer-brief svg {
+  fill: none;
+  height: 16px;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 2;
+  transition: transform var(--motion-ui) var(--motion-ease);
+  width: 16px;
+}
+
+.footer-cols {
+  display: flex;
+  gap: clamp(32px, 5vw, 80px);
+}
+
+.footer-col {
+  align-content: start;
+  display: grid;
+  gap: 10px;
+  justify-items: start;
+}
+
+.footer-col-title {
+  color: rgba(255, 255, 255, 0.62);
+  font-size: var(--text-caption);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  margin-bottom: 4px;
+  text-transform: uppercase;
+}
+
+.footer-col a {
+  color: #fff;
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 1.4;
+  text-decoration: none;
+  transition: opacity var(--motion-ui) var(--motion-ease);
+}
+
+/* The wordmark closes the footer at full width (container units); the card's bottom edge
+   cuts through the descender of «р». */
+.footer-wordmark {
+  font-family: var(--font-display);
+  font-size: clamp(64px, 23vw, 340px);
+  font-size: 30.4cqi;
+  letter-spacing: 0;
+  /* Dela Gothic: baseline sits 0.12em above the card edge, the «р» tail (0.23em) is cut. */
+  line-height: 0.76;
+  margin: 0 0 0.17em -0.035em;
+  user-select: none;
+  white-space: nowrap;
+}
+
+.footer-bottom {
+  align-items: center;
+  border-top: 1px solid rgba(255, 255, 255, 0.24);
+  color: rgba(255, 255, 255, 0.72);
+  display: flex;
+  flex-wrap: wrap;
+  font-size: var(--text-caption);
+  gap: 10px 24px;
+  justify-content: space-between;
+  padding-top: clamp(16px, 2vw, 22px);
+}
+
+.site-footer .footer-bottom {
+  margin-bottom: clamp(-12px, -1vw, -4px);
+}
+
+.footer-bottom a {
+  color: #fff;
   text-decoration: underline;
-  text-decoration-color: rgba(135, 148, 235, 0.36);
+  text-decoration-color: rgba(255, 255, 255, 0.4);
   text-underline-offset: 4px;
-  transition: color var(--motion-ui) var(--motion-ease), text-decoration-color var(--motion-ui) var(--motion-ease);
+  transition: text-decoration-color var(--motion-ui) var(--motion-ease);
 }
 
-.site-footer a:hover,
 .site-footer a:focus-visible {
-  color: var(--ink);
-  text-decoration-color: var(--violet);
+  border-radius: 6px;
+  outline: 2px solid #fff;
+  outline-offset: 3px;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .footer-brief:hover {
+    box-shadow: 0 12px 26px rgba(40, 46, 90, 0.26);
+    transform: translateY(-2px);
+  }
+
+  .footer-brief:hover svg {
+    transform: translate(2px, -2px);
+  }
+
+  .footer-col a:hover {
+    opacity: 0.72;
+  }
+
+  .footer-bottom a:hover {
+    text-decoration-color: #fff;
+  }
+}
+
+@media (max-width: 760px) {
+  .footer-top {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .footer-bottom {
+    align-items: flex-start;
+    flex-direction: column;
+  }
 }
 
 .motion-ready .reveal {
@@ -3814,14 +3951,13 @@ body.case-dialog-is-open {
   }
 
   .panel,
-  .contact,
-  .site-footer {
+  .contact {
     padding: 34px 18px;
   }
 
   .site-footer {
     margin: 18px 0 0;
-    padding: 22px 18px;
+    padding: 30px 22px 0;
   }
 
   .contact {
@@ -3989,11 +4125,6 @@ body.case-dialog-is-open {
     width: 100%;
   }
 
-  .site-footer {
-    align-items: flex-start;
-    flex-direction: column;
-    gap: 10px;
-  }
 }
 
 @media (orientation: portrait) {
@@ -4163,13 +4294,13 @@ body.case-dialog-is-open {
 /* Invisible hit-area extension: keeps the visual size, gives touch a 44px target. */
 .spotlight .black-button,
 .step-brief-link,
-.site-footer a {
+.footer-bottom a {
   position: relative;
 }
 
 .spotlight .black-button::after,
 .step-brief-link::after,
-.site-footer a::after {
+.footer-bottom a::after {
   content: "";
   left: 0;
   min-height: var(--tap-target);

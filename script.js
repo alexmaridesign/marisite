@@ -2284,6 +2284,8 @@ if (briefDialog && briefForm && typeof briefDialog.showModal === "function") {
   document.addEventListener("click", (event) => {
     const opener = event.target.closest?.("[data-brief-open]");
     if (!opener || briefDialog.open) return;
+    // A link (the footer's) opens the brief here instead of following ./#brief.
+    if (opener.tagName === "A") event.preventDefault();
     setBriefStatus("");
     if (opener.dataset.briefService) tickBriefService(opener.dataset.briefService);
     briefDialog.showModal();
