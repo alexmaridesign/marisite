@@ -3141,171 +3141,177 @@ body.case-dialog-is-open {
   max-width: 148px;
 }
 
-.skills-workspace {
+/* Skills: a bento of tiles, every tool visible at once — Figma large, Photoshop and
+   Illustrator beside it, then Procreate and one tile grouping the AI tools. */
+.skills-bento {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.skill-tile {
   background: var(--skill-paper);
-  border: 1px solid var(--skill-stroke);
-  border-radius: 22px;
-  box-shadow: 0 14px 28px var(--skill-shadow);
-}
-
-.skill-stage {
+  border-radius: calc(var(--radius-card) - 6px);
+  box-shadow: 0 10px 24px var(--skill-shadow);
   display: grid;
-  grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr);
-  min-height: clamp(270px, 30vw, 360px);
-}
-
-.skill-canvas {
-  background: radial-gradient(var(--skill-stroke) 1px, transparent 1px) 0 0 / 16px 16px;
-  border-radius: 21px 0 0 0;
-  border-right: 1px solid var(--skill-stroke);
-  display: grid;
-  padding: 26px;
-  place-items: center;
-  position: relative;
-}
-
-.skill-art {
-  background: var(--skill-paper);
-  border-radius: 27px;
-  box-shadow: 0 20px 30px var(--skill-shadow), inset 0 0 0 1px var(--skill-stroke);
-  display: grid;
-  height: clamp(136px, 14vw, 180px);
-  place-items: center;
-  transform: rotate(-8deg);
-  transition: transform var(--motion-panel) var(--motion-ease);
-  width: clamp(136px, 14vw, 180px);
-}
-
-.skill-art img {
-  border-radius: 13px;
-  height: 55%;
-  object-fit: contain;
-  width: 55%;
-}
-
-.skill-canvas-label {
-  bottom: 15px;
-  color: var(--skill-muted);
-  font-size: 11px;
-  left: 18px;
-  letter-spacing: 0.09em;
-  position: absolute;
-  text-transform: uppercase;
-}
-
-.skill-details {
-  align-items: flex-start;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
+  gap: 18px;
+  align-content: space-between;
   min-width: 0;
-  padding: 30px 28px;
+  padding: clamp(18px, 2vw, 26px);
+  transition: transform var(--motion-ui) var(--motion-ease), box-shadow var(--motion-ui) var(--motion-ease);
 }
 
-.skill-category {
+.skill-tile--feature {
+  grid-column: span 2;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: end;
+  column-gap: clamp(18px, 2.4vw, 32px);
+}
+
+.skill-tile--ai {
+  grid-column: span 3;
+  align-content: start;
+}
+
+.skill-tile-icon {
+  border-radius: var(--radius-thumb);
+  display: block;
+  height: 48px;
+  object-fit: contain;
+  width: 48px;
+}
+
+.skill-tile--feature .skill-tile-icon {
+  align-self: start;
+  background: #fff;
+  border-radius: calc(var(--radius-card) - 6px);
+  box-shadow: 0 12px 26px var(--skill-shadow);
+  box-sizing: content-box;
+  height: clamp(56px, 6vw, 76px);
+  padding: clamp(18px, 2vw, 26px);
+  width: clamp(56px, 6vw, 76px);
+}
+
+.skill-tile-text {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+}
+
+.skill-tile-category {
   color: var(--skill-muted);
   font-size: 11px;
   font-weight: 600;
   letter-spacing: 0.12em;
-  margin: 0 0 10px;
+  margin: 0;
   text-transform: uppercase;
 }
 
-.skill-title {
+.skill-tile-name {
+  color: var(--skill-ink);
   font-family: var(--font-display);
-  font-size: clamp(24px, 4.6vw, 34px);
+  font-size: clamp(20px, 1.9vw, 26px);
   font-weight: 400;
   letter-spacing: var(--heading-letter-spacing);
-  line-height: 1.2;
-  margin: 0 0 20px;
-  overflow-wrap: anywhere;
+  line-height: 1.15;
+  margin: 0;
 }
 
-.skill-tasks {
+.skill-tile--feature .skill-tile-name {
+  font-size: clamp(28px, 3.2vw, 44px);
+}
+
+.skill-tile-tasks {
   display: flex;
   flex-wrap: wrap;
-  gap: 7px;
+  gap: 6px;
+  list-style: none;
+  margin: 6px 0 0;
+  padding: 0;
+}
+
+.skill-tile-tasks li {
+  background: var(--skill-soft);
+  border-radius: 999px;
+  color: var(--skill-ink);
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1;
+  padding: 7px 10px;
+}
+
+.skill-mini-list {
+  display: grid;
+  gap: 10px;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   list-style: none;
   margin: 0;
   padding: 0;
 }
 
-.skill-tasks li {
-  background: var(--skill-soft);
-  border-radius: 8px;
-  font-size: 12px;
-  line-height: 1.45;
-  max-width: 100%;
-  overflow-wrap: anywhere;
-  padding: 6px 10px;
-}
-
-.skill-dock {
-  border-top: 1px solid var(--skill-stroke);
+.skill-mini {
+  background: #fff;
+  border-radius: var(--radius-row);
   display: grid;
-  gap: 3px;
-  grid-template-columns: repeat(8, minmax(0, 1fr));
-  padding: 15px 10px 12px;
-}
-
-.skill-tool {
-  align-items: center;
-  background: transparent;
-  border-radius: 12px;
-  color: var(--skill-muted);
-  display: flex;
-  flex-direction: column;
-  gap: 7px;
-  min-height: 66px;
+  gap: 4px;
+  justify-items: start;
   min-width: 0;
-  padding: 7px 1px;
-  transition: background var(--motion-ui) var(--motion-ease), transform var(--motion-ui) var(--motion-ease);
+  padding: 14px;
 }
 
-.skill-tool[aria-pressed="true"] {
-  background: var(--skill-selected);
-  color: var(--skill-ink);
-}
-
-.skill-tool:focus-visible {
-  outline: 2px solid var(--skill-ink);
-  outline-offset: 2px;
-}
-
-.skill-tool img {
-  border-radius: 7px;
-  height: 31px;
+.skill-mini img {
+  border-radius: 10px;
+  height: 36px;
+  margin-bottom: 8px;
   object-fit: contain;
-  width: 31px;
+  width: 36px;
 }
 
-.skill-tool span {
-  font-size: 11px;
-  line-height: 1.5;
-  white-space: nowrap;
+.skill-mini-name {
+  color: var(--skill-ink);
+  font-size: 15px;
+  font-weight: 700;
 }
 
-.skills-footer {
-  color: #fff;
-  display: flex;
-  font-size: 11px;
-  gap: 12px;
-  justify-content: space-between;
-  line-height: 1.5;
-  margin-top: 17px;
+.skill-mini-tasks {
+  color: var(--skill-muted);
+  font-size: 12px;
+  line-height: 1.4;
 }
 
 @media (hover: hover) and (pointer: fine) {
-  .skill-canvas:hover .skill-art {
-    transform: rotate(0deg) translateY(-3px);
-  }
-
-  .skill-tool:hover {
+  .skill-tile:hover {
+    box-shadow: 0 16px 32px var(--skill-shadow);
     transform: translateY(-3px);
   }
+}
 
-  .skill-tool:not([aria-pressed="true"]):hover {
-    background: var(--skill-soft);
+/* Tablets: two columns — Figma and the AI tile across, the rest in pairs. */
+@media (max-width: 900px) {
+  .skills-bento {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .skill-tile--ai,
+  .skill-tile--solo {
+    grid-column: span 2;
+  }
+
+  /* Across the full width the icon sits beside the text, as on the Figma tile. */
+  .skill-tile--solo {
+    align-items: center;
+    column-gap: 18px;
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+
+  .skill-mini-list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 521px) and (max-width: 900px) {
+  .skill-mini-list {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
   }
 }
 
@@ -3319,50 +3325,38 @@ body.case-dialog-is-open {
     margin: 12px 0 0;
     max-width: none;
   }
-
-  .skill-stage {
-    grid-template-columns: 1fr;
-  }
-
-  .skill-canvas {
-    border-bottom: 1px solid var(--skill-stroke);
-    border-radius: 21px 21px 0 0;
-    border-right: 0;
-    min-height: 172px;
-  }
-
-  .skill-art {
-    border-radius: 23px;
-    height: 110px;
-    width: 110px;
-  }
-
-  .skill-details {
-    min-height: 194px;
-    padding: 23px 20px;
-  }
-
-  .skill-title {
-    margin-bottom: 13px;
-  }
-
-  .skill-dock {
-    gap: 5px;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-  }
-
-  .skill-tool {
-    padding: 9px 1px;
-  }
-
-  .skills-footer {
-    flex-wrap: wrap;
-  }
 }
 
-@media (max-width: 360px) {
-  .skill-details {
-    min-height: 224px;
+/* Phones: Figma across, the design tools in pairs, Procreate across, AI tools 2×2. */
+@media (max-width: 520px) {
+  .skills-bento {
+    gap: 8px;
+  }
+
+  .skill-tile {
+    padding: 16px;
+  }
+
+  .skill-tile--feature {
+    grid-template-columns: minmax(0, 1fr);
+    row-gap: 16px;
+  }
+
+  /* Narrow tiles wrap long labels; a soft corner reads better than a pill on two lines. */
+  .skill-tile-tasks li {
+    border-radius: 8px;
+    font-size: 11px;
+    line-height: 1.25;
+    padding: 5px 8px;
+  }
+
+  .skill-mini-list {
+    gap: 8px;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .skill-mini {
+    padding: 12px;
   }
 }
 

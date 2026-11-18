@@ -2056,54 +2056,6 @@ if (processStack) {
 }
 
 (() => {
-  const skills = document.querySelector("[data-skills]");
-  if (!skills) return;
-
-  const buttons = Array.from(skills.querySelectorAll("[data-skill-select]"));
-  const image = skills.querySelector("[data-skill-image]");
-  const title = skills.querySelector("[data-skill-title]");
-  const category = skills.querySelector("[data-skill-category-label]");
-  const taskList = skills.querySelector("[data-skill-tasks]");
-  if (!buttons.length || !image || !title || !category || !taskList) return;
-
-  const panel = skills.querySelector(".skill-details");
-  let skillMotionSerial = 0;
-  const selectSkill = async (button, { animate = true } = {}) => {
-    const buttonImage = button.querySelector("img");
-    if (!buttonImage) return;
-    let tasks;
-    try { tasks = JSON.parse(button.dataset.skillTasks || "[]"); } catch { return; }
-    if (!Array.isArray(tasks) || !tasks.every((task) => typeof task === "string")) return;
-    const serial = ++skillMotionSerial;
-    buttons.forEach((candidate) => candidate.setAttribute("aria-pressed", String(candidate === button)));
-    if (animate) {
-      const outgoing = [panel, image].filter(Boolean).map((element) => {
-        const style = getComputedStyle(element);
-        return playUiMotion(element, [{ opacity: style.opacity }, { opacity: 0 }], { duration: 120 });
-      });
-      await Promise.all(outgoing.map((animation) => animation?.finished.catch(() => {}) ?? Promise.resolve()));
-      if (serial !== skillMotionSerial) return;
-    }
-    image.src = buttonImage.src;
-    image.alt = buttonImage.alt;
-    title.textContent = formatRussianText(button.dataset.skillName);
-    category.textContent = formatRussianText(button.dataset.skillCategory);
-    taskList.replaceChildren(...tasks.map((task) => {
-      const item = document.createElement("li");
-      item.textContent = formatRussianText(task);
-      return item;
-    }));
-    if (animate) {
-      playUiMotion(panel, [{ opacity: 0, transform: "translateY(5px)" }, { opacity: 1, transform: "translateY(0)" }]);
-      playUiMotion(image, [{ opacity: 0 }, { opacity: 1 }]);
-    }
-  };
-
-  buttons.forEach((button) => button.addEventListener("click", () => selectSkill(button)));
-  selectSkill(buttons.find((button) => button.getAttribute("aria-pressed") === "true") || buttons[0], { animate: false });
-})();
-
-(() => {
   const contact = document.querySelector("#contact");
   const decoration = contact?.querySelector(".contact-loupe");
   if (!contact || !decoration) return;
