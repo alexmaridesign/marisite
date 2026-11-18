@@ -54,9 +54,10 @@
   box-sizing: border-box;
 }
 
-/* No rubber-band pull past the top or bottom: the page stays pinned to the window edge. */
-html,
-body {
+/* No rubber-band pull past the top or bottom: the page stays pinned to the window edge.
+   Only on the root: body is a scroll box of its own (overflow-x), and overscroll-behavior on
+   it would stop every swipe and wheel from reaching the page. */
+html {
   overscroll-behavior-y: none;
 }
 
@@ -4036,9 +4037,12 @@ body.case-dialog-is-open {
   outline-offset: 2px;
 }
 
-/* The notice is a top sheet: full width, about a third of the screen, flush with the top
-   edge. It follows the finger while dragged (--dev-drag) and springs back or folds away. */
+/* The notice is a top sheet: full width, about a third of the screen, pinned to the top
+   edge. Dragged up it moves with the finger (--dev-drag); dragged down it grows taller
+   (--dev-stretch) instead of leaving the edge. Motion uses the iOS sheet curve. */
 .dev-notice {
+  --dev-sheet-ease: cubic-bezier(0.32, 0.72, 0, 1);
+
   background:
     radial-gradient(60% 120% at 50% 0%, rgba(255, 255, 255, 0.9), transparent 70%),
     #f2f3ff;
@@ -4047,7 +4051,7 @@ body.case-dialog-is-open {
   cursor: grab;
   display: grid;
   grid-template-rows: minmax(0, 1fr) auto;
-  height: clamp(220px, 30vh, 420px);
+  height: calc(clamp(220px, 30vh, 420px) + var(--dev-stretch, 0px));
   justify-items: center;
   left: 0;
   overflow: hidden;
@@ -4057,7 +4061,7 @@ body.case-dialog-is-open {
   top: 0;
   touch-action: none;
   transform: translateY(calc(-100% - 40px));
-  transition: transform var(--motion-panel) var(--motion-ease);
+  transition: transform 500ms var(--dev-sheet-ease), height 500ms var(--dev-sheet-ease);
   user-select: none;
   z-index: 40;
 }
@@ -4166,7 +4170,7 @@ body.case-dialog-is-open {
   inset: 0;
   opacity: 0;
   position: fixed;
-  transition: opacity var(--motion-panel) var(--motion-ease);
+  transition: opacity 500ms var(--dev-sheet-ease, cubic-bezier(0.32, 0.72, 0, 1));
   z-index: 39;
 }
 
@@ -4231,7 +4235,6 @@ html.dev-notice-open body {
 html:has(dialog[open]),
 html:has(dialog[open]) body {
   overflow: hidden;
-  overscroll-behavior: none;
 }
 
 dialog[open] {

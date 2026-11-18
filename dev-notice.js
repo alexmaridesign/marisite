@@ -1,7 +1,7 @@
 // "Site in development": a thin strip at the top of every page, and a top sheet (full width,
 // about a third of the screen) that slides down once per visit over a blurred, dimmed page.
-// Like a native sheet it follows the finger: drag it up to put it away, a short drag springs
-// back. It also folds by itself after a few seconds, with the cross, Esc or a click on the page.
+// Like a native iOS sheet it stays pinned to the top edge: dragged up it follows the finger,
+// dragged down it stretches with growing resistance; a short drag springs back. It also folds by itself after a few seconds, with the cross, Esc or a click on the page.
 // "Подробнее" in the strip brings it back.
 
 (() => {
@@ -54,6 +54,7 @@
   const more = strip.querySelector(".dev-strip-more");
   const close = notice.querySelector(".dev-notice-close");
   let foldTimer = 0;
+  let openFrame = 0;
 
   const setOpen = (open) => {
     notice.classList.toggle("is-open", open);
@@ -67,23 +68,35 @@
     notice.hidden = false;
     backdrop.hidden = false;
     if (auto) foldTimer = setTimeout(foldNotice, AUTO_FOLD);
-    // Two frames, so the slide starts from the folded position.
-    requestAnimationFrame(() => requestAnimationFrame(() => setOpen(true)));
+    // Two frames, so the slide starts from the folded position. A fold before then cancels it,
+    // otherwise a late frame (a background tab) would reopen it and keep the page locked.
+    cancelAnimationFrame(openFrame);
+    openFrame = requestAnimationFrame(() => {
+      openFrame = requestAnimationFrame(() => {
+        openFrame = 0;
+        setOpen(true);
+      });
+    });
   };
 
   function foldNotice() {
     if (notice.hidden) return;
     clearTimeout(foldTimer);
+    cancelAnimationFrame(openFrame);
+    openFrame = 0;
     notice.style.removeProperty("--dev-drag");
+    notice.style.removeProperty("--dev-stretch");
     notice.classList.remove("is-dragging");
     setOpen(false);
     const finish = () => {
       if (notice.classList.contains("is-open")) return;
       notice.hidden = true;
       backdrop.hidden = true;
+      // Never leave the page locked behind a folded sheet.
+      document.documentElement.classList.remove("dev-notice-open");
     };
     if (reducedMotion()) finish();
-    else setTimeout(finish, 460);
+    else setTimeout(finish, 520);
   }
 
   close.addEventListener("click", () => {
@@ -99,20 +112,23 @@
     if (event.key === "Escape" && notice.classList.contains("is-open") && !document.querySelector("dialog[open]")) foldNotice();
   });
 
-  // Drag: the sheet follows the pointer upwards 1:1, downwards only a little (rubber band).
+  // iOS-style rubber band: the further the pull, the less the sheet gives.
+  const rubber = (distance, limit = 160) => limit * (1 - 1 / ((distance * 0.55) / limit + 1));
+
+  // Drag: up moves the sheet 1:1; down never detaches it from the top, it stretches instead.
   let drag = null;
   notice.addEventListener("pointerdown", (event) => {
     if (event.button !== 0 || event.target.closest("button, a")) return;
     clearTimeout(foldTimer);
     drag = { id: event.pointerId, startY: event.clientY, lastY: event.clientY, lastT: event.timeStamp, speed: 0 };
-    notice.setPointerCapture(event.pointerId);
+    try { notice.setPointerCapture(event.pointerId); } catch { /* pointer already gone */ }
     notice.classList.add("is-dragging");
   });
   notice.addEventListener("pointermove", (event) => {
     if (!drag || event.pointerId !== drag.id) return;
     const dy = event.clientY - drag.startY;
-    const shift = dy < 0 ? dy : Math.sqrt(dy) * 4;
-    notice.style.setProperty("--dev-drag", `${shift}px`);
+    notice.style.setProperty("--dev-drag", `${Math.min(0, dy)}px`);
+    notice.style.setProperty("--dev-stretch", `${dy > 0 ? rubber(dy) : 0}px`);
     const dt = Math.max(1, event.timeStamp - drag.lastT);
     drag.speed = (drag.lastY - event.clientY) / dt;
     drag.lastY = event.clientY;
@@ -128,6 +144,7 @@
       foldNotice();
     } else {
       notice.style.removeProperty("--dev-drag");
+      notice.style.removeProperty("--dev-stretch");
     }
   };
   notice.addEventListener("pointerup", endDrag);
