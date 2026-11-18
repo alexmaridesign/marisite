@@ -4243,6 +4243,203 @@ body.case-dialog-is-open {
   visibility: hidden;
 }
 
+/* "Site in development": a strip on top of every page and a card that slides down from the
+   top once per visit, then folds back up (dev-notice.js). */
+.dev-strip {
+  align-items: center;
+  background: var(--accent-text);
+  color: #fff;
+  display: flex;
+  font-size: var(--text-caption);
+  gap: 10px;
+  justify-content: center;
+  min-height: 36px;
+  padding: 4px 16px;
+  position: relative;
+  text-align: center;
+  z-index: 30;
+}
+
+.dev-strip-dot {
+  animation: dev-strip-pulse 1.8s var(--motion-ease) infinite;
+  background: #ffd84d;
+  border-radius: 50%;
+  flex: none;
+  height: 8px;
+  width: 8px;
+}
+
+.dev-strip-text {
+  font-weight: 600;
+}
+
+.dev-strip-note {
+  font-weight: 400;
+  opacity: 0.86;
+}
+
+.dev-strip-more {
+  background: rgba(255, 255, 255, 0.16);
+  border: 0;
+  border-radius: 999px;
+  color: #fff;
+  cursor: pointer;
+  flex: none;
+  font: inherit;
+  font-weight: 600;
+  min-height: 26px;
+  padding: 0 12px;
+  transition: background var(--motion-ui) var(--motion-ease);
+}
+
+.dev-strip-more:focus-visible,
+.dev-notice-close:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 2px;
+}
+
+.dev-notice {
+  background: var(--section-paper);
+  border: 1px solid rgba(255, 255, 255, 0.9);
+  border-radius: var(--radius-card);
+  box-shadow: 0 24px 60px rgba(67, 75, 130, 0.28);
+  left: 50%;
+  opacity: 0;
+  overflow: hidden;
+  padding: 8px;
+  position: fixed;
+  top: 12px;
+  transform: translate(-50%, calc(-100% - 24px));
+  transition: transform var(--motion-panel) var(--motion-ease), opacity var(--motion-panel) var(--motion-ease);
+  width: min(520px, calc(100% - 24px));
+  z-index: 40;
+}
+
+.dev-notice.is-open {
+  opacity: 1;
+  transform: translate(-50%, 0);
+}
+
+.dev-notice-art {
+  aspect-ratio: 1120 / 718;
+  border-radius: calc(var(--radius-card) - 8px);
+  display: block;
+  height: auto;
+  width: 100%;
+}
+
+.dev-notice-bar {
+  align-items: center;
+  display: flex;
+  gap: 12px;
+  justify-content: space-between;
+  padding: 12px 6px 8px 12px;
+}
+
+.dev-notice-bar p {
+  color: var(--text-muted);
+  font-size: 14px;
+  line-height: 1.45;
+  margin: 0;
+  text-wrap: pretty;
+}
+
+.dev-notice-close {
+  align-items: center;
+  background: var(--chip-surface);
+  border: 0;
+  border-radius: 50%;
+  color: var(--accent-text);
+  cursor: pointer;
+  display: inline-flex;
+  flex: none;
+  height: 40px;
+  justify-content: center;
+  transition: background var(--motion-ui) var(--motion-ease), color var(--motion-ui) var(--motion-ease);
+  width: 40px;
+}
+
+.dev-notice-close svg {
+  fill: none;
+  height: 18px;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-width: 2;
+  width: 18px;
+}
+
+.dev-notice-close:focus-visible {
+  outline-color: var(--accent-text);
+}
+
+/* The line along the bottom runs down while the card waits; hover or focus pauses it. */
+.dev-notice-timer {
+  background: var(--accent);
+  bottom: 0;
+  height: 3px;
+  left: 0;
+  position: absolute;
+  right: 0;
+  transform: scaleX(0);
+  transform-origin: left;
+}
+
+.dev-notice.is-timed .dev-notice-timer {
+  animation: dev-notice-countdown var(--dev-notice-time, 7s) linear forwards;
+}
+
+.dev-notice.is-timed:hover .dev-notice-timer,
+.dev-notice.is-timed:focus-within .dev-notice-timer {
+  animation-play-state: paused;
+}
+
+@keyframes dev-notice-countdown {
+  from {
+    transform: scaleX(1);
+  }
+
+  to {
+    transform: scaleX(0);
+  }
+}
+
+@keyframes dev-strip-pulse {
+  50% {
+    opacity: 0.4;
+  }
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .dev-strip-more:hover {
+    background: rgba(255, 255, 255, 0.28);
+  }
+
+  .dev-notice-close:hover {
+    background: var(--accent-text);
+    color: #fff;
+  }
+}
+
+@media (max-width: 520px) {
+  .dev-strip-note {
+    display: none;
+  }
+
+  .dev-notice-bar p {
+    font-size: 13px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dev-notice {
+    transition: none;
+  }
+
+  .dev-strip-dot {
+    animation: none;
+  }
+}
+
 /* While any modal is open the page underneath neither scrolls nor swipes. */
 html:has(dialog[open]),
 html:has(dialog[open]) body {
