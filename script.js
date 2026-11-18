@@ -2254,17 +2254,30 @@ if (briefDialog && briefForm && typeof briefDialog.showModal === "function") {
     ].filter(Boolean).join("\n\n");
   };
 
+  // Opened from a service, the brief ticks its chip. A chip ticked this way is replaced when
+  // the brief opens from another service; one the visitor ticked or unticked is theirs and stays.
+  const briefServiceInputs = Array.from(briefForm.querySelectorAll('input[name="service"]'));
+  const briefAutoTicked = new Set();
+  const tickBriefService = (service) => {
+    briefAutoTicked.forEach((input) => {
+      input.checked = false;
+    });
+    briefAutoTicked.clear();
+    const input = briefServiceInputs.find((item) => item.value === service);
+    if (input && !input.checked) {
+      input.checked = true;
+      briefAutoTicked.add(input);
+    }
+  };
+  briefServiceInputs.forEach((input) => {
+    input.addEventListener("change", () => briefAutoTicked.delete(input));
+  });
+
   document.addEventListener("click", (event) => {
     const opener = event.target.closest?.("[data-brief-open]");
     if (!opener || briefDialog.open) return;
     setBriefStatus("");
-    // Opened from a service: tick the matching chip so the brief starts filled in.
-    const service = opener.dataset.briefService;
-    if (service) {
-      briefForm.querySelectorAll('input[name="service"]').forEach((input) => {
-        if (input.value === service) input.checked = true;
-      });
-    }
+    if (opener.dataset.briefService) tickBriefService(opener.dataset.briefService);
     briefDialog.showModal();
   });
 
@@ -2273,9 +2286,7 @@ if (briefDialog && briefForm && typeof briefDialog.showModal === "function") {
   if (location.hash in BRIEF_HASH_SERVICES) {
     const service = BRIEF_HASH_SERVICES[location.hash];
     history.replaceState(history.state, "", location.pathname + location.search);
-    briefForm.querySelectorAll('input[name="service"]').forEach((input) => {
-      if (input.value === service) input.checked = true;
-    });
+    if (service) tickBriefService(service);
     briefDialog.showModal();
   }
 
