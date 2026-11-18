@@ -54,6 +54,12 @@
   box-sizing: border-box;
 }
 
+/* No rubber-band pull past the top or bottom: the page stays pinned to the window edge. */
+html,
+body {
+  overscroll-behavior-y: none;
+}
+
 html {
   overflow-x: hidden;
   scroll-behavior: smooth;
@@ -4030,34 +4036,78 @@ body.case-dialog-is-open {
   outline-offset: 2px;
 }
 
-/* The notice is a full-screen sheet that slides down flush from the top edge. Its picture
-   fills the screen on landscape screens and sits whole in the middle on portrait ones. */
+/* The notice is a top sheet: full width, about a third of the screen, flush with the top
+   edge. It follows the finger while dragged (--dev-drag) and springs back or folds away. */
 .dev-notice {
-  background: #f2f3ff;
-  cursor: pointer;
+  background:
+    radial-gradient(60% 120% at 50% 0%, rgba(255, 255, 255, 0.9), transparent 70%),
+    #f2f3ff;
+  border-radius: 0 0 var(--radius-panel) var(--radius-panel);
+  box-shadow: 0 24px 60px rgba(35, 38, 70, 0.22);
+  cursor: grab;
   display: grid;
-  inset: 0;
-  place-items: center;
+  grid-template-rows: minmax(0, 1fr) auto;
+  height: clamp(220px, 30vh, 420px);
+  justify-items: center;
+  left: 0;
+  overflow: hidden;
+  padding-top: env(safe-area-inset-top);
   position: fixed;
-  transform: translateY(-100%);
+  right: 0;
+  top: 0;
+  touch-action: none;
+  transform: translateY(calc(-100% - 40px));
   transition: transform var(--motion-panel) var(--motion-ease);
+  user-select: none;
   z-index: 40;
 }
 
 .dev-notice.is-open {
-  transform: translateY(0);
+  transform: translateY(var(--dev-drag, 0px));
 }
 
-.dev-notice[hidden] {
+.dev-notice.is-dragging {
+  cursor: grabbing;
+  transition: none;
+}
+
+.dev-notice[hidden],
+.dev-notice-backdrop[hidden] {
   display: none;
 }
 
-.dev-notice-art {
+/* Tools on the left, the title and a line of text on the right, centred in the sheet. */
+.dev-notice-body {
+  align-items: center;
+  display: flex;
+  gap: clamp(14px, 3vw, 40px);
   height: 100%;
-  inset: 0;
-  object-fit: cover;
-  position: absolute;
-  width: 100%;
+  min-height: 0;
+  padding: 16px 72px 0;
+}
+
+.dev-notice-art {
+  flex: none;
+  height: min(100%, 220px);
+  min-height: 0;
+  object-fit: contain;
+  pointer-events: none;
+  width: auto;
+}
+
+.dev-notice-text {
+  display: grid;
+  gap: 10px;
+  max-width: 460px;
+}
+
+.dev-notice-title {
+  color: var(--accent);
+  font-family: var(--font-display);
+  font-size: clamp(24px, 3.4vw, 46px);
+  letter-spacing: var(--heading-letter-spacing);
+  line-height: 1.05;
+  margin: 0;
 }
 
 .dev-notice-close {
@@ -4065,26 +4115,26 @@ body.case-dialog-is-open {
   background: rgba(255, 255, 255, 0.86);
   border: 0;
   border-radius: 50%;
-  box-shadow: 0 8px 20px rgba(67, 75, 130, 0.16);
+  box-shadow: 0 8px 20px rgba(67, 75, 130, 0.14);
   color: var(--accent-text);
   cursor: pointer;
   display: inline-flex;
-  height: 48px;
+  height: 44px;
   justify-content: center;
   position: absolute;
-  right: clamp(16px, 3vw, 32px);
-  top: clamp(16px, 3vw, 32px);
+  right: clamp(12px, 2.4vw, 28px);
+  top: calc(env(safe-area-inset-top) + clamp(12px, 2vw, 22px));
   transition: background var(--motion-ui) var(--motion-ease), color var(--motion-ui) var(--motion-ease);
-  width: 48px;
+  width: 44px;
 }
 
 .dev-notice-close svg {
   fill: none;
-  height: 20px;
+  height: 18px;
   stroke: currentColor;
   stroke-linecap: round;
   stroke-width: 2;
-  width: 20px;
+  width: 18px;
 }
 
 .dev-notice-close:focus-visible {
@@ -4093,44 +4143,41 @@ body.case-dialog-is-open {
 }
 
 .dev-notice-caption {
-  background: rgba(255, 255, 255, 0.86);
-  border-radius: 999px;
-  bottom: clamp(20px, 5vh, 48px);
   color: var(--text-muted);
   font-size: 15px;
-  left: 50%;
   line-height: 1.45;
   margin: 0;
-  max-width: calc(100% - 32px);
-  padding: 12px 22px;
-  position: absolute;
-  text-align: center;
-  text-wrap: balance;
-  transform: translateX(-50%);
-  width: max-content;
+  text-wrap: pretty;
+}
+
+.dev-notice-grabber {
+  background: rgba(98, 109, 170, 0.32);
+  border-radius: 999px;
+  height: 5px;
+  margin: 10px 0 12px;
+  width: 44px;
+}
+
+/* The page under the sheet: slightly dimmed and blurred; a click on it folds the sheet. */
+.dev-notice-backdrop {
+  -webkit-backdrop-filter: blur(3px);
+  backdrop-filter: blur(3px);
+  background: rgba(35, 38, 70, 0.16);
+  inset: 0;
+  opacity: 0;
+  position: fixed;
+  transition: opacity var(--motion-panel) var(--motion-ease);
+  z-index: 39;
+}
+
+.dev-notice-backdrop.is-open {
+  opacity: 1;
 }
 
 /* While the sheet is down the page underneath stays put. */
-html:has(.dev-notice.is-open) {
+html.dev-notice-open,
+html.dev-notice-open body {
   overflow: hidden;
-}
-
-@media (orientation: portrait) {
-  /* Portrait: the picture stays whole, as a card, so the title is never cropped. */
-  .dev-notice-art {
-    border-radius: var(--radius-card);
-    box-shadow: 0 18px 40px rgba(67, 75, 130, 0.14);
-    height: auto;
-    inset: auto;
-    max-height: 70vh;
-    object-fit: contain;
-    position: static;
-    width: calc(100% - 32px);
-  }
-
-  .dev-notice-caption {
-    border-radius: 18px;
-  }
 }
 
 @keyframes dev-strip-pulse {
@@ -4155,13 +4202,23 @@ html:has(.dev-notice.is-open) {
     display: none;
   }
 
+  .dev-notice-body {
+    gap: 12px;
+    padding: 12px 56px 0 16px;
+  }
+
+  .dev-notice-art {
+    height: min(100%, 120px);
+  }
+
   .dev-notice-caption {
     font-size: 13px;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .dev-notice {
+  .dev-notice,
+  .dev-notice-backdrop {
     transition: none;
   }
 
