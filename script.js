@@ -113,7 +113,6 @@ document.addEventListener("visibilitychange", () => {
 const ORBIT_DENSITY = 1;
 const caseDialogImageCrop = new Map([
   ["./assets/company-sofacinic.png", "deep"],
-  ["./assets/company-pinhead.png", "medium"],
 ]);
 const orbitPairs = Array.from({ length: pairs.length * ORBIT_DENSITY }, (_, index) => pairs[index % pairs.length]);
 const ORBIT_STEP = (Math.PI * 2) / orbitPairs.length;
