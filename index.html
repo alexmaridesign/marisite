@@ -179,7 +179,7 @@
     <link rel="preload" href="./assets/fonts/inter-cyrillic-wght-normal.woff2" as="font" type="font/woff2" crossorigin />
     <link rel="preload" href="./assets/fonts/dela-gothic-one-cyrillic-400-normal.woff2" as="font" type="font/woff2" crossorigin />
     <link rel="stylesheet" href="./fonts.css?v=20261117-02" />
-    <link rel="stylesheet" href="./styles.css?v=20261118-18" />
+    <link rel="stylesheet" href="./styles.css?v=20261118-20" />
   </head>
   <body>
     <svg class="liquid-filter-defs" aria-hidden="true" focusable="false">
@@ -999,7 +999,7 @@
       <div class="brief-card">
         <aside class="brief-aside">
           <h2 id="brief-title">Бриф</h2>
-          <p class="brief-lead">Пара минут&nbsp;— и&nbsp;я&nbsp;пойму задачу. Ответы соберутся в&nbsp;одно сообщение.</p>
+          <p class="brief-lead">Пара минут&nbsp;— и&nbsp;я&nbsp;пойму задачу.<span class="brief-long"> Ответы соберутся в&nbsp;одно сообщение.</span></p>
           <figure class="brief-person">
             <img src="./assets/mari-portrait.webp" alt="" width="900" height="1125" decoding="async" />
             <figcaption>
@@ -1057,11 +1057,9 @@
 
             <label class="brief-field brief-field--budget">
               <span class="brief-label">Бюджет <small>если уже понятен</small></span>
-              <input class="brief-input" type="text" name="budget" inputmode="text" maxlength="60" placeholder="Например, до 100 000 ₽" />
+              <input class="brief-input" type="text" name="budget" inputmode="text" maxlength="60" placeholder="До 100 000 ₽" />
             </label>
           </div>
-
-          <p class="brief-status" role="status" aria-live="polite" data-brief-status></p>
 
           <footer class="brief-footer">
             <div class="brief-actions">
@@ -1079,7 +1077,8 @@
                 <span><span class="brief-long">Отправить письмом</span><span class="brief-short">Письмом</span></span>
               </button>
             </div>
-            <p class="brief-note">Сайт ничего не&nbsp;сохраняет: откроется готовое сообщение, отправляете его вы сами. <a href="./privacy" target="_blank" rel="noopener">Политика конфиденциальности</a></p>
+            <p class="brief-status" role="status" aria-live="polite" data-brief-status></p>
+            <p class="brief-note"><span class="brief-long">Сайт ничего не&nbsp;сохраняет: откроется готовое сообщение, отправляете его вы сами.</span><span class="brief-short">Сайт ничего не&nbsp;сохраняет, сообщение отправляете вы.</span> <a href="./privacy" target="_blank" rel="noopener">Политика конфиденциальности</a></p>
           </footer>
         </form>
       </div>

@@ -4178,6 +4178,17 @@ body.case-dialog-is-open {
   transform: translateY(-50%);
 }
 
+/* While any modal is open the page underneath neither scrolls nor swipes. */
+html:has(dialog[open]),
+html:has(dialog[open]) body {
+  overflow: hidden;
+  overscroll-behavior: none;
+}
+
+dialog[open] {
+  overscroll-behavior: contain;
+}
+
 /* Brief dialog: a lilac panel (who you write to, direct contacts) beside the form.
    Header and send buttons stay put; only the fields scroll, and only on short screens. */
 .brief-dialog {
@@ -4386,6 +4397,11 @@ body.case-dialog-is-open {
   padding: 0;
 }
 
+/* In a fieldset the label is a <legend>, which sits outside the grid gap. */
+legend.brief-label {
+  margin-bottom: 8px;
+}
+
 .brief-label small {
   font-size: 12px;
   font-weight: 500;
@@ -4469,7 +4485,9 @@ textarea.brief-input {
   outline-offset: 2px;
 }
 
-.brief-status:empty {
+/* The message takes the note's place under the buttons, so the window never grows. */
+.brief-status:empty,
+.brief-status:not(:empty) + .brief-note {
   display: none;
 }
 
@@ -4478,11 +4496,11 @@ textarea.brief-input {
   border-radius: 14px;
   color: var(--accent-text);
   flex: none;
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 600;
-  line-height: 1.5;
+  line-height: 1.45;
   margin: 0;
-  padding: 12px 14px;
+  padding: 8px 12px;
 }
 
 .brief-status.is-error {
@@ -4611,22 +4629,113 @@ textarea.brief-input {
   }
 }
 
-/* Phones: one column, both buttons in one row with short labels. */
+/* Phones: everything compacts so the whole brief fits the screen without scrolling —
+   name and budget share a row, smaller chips, buttons in one row with short labels. */
 @media (max-width: 520px) {
+  .brief-dialog {
+    padding: 8px;
+  }
+
+  .brief-card {
+    max-height: calc(100dvh - 16px);
+    padding: 6px;
+  }
+
+  .brief-aside {
+    column-gap: 12px;
+    grid-template-columns: 44px minmax(0, 1fr);
+    padding: 12px 60px 12px 12px;
+  }
+
+  .brief-aside h2 {
+    font-size: 26px;
+  }
+
+  .brief-lead {
+    font-size: 12px;
+    line-height: 1.4;
+  }
+
+  .brief-person {
+    height: 44px;
+    width: 44px;
+  }
+
+  .brief-close {
+    height: 40px;
+    right: 16px;
+    top: 14px;
+    width: 40px;
+  }
+
+  .brief-form {
+    gap: 14px;
+    padding: 14px 10px 10px;
+  }
+
   .brief-fields {
-    grid-template-areas:
-      "name"
-      "services"
-      "about"
-      "deadline"
-      "budget";
-    grid-template-columns: minmax(0, 1fr);
+    column-gap: 10px;
+    row-gap: 14px;
+  }
+
+  .brief-label {
+    font-size: 12px;
+  }
+
+  .brief-label small {
+    font-size: 11px;
+    margin-left: 4px;
+  }
+
+  .brief-field {
+    gap: 6px;
+  }
+
+  legend.brief-label {
+    margin-bottom: 6px;
+  }
+
+  .brief-input {
+    padding: 9px 12px;
+  }
+
+  .brief-input::placeholder {
+    font-size: 14px;
+  }
+
+  textarea.brief-input {
+    height: 84px;
+    min-height: 0;
+  }
+
+  .brief-chips {
+    gap: 6px;
+  }
+
+  .brief-chip span {
+    font-size: 13px;
+    min-height: 34px;
+    padding: 0 12px;
+  }
+
+  .brief-footer {
+    gap: 8px;
+    padding-top: 12px;
+  }
+
+  .brief-actions {
+    gap: 8px;
+    grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
   }
 
   .brief-actions .process-button {
     gap: 8px;
-    min-height: 48px;
+    min-height: 46px;
     padding-inline: 12px;
+  }
+
+  .brief-note {
+    font-size: 11px;
   }
 
   .brief-long {
