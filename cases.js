@@ -13,9 +13,12 @@
     return node;
   };
 
+  // Card in the manner of a portfolio feed: the picture, then who it is for
+  // (logo, company, what they are), then one line about the work.
   const card = (item) => {
     const link = element("a", "case-card");
     link.href = `./#case/${encodeURIComponent(item.slug)}`;
+
     const media = element("span", "case-card-media");
     const image = document.createElement("img");
     image.src = item.caseImage || item.companyImage;
@@ -23,9 +26,22 @@
     image.loading = "lazy";
     image.decoding = "async";
     media.append(image);
-    const body = element("span", "case-card-body");
-    body.append(element("span", "case-card-type", item.type), element("span", "case-card-title", item.title), element("span", "case-card-copy", item.copy));
-    link.append(media, body);
+
+    const author = element("span", "case-card-author");
+    const avatar = document.createElement("img");
+    avatar.className = "case-card-avatar";
+    avatar.src = item.companyImage;
+    avatar.alt = "";
+    avatar.loading = "lazy";
+    avatar.decoding = "async";
+    const who = element("span", "case-card-who");
+    who.append(element("span", "case-card-company", item.company), element("span", "case-card-meta", item.label));
+    author.append(avatar, who);
+
+    const title = element("span", "case-card-title", item.copy.replace(/\.$/, ""));
+    title.title = title.textContent;
+
+    link.append(media, author, title);
     return link;
   };
 
