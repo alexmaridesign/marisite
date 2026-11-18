@@ -4296,27 +4296,39 @@ dialog[open] {
 }
 
 .brief-contacts {
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
   font-size: 13px;
   gap: 8px;
-}
-
-.brief-contacts span {
-  flex-basis: 100%;
-  opacity: 0.78;
+  grid-template-columns: 1fr 1fr;
 }
 
 .brief-contacts a {
   align-items: center;
+  gap: 8px;
+  justify-content: center;
   border: 1px solid rgba(255, 255, 255, 0.4);
   border-radius: 999px;
   color: #fff;
   display: inline-flex;
   font-weight: 600;
-  min-height: 36px;
+  min-height: 40px;
   padding: 0 14px;
   transition: background var(--motion-ui) var(--motion-ease), border-color var(--motion-ui) var(--motion-ease);
+}
+
+.brief-contacts svg {
+  fill: currentColor;
+  flex: none;
+  height: 16px;
+  width: 16px;
+}
+
+.brief-contacts svg.brief-contact-line {
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.8;
 }
 
 .brief-contacts a:focus-visible {
