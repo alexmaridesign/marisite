@@ -21,7 +21,8 @@
   --radius-row: 16px;
   --row-marker-inset: 6px;
   --tap-target: 44px;
-  --brief-width: 600px;
+  --brief-width: 1000px;
+  --brief-aside-width: clamp(260px, 28vw, 320px);
   --pricing-card-head: clamp(44px, 4.4vw, 60px);
   --pricing-price-size: clamp(28px, 2.6vw, 34px);
   --pricing-cta-h: 52px;
@@ -4177,7 +4178,8 @@ body.case-dialog-is-open {
   transform: translateY(-50%);
 }
 
-/* Brief form dialog */
+/* Brief dialog: a lilac panel (who you write to, direct contacts) beside the form.
+   Header and send buttons stay put; only the fields scroll, and only on short screens. */
 .brief-dialog {
   background: transparent;
   border: 0;
@@ -4196,61 +4198,176 @@ body.case-dialog-is-open {
   -webkit-backdrop-filter: blur(20px) saturate(0.95);
 }
 
-/* Header and the send buttons stay put; only the fields scroll, and only when the screen
-   is too short for them (phones). On wide screens the fields sit in two columns and fit. */
 .brief-card {
   background: var(--section-paper);
   border: 1px solid rgba(255, 255, 255, 0.88);
-  border-radius: clamp(22px, 3vw, 34px);
+  border-radius: var(--radius-panel);
   box-shadow: 0 30px 80px rgba(67, 75, 130, 0.22);
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
+  display: grid;
+  gap: 0;
+  grid-template-columns: var(--brief-aside-width) minmax(0, 1fr);
   max-height: calc(100dvh - 24px);
   overflow: hidden;
-  padding: clamp(20px, 3.4vw, 32px);
+  padding: 10px;
 }
 
-.brief-header {
-  align-items: flex-start;
+/* Panel: the same lilac card as the selected service. */
+.brief-aside {
+  background:
+    radial-gradient(120% 70% at 100% 0%, rgba(255, 255, 255, 0.2), transparent 62%),
+    var(--accent-text);
+  border-radius: calc(var(--radius-panel) - 10px);
+  color: #fff;
   display: flex;
-  gap: 16px;
-  justify-content: space-between;
+  flex-direction: column;
+  gap: 14px;
+  min-height: 0;
+  overflow: hidden;
+  padding: clamp(22px, 2.6vw, 30px);
 }
 
-.brief-header h2 {
-  color: var(--accent);
+.brief-aside h2 {
   font-family: var(--font-display);
-  font-size: clamp(30px, 5vw, 42px);
+  font-size: clamp(34px, 3.6vw, 46px);
   font-weight: 400;
   letter-spacing: var(--heading-letter-spacing);
   line-height: 1;
-  margin: 0 0 10px;
+  margin: 0;
 }
 
-.brief-header p,
-.brief-note,
-.brief-status {
+.brief-lead {
+  color: rgba(255, 255, 255, 0.88);
   font-size: 14px;
   line-height: 1.5;
   margin: 0;
   text-wrap: pretty;
 }
 
+.brief-person {
+  border-radius: var(--radius-row);
+  flex: 1 1 auto;
+  margin: 6px 0 0;
+  min-height: 150px;
+  overflow: hidden;
+  position: relative;
+}
+
+.brief-person img {
+  display: block;
+  height: 100%;
+  inset: 0;
+  object-fit: cover;
+  object-position: 58% 22%;
+  position: absolute;
+  width: 100%;
+}
+
+.brief-person figcaption {
+  background: linear-gradient(transparent, rgba(24, 28, 52, 0.72));
+  bottom: 0;
+  display: grid;
+  gap: 2px;
+  left: 0;
+  padding: 36px 16px 14px;
+  position: absolute;
+  right: 0;
+}
+
+.brief-person strong {
+  font-family: var(--font-display);
+  font-size: 18px;
+  font-weight: 400;
+}
+
+.brief-person span {
+  font-size: 12px;
+  opacity: 0.86;
+}
+
+.brief-contacts {
+  display: flex;
+  flex-wrap: wrap;
+  font-size: 13px;
+  gap: 8px;
+}
+
+.brief-contacts span {
+  flex-basis: 100%;
+  opacity: 0.78;
+}
+
+.brief-contacts a {
+  align-items: center;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  border-radius: 999px;
+  color: #fff;
+  display: inline-flex;
+  font-weight: 600;
+  min-height: 36px;
+  padding: 0 14px;
+  transition: background var(--motion-ui) var(--motion-ease), border-color var(--motion-ui) var(--motion-ease);
+}
+
+.brief-contacts a:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 2px;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .brief-contacts a:hover {
+    background: rgba(255, 255, 255, 0.14);
+    border-color: rgba(255, 255, 255, 0.7);
+  }
+}
+
+/* Form */
+.brief-form {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  min-height: 0;
+  padding: clamp(18px, 2.4vw, 28px) clamp(18px, 2.6vw, 32px) clamp(16px, 2vw, 22px);
+  position: relative;
+}
+
 .brief-close {
   color: var(--accent-text);
+  position: absolute;
+  right: clamp(12px, 1.6vw, 20px);
+  top: clamp(12px, 1.6vw, 20px);
+  z-index: 1;
 }
 
 .brief-fields {
+  column-gap: 16px;
   display: grid;
   flex: 0 1 auto;
-  gap: 16px;
-  /* Room for focus rings at the scroll edges. */
+  grid-template-areas:
+    "name budget"
+    "services services"
+    "about about"
+    "deadline deadline";
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  /* Room for focus rings at the scroll edges, and for the close button beside the first row. */
   margin: -4px;
   min-height: 0;
   overflow-y: auto;
   overscroll-behavior: contain;
-  padding: 4px;
+  padding: 4px 64px 4px 4px;
+  row-gap: 18px;
+}
+
+.brief-field--name { grid-area: name; }
+.brief-field--budget { grid-area: budget; }
+.brief-field--services { grid-area: services; }
+.brief-field--about { grid-area: about; }
+.brief-field--deadline { grid-area: deadline; }
+
+/* Rows below the first run under the close button, back to the full width. */
+.brief-fields .brief-field--services,
+.brief-fields .brief-field--about,
+.brief-fields .brief-field--deadline {
+  margin-right: -60px;
 }
 
 .brief-field {
@@ -4291,7 +4408,7 @@ body.case-dialog-is-open {
 }
 
 textarea.brief-input {
-  min-height: 108px;
+  min-height: 104px;
   resize: none;
 }
 
@@ -4360,7 +4477,11 @@ textarea.brief-input {
   background: var(--chip-surface);
   border-radius: 14px;
   color: var(--accent-text);
+  flex: none;
+  font-size: 14px;
   font-weight: 600;
+  line-height: 1.5;
+  margin: 0;
   padding: 12px 14px;
 }
 
@@ -4370,10 +4491,12 @@ textarea.brief-input {
 }
 
 .brief-footer {
-  align-items: center;
+  border-top: 1px solid var(--hairline);
   display: grid;
   flex: none;
   gap: 12px;
+  margin-top: auto;
+  padding-top: 18px;
 }
 
 .brief-actions {
@@ -4391,7 +4514,10 @@ textarea.brief-input {
 
 .brief-note {
   font-size: 12px;
+  line-height: 1.5;
+  margin: 0;
   opacity: 0.86;
+  text-wrap: pretty;
 }
 
 .brief-note a {
@@ -4400,80 +4526,101 @@ textarea.brief-input {
   text-underline-offset: 3px;
 }
 
-.brief-header,
-.brief-status {
-  flex: none;
-}
-
-/* Wide screens: short answers on the left, the story on the right at full height,
-   buttons and the note in one row. */
-@media (min-width: 820px) {
-  :root {
-    --brief-width: 940px;
-  }
-
-  .brief-header > div {
-    align-items: baseline;
-    column-gap: 22px;
-    display: flex;
-    flex-wrap: wrap;
-  }
-
-  .brief-header h2 {
-    margin: 0;
-  }
-
-  .brief-header p {
-    max-width: 380px;
-  }
-
-  .brief-fields {
-    column-gap: 28px;
-    grid-template-areas:
-      "name about"
-      "services about"
-      "deadline about"
-      "budget about";
-    grid-template-columns: minmax(0, 1fr) minmax(0, 0.9fr);
-    grid-template-rows: auto auto auto 1fr;
-  }
-
-  .brief-field--name { grid-area: name; }
-  .brief-field--services { grid-area: services; }
-  .brief-field--deadline { grid-area: deadline; }
-  .brief-field--budget { grid-area: budget; }
-
-  .brief-field--about {
-    grid-area: about;
-    grid-template-rows: auto 1fr;
-  }
-
-  .brief-field--about textarea.brief-input {
-    height: 100%;
-  }
-
-  .brief-footer {
-    column-gap: 24px;
-    grid-template-columns: auto minmax(0, 1fr);
-  }
-
-  .brief-actions {
-    grid-template-columns: auto auto;
-  }
-
-  .brief-actions .process-button {
-    padding-inline: 22px;
-  }
-}
-
 .brief-short {
   display: none;
 }
 
-/* Phones: both buttons in one row with short labels, so more of the form is in view. */
+/* Up to tablets: the panel folds into a header strip with a round portrait. */
+@media (max-width: 819px) {
+  .brief-card {
+    display: flex;
+    flex-direction: column;
+    padding: 8px;
+  }
+
+  .brief-aside {
+    align-items: center;
+    border-radius: calc(var(--radius-panel) - 8px);
+    column-gap: 14px;
+    display: grid;
+    flex: none;
+    grid-template-columns: 56px minmax(0, 1fr);
+    padding: 16px 64px 16px 16px;
+    row-gap: 4px;
+  }
+
+  .brief-aside h2 {
+    font-size: 30px;
+    grid-column: 2;
+    grid-row: 1;
+  }
+
+  .brief-lead {
+    font-size: 13px;
+    grid-column: 2;
+    grid-row: 2;
+  }
+
+  .brief-person {
+    border-radius: 50%;
+    grid-column: 1;
+    grid-row: 1 / 3;
+    height: 56px;
+    margin: 0;
+    min-height: 0;
+    width: 56px;
+  }
+
+  .brief-person img {
+    object-position: 56% 20%;
+    transform: scale(2.2);
+    transform-origin: 56% 24%;
+  }
+
+  .brief-person figcaption,
+  .brief-contacts {
+    display: none;
+  }
+
+  .brief-form {
+    flex: 1 1 auto;
+    padding: 18px 12px 12px;
+    position: static;
+  }
+
+  .brief-close {
+    border-color: rgba(255, 255, 255, 0.5);
+    color: #fff;
+    background: rgba(255, 255, 255, 0.12);
+    right: 22px;
+    top: 22px;
+  }
+
+  .brief-card {
+    position: relative;
+  }
+
+  .brief-fields {
+    padding-right: 4px;
+  }
+
+  .brief-fields .brief-field--services,
+  .brief-fields .brief-field--about,
+  .brief-fields .brief-field--deadline {
+    margin-right: 0;
+  }
+}
+
+/* Phones: one column, both buttons in one row with short labels. */
 @media (max-width: 520px) {
-  .brief-actions {
-    grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+  .brief-fields {
+    grid-template-areas:
+      "name"
+      "services"
+      "about"
+      "deadline"
+      "budget";
+    grid-template-columns: minmax(0, 1fr);
   }
 
   .brief-actions .process-button {
