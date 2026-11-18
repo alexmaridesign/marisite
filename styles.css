@@ -3263,13 +3263,39 @@ body.case-dialog-is-open {
   justify-content: space-between;
 }
 
+/* Logo, name and the same subtitle as in the header. */
+.footer-brand {
+  align-items: center;
+  display: inline-flex;
+  gap: 12px;
+  text-decoration: none;
+}
+
+.footer-logo {
+  flex: none;
+  height: auto;
+  width: 40px;
+}
+
+.footer-brand-text {
+  display: grid;
+  gap: 4px;
+}
+
 .footer-name {
   color: var(--accent);
   font-family: var(--font-display);
   font-size: 24px;
   letter-spacing: var(--heading-letter-spacing);
   line-height: 1;
-  text-decoration: none;
+}
+
+.footer-tagline {
+  color: var(--accent);
+  font-family: var(--font-display);
+  font-size: 12px;
+  letter-spacing: 0.03em;
+  line-height: 1.1;
 }
 
 .footer-links {
@@ -3336,7 +3362,7 @@ body.case-dialog-is-open {
 
 @media (hover: hover) and (pointer: fine) {
   .footer-links a:hover,
-  .footer-name:hover {
+  .footer-brand:hover .footer-name {
     color: var(--accent-text);
   }
 
