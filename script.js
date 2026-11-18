@@ -632,6 +632,9 @@ function renderCaseDialog(index) {
 // Case addresses: #case/<slug>. One history entry per opened case; switching cases
 // inside the dialog replaces it, closing steps back (or strips the hash on a direct load).
 const CASE_HASH_PREFIX = "#case/";
+// Section pages (cases, identity, merch…) open a case here with ?from=<page>; closing it goes back there.
+const CASE_RETURN_PAGES = ["cases", "identity", "merch", "illustrations", "social"];
+const caseReturnPage = CASE_RETURN_PAGES.find((page) => page === new URLSearchParams(location.search).get("from"));
 let caseHistoryPushed = false;
 let caseClosedByHistory = false;
 
@@ -1764,6 +1767,13 @@ if (caseDialogOpenButton && caseDialog && caseDialogCloseButton) {
     document.body.classList.remove("case-dialog-is-open");
     document.body.style.removeProperty("--case-dialog-scrollbar-gap");
     orbitPicker.autoPausedByUser = caseDialogSelectionChanged || caseDialogAutoWasPaused;
+    if (caseReturnPage && document.documentElement.classList.contains("case-from-section")) {
+      // Back to the section page the visitor came from, at the same scroll position.
+      const cameFromSection = document.referrer.startsWith(location.origin) && history.length > 1;
+      if (cameFromSection) history.back();
+      else location.replace(`./${caseReturnPage}`);
+      return;
+    }
     if (!caseClosedByHistory && location.hash.startsWith(CASE_HASH_PREFIX)) {
       // Drop the case address without leaving a stray entry, so Back never reopens it.
       if (caseHistoryPushed) history.back();

@@ -4179,6 +4179,11 @@ body.case-dialog-is-open {
   transform: translateY(-50%);
 }
 
+/* A case opened from a section page: only the case is shown, as a page of its own. */
+.case-from-section body > :not(dialog) {
+  visibility: hidden;
+}
+
 /* While any modal is open the page underneath neither scrolls nor swipes. */
 html:has(dialog[open]),
 html:has(dialog[open]) body {

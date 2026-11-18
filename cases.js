@@ -15,9 +15,12 @@
 
   // Card in the manner of a portfolio feed: the picture, then who it is for
   // (logo, company, what they are), then one line about the work.
+  const casePage = location.pathname.split("/").pop().replace(/\.html$/, "") || "cases";
+
   const card = (item) => {
     const link = element("a", "case-card");
-    link.href = `./#case/${encodeURIComponent(item.slug)}`;
+    // The case reader lives on the main page; "from" brings the visitor back here on close.
+    link.href = `./?from=${casePage}#case/${encodeURIComponent(item.slug)}`;
 
     const media = element("span", "case-card-media");
     const image = document.createElement("img");

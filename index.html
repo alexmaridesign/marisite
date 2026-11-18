@@ -2,6 +2,10 @@
 <html lang="ru">
   <head>
     <meta charset="utf-8" />
+    <script>
+      // Opened from a case page: show only the case, the page behind it stays hidden.
+      if (/[?&]from=/.test(location.search) && location.hash.indexOf("#case/") === 0) document.documentElement.classList.add("case-from-section");
+    </script>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta
       name="description"
@@ -179,7 +183,7 @@
     <link rel="preload" href="./assets/fonts/inter-cyrillic-wght-normal.woff2" as="font" type="font/woff2" crossorigin />
     <link rel="preload" href="./assets/fonts/dela-gothic-one-cyrillic-400-normal.woff2" as="font" type="font/woff2" crossorigin />
     <link rel="stylesheet" href="./fonts.css?v=20261117-02" />
-    <link rel="stylesheet" href="./styles.css?v=20261118-23" />
+    <link rel="stylesheet" href="./styles.css?v=20261118-24" />
   </head>
   <body>
     <svg class="liquid-filter-defs" aria-hidden="true" focusable="false">
@@ -1095,6 +1099,6 @@
     </dialog>
 
     <script src="./cases-data.js?v=20261118-05"></script>
-    <script src="./script.js?v=20261118-07"></script>
+    <script src="./script.js?v=20261118-08"></script>
   </body>
 </html>
