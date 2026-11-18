@@ -3512,166 +3512,120 @@ body.case-dialog-is-open {
   min-height: 56px;
 }
 
-/* Footer: the same lilac card as the selected service and the brief panel —
-   name, sections and contacts (the brief is a quiet link there), then the legal line. */
+/* Footer: plain text on the page, two thin rows — the name and links, then the legal
+   line with the developer credit set apart as a soft chip. */
 .site-footer {
-  background:
-    radial-gradient(90% 80% at 100% 0%, rgba(255, 255, 255, 0.18), transparent 60%),
-    var(--accent-text);
-  border-radius: var(--radius-panel);
-  color: #fff;
+  color: var(--text-muted);
   display: grid;
-  gap: clamp(28px, 4vw, 48px);
-  margin: clamp(14px, 2vw, 28px) auto 0;
+  font-size: 14px;
+  gap: 14px;
+  margin: clamp(18px, 2.4vw, 32px) auto 0;
   max-width: 1380px;
-  overflow: hidden;
-  padding: clamp(28px, 4.2vw, 58px) clamp(22px, 4.2vw, 58px) clamp(20px, 2.4vw, 30px);
+  padding: 0 clamp(18px, 3vw, 38px) clamp(20px, 2.4vw, 28px);
 }
 
-.footer-top {
-  align-items: start;
-  display: grid;
-  gap: 32px clamp(24px, 4vw, 64px);
-  grid-template-columns: minmax(0, 1fr) auto;
-}
-
-.footer-brand {
-  display: grid;
-  gap: 8px;
+.footer-row {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 28px;
+  justify-content: space-between;
 }
 
 .footer-name {
+  color: var(--accent);
   font-family: var(--font-display);
-  font-size: clamp(32px, 3.4vw, 46px);
+  font-size: 24px;
   letter-spacing: var(--heading-letter-spacing);
   line-height: 1;
-  margin: 0;
-}
-
-.footer-tagline {
-  color: rgba(255, 255, 255, 0.78);
-  font-size: var(--text-body);
-  margin: 0;
-}
-
-.footer-about {
-  color: rgba(255, 255, 255, 0.92);
-  font-size: var(--text-body);
-  line-height: 1.55;
-  margin: 10px 0 0;
-  max-width: 340px;
-}
-
-.footer-clients-title {
-  color: rgba(255, 255, 255, 0.62);
-  font-size: var(--text-caption);
-  font-weight: 600;
-  letter-spacing: 0.04em;
-  margin: 16px 0 2px;
-  text-transform: uppercase;
-}
-
-.footer-clients {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  list-style: none;
-  margin: 0;
-  padding: 0;
-}
-
-.footer-clients img {
-  border-radius: var(--radius-thumb);
-  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.22);
-  display: block;
-  height: 40px;
-  object-fit: cover;
-  width: 40px;
-}
-
-.footer-cols {
-  display: flex;
-  gap: clamp(32px, 5vw, 80px);
-}
-
-.footer-col {
-  align-content: start;
-  display: grid;
-  gap: 10px;
-  justify-items: start;
-}
-
-.footer-col-title {
-  color: rgba(255, 255, 255, 0.62);
-  font-size: var(--text-caption);
-  font-weight: 600;
-  letter-spacing: 0.04em;
-  margin-bottom: 4px;
-  text-transform: uppercase;
-}
-
-.footer-col a {
-  color: #fff;
-  font-size: 16px;
-  font-weight: 500;
-  line-height: 1.4;
   text-decoration: none;
-  transition: opacity var(--motion-ui) var(--motion-ease);
 }
 
-.footer-bottom {
-  align-items: center;
-  border-top: 1px solid rgba(255, 255, 255, 0.24);
-  color: rgba(255, 255, 255, 0.72);
+.footer-links {
   display: flex;
   flex-wrap: wrap;
-  font-size: var(--text-caption);
-  gap: 10px 24px;
-  justify-content: space-between;
-  padding-top: clamp(16px, 2vw, 22px);
+  gap: 6px 22px;
 }
 
-.footer-bottom a {
-  color: #fff;
+.footer-links a {
+  color: var(--ink-violet);
+  font-weight: 600;
+  text-decoration: none;
+  transition: color var(--motion-ui) var(--motion-ease);
+}
+
+.footer-legal {
+  border-top: 1px solid var(--hairline);
+  color: var(--text-subtle);
+  font-size: var(--text-caption);
+  padding-top: 14px;
+}
+
+.footer-legal > a:not(.footer-dev) {
+  color: inherit;
   text-decoration: underline;
-  text-decoration-color: rgba(255, 255, 255, 0.4);
+  text-decoration-color: var(--hairline);
   text-underline-offset: 4px;
-  transition: text-decoration-color var(--motion-ui) var(--motion-ease);
+}
+
+/* The developer credit: a soft chip with an arrow, so it reads as a link to a studio. */
+.footer-dev {
+  align-items: center;
+  background: var(--chip-surface);
+  border-radius: 999px;
+  color: var(--accent-text);
+  display: inline-flex;
+  gap: 6px;
+  min-height: 34px;
+  padding: 0 14px;
+  text-decoration: none;
+  transition: background var(--motion-ui) var(--motion-ease), color var(--motion-ui) var(--motion-ease);
+}
+
+.footer-dev strong {
+  font-weight: 700;
+}
+
+.footer-dev svg {
+  fill: none;
+  height: 14px;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 2;
+  transition: transform var(--motion-ui) var(--motion-ease);
+  width: 14px;
 }
 
 .site-footer a:focus-visible {
   border-radius: 6px;
-  outline: 2px solid #fff;
+  outline: 2px solid var(--accent-text);
   outline-offset: 3px;
 }
 
 @media (hover: hover) and (pointer: fine) {
-  .footer-col a:hover {
-    opacity: 0.72;
+  .footer-links a:hover,
+  .footer-name:hover {
+    color: var(--accent-text);
   }
 
-  .footer-bottom a:hover {
-    text-decoration-color: #fff;
+  .footer-legal > a:not(.footer-dev):hover {
+    color: var(--ink-violet);
+    text-decoration-color: currentColor;
+  }
+
+  .footer-dev:hover {
+    background: var(--accent-text);
+    color: #fff;
+  }
+
+  .footer-dev:hover svg {
+    transform: translate(2px, -2px);
   }
 }
 
 @media (max-width: 760px) {
-  .footer-top {
-    grid-template-columns: minmax(0, 1fr);
-  }
-
-  /* All eight logos in one row on a phone. */
-  .footer-clients {
-    gap: 6px;
-  }
-
-  .footer-clients img {
-    border-radius: 10px;
-    height: 34px;
-    width: 34px;
-  }
-
-  .footer-bottom {
+  .footer-row {
     align-items: flex-start;
     flex-direction: column;
   }
@@ -3928,8 +3882,8 @@ body.case-dialog-is-open {
   }
 
   .site-footer {
-    margin: 18px 0 0;
-    padding: 30px 22px 20px;
+    margin: 24px 0 0;
+    padding: 0 22px 22px;
   }
 
   .contact {
@@ -4266,13 +4220,15 @@ body.case-dialog-is-open {
 /* Invisible hit-area extension: keeps the visual size, gives touch a 44px target. */
 .spotlight .black-button,
 .step-brief-link,
-.footer-bottom a {
+.footer-links a,
+.footer-legal > a:not(.footer-dev) {
   position: relative;
 }
 
 .spotlight .black-button::after,
 .step-brief-link::after,
-.footer-bottom a::after {
+.footer-links a::after,
+.footer-legal > a:not(.footer-dev)::after {
   content: "";
   left: 0;
   min-height: var(--tap-target);
