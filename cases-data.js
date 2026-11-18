@@ -51,7 +51,7 @@ const pairs = [
     type: "бренд / digital",
     categories: ["identity"],
     count: "20 материалов",
-    companyImage: "./assets/company-sofacinic.png",
+    companyImage: "./assets/company-sofacinic.webp",
     companyArtwork: true,
     title: "Sofacinic",
     short: "Sofacinic",
