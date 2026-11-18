@@ -1797,6 +1797,7 @@ if (pricing) {
   const pricingField = (name) => pricing.querySelector(`[data-pricing-card-${name}]`);
   const pricingSplitQuery = window.matchMedia("(min-width: 901px)");
   const pricingHoverQuery = window.matchMedia("(hover: hover) and (pointer: fine)");
+  let pricingPinned = false;
   const pricingNumber = (value) => String(value).padStart(2, "0");
   let pricingActiveIndex = -1;
   let pricingDeckIndex = 0;
@@ -1827,21 +1828,24 @@ if (pricing) {
     pricingField("cta").dataset.briefService = service.dataset.briefService || "";
   };
 
-  // Old text fades out, the new one fades in part by part. A switch during the fade-out
-  // only changes what comes in, so running the pointer down the list never flickers.
+  // Old text fades out, the new one fades in part by part; the button is not part of it and
+  // stays put. A switch during the fade-out only changes what comes in, so nothing flickers.
   const swapPricingCard = () => {
     if (pricingCardOut) return;
     const shift = reduceMotion ? 0 : 8;
-    pricingCardOut = pricingCardBody.animate(
-      [{ opacity: 0, transform: `translateY(${-pricingCardDirection * shift * 0.5}px)` }],
-      { duration: 140, easing: "cubic-bezier(0.4, 0, 1, 1)", fill: "forwards" },
-    );
-    pricingCardOut.finished
+    const outs = pricingCardParts.map((part) => {
+      // Start from wherever an unfinished fade-in left the part.
+      const from = { opacity: getComputedStyle(part).opacity, transform: getComputedStyle(part).transform };
+      part.getAnimations().forEach((animation) => animation.cancel());
+      return part.animate(
+        [from, { opacity: 0, transform: `translateY(${-pricingCardDirection * shift * 0.5}px)` }],
+        { duration: 140, easing: "cubic-bezier(0.4, 0, 1, 1)", fill: "forwards" },
+      );
+    });
+    pricingCardOut = Promise.all(outs.map((animation) => animation.finished))
       .then(() => {
         fillPricingCard();
-        pricingCardParts.forEach((part) => part.getAnimations().forEach((animation) => animation.cancel()));
-        pricingCardOut.cancel();
-        pricingCardOut = null;
+        outs.forEach((animation) => animation.cancel());
         pricingCardParts.forEach((part, order) => {
           part.animate(
             [
@@ -1852,7 +1856,8 @@ if (pricing) {
           );
         });
       })
-      .catch(() => {
+      .catch(() => fillPricingCard())
+      .finally(() => {
         pricingCardOut = null;
       });
   };
@@ -1940,16 +1945,23 @@ if (pricing) {
     const summary = details.querySelector("summary");
     if (!summary) return;
 
+    // Hover previews a service until a click pins one; then the card holds it while the
+    // pointer travels to its button. Clicking the pinned row again lets hover drive it again.
     summary.addEventListener("pointerenter", () => {
-      if (isPricingSplit() && pricingHoverQuery.matches) selectPricingService(index);
+      if (isPricingSplit() && pricingHoverQuery.matches && !pricingPinned) selectPricingService(index);
     });
     summary.addEventListener("focus", () => {
-      if (isPricingSplit()) selectPricingService(index);
+      if (isPricingSplit() && !pricingPinned) selectPricingService(index);
     });
     // The script owns open/closed in both modes, so a click never toggles the details.
     summary.addEventListener("click", (event) => {
       event.preventDefault();
-      if (isPricingSplit()) selectPricingService(index);
+      if (!isPricingSplit()) return;
+      pricingPinned = !(pricingPinned && index === pricingActiveIndex);
+      selectPricingService(index);
+      pricing.classList.toggle("is-pinned", pricingPinned);
+      pricingServices.forEach((item) => item.querySelector("summary")?.setAttribute("aria-pressed", "false"));
+      summary.setAttribute("aria-pressed", String(pricingPinned));
     });
   });
 

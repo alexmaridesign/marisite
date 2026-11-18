@@ -2221,7 +2221,7 @@ body.case-dialog-is-open {
   right: 0;
   top: var(--row-marker-inset);
   transform: translateY(var(--pricing-marker-y, 0));
-  transition: transform var(--motion-panel) var(--motion-ease);
+  transition: transform var(--motion-panel) var(--motion-ease), box-shadow var(--motion-ui) var(--motion-ease);
   z-index: -1;
 }
 
@@ -2252,6 +2252,26 @@ body.case-dialog-is-open {
   display: block;
   margin-bottom: 0.45em;
   transition: border-color var(--motion-ui) var(--motion-ease);
+}
+
+/* A click pins the service: the highlight gets an outline and other rows only hint on hover. */
+.pricing.is-split .pricing-service summary {
+  border-radius: var(--radius-row);
+  transition: background var(--motion-ui) var(--motion-ease);
+}
+
+.pricing.is-split.is-pinned .pricing-list::before {
+  box-shadow: inset 0 0 0 1.5px var(--accent);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .pricing.is-split.is-pinned .pricing-service:not(.is-active) summary:hover {
+    background: color-mix(in srgb, var(--surface-tint) 45%, transparent);
+  }
+
+  .pricing.is-split.is-pinned .pricing-service:not(.is-active) summary:hover .pricing-name {
+    color: var(--accent-text);
+  }
 }
 
 .pricing.is-split .pricing-service.is-active .pricing-name {
