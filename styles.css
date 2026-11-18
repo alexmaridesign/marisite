@@ -2586,16 +2586,6 @@ body.case-dialog-is-open {
   width: 100%;
 }
 
-.process-actions {
-  bottom: clamp(12px, 1.3vw, 18px);
-  display: grid;
-  gap: clamp(8px, 0.85vw, 12px);
-  position: absolute;
-  right: 6.25%;
-  width: 30.8%;
-  z-index: 4;
-}
-
 .process-contact-actions {
   display: grid;
   gap: clamp(8px, 0.85vw, 12px);
@@ -2967,15 +2957,6 @@ body.case-dialog-is-open {
     margin: 16px auto 0;
     position: relative;
     top: auto;
-    width: min(100%, 436px);
-  }
-
-  .process-actions {
-    bottom: auto;
-    gap: 12px;
-    margin: 24px auto 0;
-    position: relative;
-    right: auto;
     width: min(100%, 436px);
   }
 
@@ -3573,6 +3554,41 @@ body.case-dialog-is-open {
   margin: 0;
 }
 
+.footer-about {
+  color: rgba(255, 255, 255, 0.92);
+  font-size: var(--text-body);
+  line-height: 1.55;
+  margin: 10px 0 0;
+  max-width: 340px;
+}
+
+.footer-clients-title {
+  color: rgba(255, 255, 255, 0.62);
+  font-size: var(--text-caption);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  margin: 16px 0 2px;
+  text-transform: uppercase;
+}
+
+.footer-clients {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.footer-clients img {
+  border-radius: var(--radius-thumb);
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.22);
+  display: block;
+  height: 40px;
+  object-fit: cover;
+  width: 40px;
+}
+
 .footer-cols {
   display: flex;
   gap: clamp(32px, 5vw, 80px);
@@ -3642,6 +3658,17 @@ body.case-dialog-is-open {
 @media (max-width: 760px) {
   .footer-top {
     grid-template-columns: minmax(0, 1fr);
+  }
+
+  /* All eight logos in one row on a phone. */
+  .footer-clients {
+    gap: 6px;
+  }
+
+  .footer-clients img {
+    border-radius: 10px;
+    height: 34px;
+    width: 34px;
   }
 
   .footer-bottom {
