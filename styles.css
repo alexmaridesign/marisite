@@ -21,6 +21,7 @@
   --radius-row: 16px;
   --row-marker-inset: 6px;
   --tap-target: 44px;
+  --brief-width: 600px;
   --pricing-card-head: clamp(44px, 4.4vw, 60px);
   --pricing-price-size: clamp(28px, 2.6vw, 34px);
   --pricing-cta-h: 52px;
@@ -4186,7 +4187,7 @@ body.case-dialog-is-open {
   max-width: 100%;
   overflow: visible;
   padding: 12px;
-  width: min(600px, 100%);
+  width: min(var(--brief-width), 100%);
 }
 
 .brief-dialog::backdrop {
@@ -4195,17 +4196,19 @@ body.case-dialog-is-open {
   -webkit-backdrop-filter: blur(20px) saturate(0.95);
 }
 
+/* Header and the send buttons stay put; only the fields scroll, and only when the screen
+   is too short for them (phones). On wide screens the fields sit in two columns and fit. */
 .brief-card {
   background: var(--section-paper);
   border: 1px solid rgba(255, 255, 255, 0.88);
   border-radius: clamp(22px, 3vw, 34px);
   box-shadow: 0 30px 80px rgba(67, 75, 130, 0.22);
-  display: grid;
-  gap: 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
   max-height: calc(100dvh - 24px);
-  overflow-y: auto;
-  overscroll-behavior: contain;
-  padding: clamp(20px, 4vw, 34px);
+  overflow: hidden;
+  padding: clamp(20px, 3.4vw, 32px);
 }
 
 .brief-header {
@@ -4240,7 +4243,14 @@ body.case-dialog-is-open {
 
 .brief-fields {
   display: grid;
-  gap: 18px;
+  flex: 0 1 auto;
+  gap: 16px;
+  /* Room for focus rings at the scroll edges. */
+  margin: -4px;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 4px;
 }
 
 .brief-field {
@@ -4282,7 +4292,7 @@ body.case-dialog-is-open {
 
 textarea.brief-input {
   min-height: 108px;
-  resize: vertical;
+  resize: none;
 }
 
 .brief-input::placeholder {
@@ -4360,8 +4370,10 @@ textarea.brief-input {
 }
 
 .brief-footer {
+  align-items: center;
   display: grid;
-  gap: 14px;
+  flex: none;
+  gap: 12px;
 }
 
 .brief-actions {
@@ -4388,9 +4400,94 @@ textarea.brief-input {
   text-underline-offset: 3px;
 }
 
+.brief-header,
+.brief-status {
+  flex: none;
+}
+
+/* Wide screens: short answers on the left, the story on the right at full height,
+   buttons and the note in one row. */
+@media (min-width: 820px) {
+  :root {
+    --brief-width: 940px;
+  }
+
+  .brief-header > div {
+    align-items: baseline;
+    column-gap: 22px;
+    display: flex;
+    flex-wrap: wrap;
+  }
+
+  .brief-header h2 {
+    margin: 0;
+  }
+
+  .brief-header p {
+    max-width: 380px;
+  }
+
+  .brief-fields {
+    column-gap: 28px;
+    grid-template-areas:
+      "name about"
+      "services about"
+      "deadline about"
+      "budget about";
+    grid-template-columns: minmax(0, 1fr) minmax(0, 0.9fr);
+    grid-template-rows: auto auto auto 1fr;
+  }
+
+  .brief-field--name { grid-area: name; }
+  .brief-field--services { grid-area: services; }
+  .brief-field--deadline { grid-area: deadline; }
+  .brief-field--budget { grid-area: budget; }
+
+  .brief-field--about {
+    grid-area: about;
+    grid-template-rows: auto 1fr;
+  }
+
+  .brief-field--about textarea.brief-input {
+    height: 100%;
+  }
+
+  .brief-footer {
+    column-gap: 24px;
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+
+  .brief-actions {
+    grid-template-columns: auto auto;
+  }
+
+  .brief-actions .process-button {
+    padding-inline: 22px;
+  }
+}
+
+.brief-short {
+  display: none;
+}
+
+/* Phones: both buttons in one row with short labels, so more of the form is in view. */
 @media (max-width: 520px) {
   .brief-actions {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+  }
+
+  .brief-actions .process-button {
+    gap: 8px;
+    min-height: 48px;
+    padding-inline: 12px;
+  }
+
+  .brief-long {
+    display: none;
+  }
+
+  .brief-short {
+    display: inline;
   }
 }
 
