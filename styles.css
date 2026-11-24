@@ -69,6 +69,8 @@ html {
 html {
   overflow-x: hidden;
   scroll-behavior: smooth;
+  /* No grey box from iOS around a tapped card or button: each control shows its own response. */
+  -webkit-tap-highlight-color: transparent;
 }
 
 body {
@@ -2306,7 +2308,8 @@ body.case-dialog-is-open {
 }
 
 /* Accordion mode (narrow screens): set by script. Services are violet cards stacked with a
-   small gap; one is open at a time, its plus turns into a cross. Height is animated in JS. */
+   small gap; one is open at a time, its plus turns into a cross. The fold is animated in JS
+   with transform and clip-path; a clip would cut a shadow, so the cards have none. */
 .pricing.is-accordion .pricing-list {
   border: 0;
   display: grid;
@@ -2318,7 +2321,6 @@ body.case-dialog-is-open {
   background: var(--accent-card);
   border: 0;
   border-radius: var(--radius-card);
-  box-shadow: 0 10px 22px rgba(98, 109, 170, 0.18);
   color: #fff;
   overflow: hidden;
 }
@@ -2352,7 +2354,7 @@ body.case-dialog-is-open {
   font-weight: 600;
 }
 
-.pricing.is-accordion .pricing-service.is-open .pricing-caption {
+.pricing.is-accordion .pricing-service[open] .pricing-caption {
   display: block;
 }
 

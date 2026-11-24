@@ -1891,36 +1891,90 @@ if (pricing) {
   };
 
   // Accordion (narrow screens): one service open at a time; opening another folds the open one.
-  // Height is animated by hand: a closed <details> has no content box to transition to.
-  const pricingFolds = new Map();
-  const foldPricingService = (service, open) => {
-    pricingFolds.get(service)?.cancel();
-    pricingFolds.delete(service);
-    const from = service.offsetHeight;
-    if (open) service.open = true;
-    const to = open ? service.scrollHeight : service.querySelector("summary").offsetHeight;
-    service.classList.toggle("is-open", open);
-    if (reduceMotion || !service.animate || from === to) {
-      service.open = open;
-      return;
-    }
-    const fold = service.animate(
-      [{ height: `${from}px` }, { height: `${to}px` }],
-      { duration: 420, easing: open ? "cubic-bezier(0.22, 1, 0.36, 1)" : "cubic-bezier(0.4, 0, 0.2, 1)" },
-    );
-    pricingFolds.set(service, fold);
-    fold.onfinish = () => {
-      pricingFolds.delete(service);
-      if (!open) service.open = false;
-    };
-  };
+  // The layout changes once, up front, and the move is drawn with transform and clip-path only
+  // (FLIP): animating height re-laid out and repainted the whole page every frame on iPhone.
+  // Until the fold ends, a closing card keeps its content and a negative margin pulls the rest
+  // up to the final layout; the panel keeps its old height the same way when it shrinks.
+  const pricingFollowers = [];
+  for (let next = pricing.nextElementSibling; next; next = next.nextElementSibling) pricingFollowers.push(next);
+  let pricingFold = null;
 
   const togglePricingService = (index) => {
-    const opening = !pricingServices[index].classList.contains("is-open");
-    pricingServices.forEach((service, itemIndex) => {
-      const open = opening && itemIndex === index;
-      if (open !== service.classList.contains("is-open")) foldPricingService(service, open);
+    pricingFold?.finish();
+    const target = pricingServices[index];
+    const opening = !target.classList.contains("is-open");
+    const closing = pricingServices.filter((service) => service.classList.contains("is-open") && (opening || service === target));
+    const movers = [...pricingServices, ...pricingFollowers];
+    const before = new Map(movers.map((element) => [element, element.getBoundingClientRect()]));
+    const panelBefore = pricing.offsetHeight;
+
+    const folds = closing.map((service) => {
+      const full = service.offsetHeight;
+      service.open = false;
+      const collapsed = service.offsetHeight;
+      service.open = true;
+      service.classList.remove("is-open");
+      service.style.marginBottom = `${collapsed - full}px`;
+      return { service, from: 0, to: full - collapsed };
     });
+    if (opening) {
+      const collapsed = target.offsetHeight;
+      target.open = true;
+      target.classList.add("is-open");
+      folds.push({ service: target, from: target.offsetHeight - collapsed, to: 0 });
+    }
+
+    const shrink = panelBefore - pricing.offsetHeight;
+    if (shrink > 0) {
+      pricing.style.paddingBottom = `${parseFloat(getComputedStyle(pricing).paddingBottom) + shrink}px`;
+      pricing.style.marginBottom = `${-shrink}px`;
+    }
+
+    let animations = [];
+    const finish = () => {
+      if (pricingFold !== fold) return;
+      pricingFold = null;
+      animations.forEach((animation) => animation.cancel());
+      closing.forEach((service) => {
+        service.style.removeProperty("margin-bottom");
+        service.open = false;
+      });
+      pricing.style.removeProperty("padding-bottom");
+      pricing.style.removeProperty("margin-bottom");
+    };
+    const fold = { finish };
+    pricingFold = fold;
+    if (reduceMotion || !pricing.animate) {
+      finish();
+      return;
+    }
+
+    const timing = { duration: 420, easing: "cubic-bezier(0.22, 1, 0.36, 1)" };
+    const onScreen = (a, b) => Math.min(a.top, b.top) < innerHeight && Math.max(a.bottom, b.bottom) > 0;
+    const clip = (bottom, radius) => `inset(0 0 ${bottom}px 0 round ${radius})`;
+    const cardRadius = getComputedStyle(target).borderTopLeftRadius;
+    const panelRadius = getComputedStyle(pricing).borderBottomLeftRadius;
+    const panelRect = pricing.getBoundingClientRect();
+    const panelHidden = Math.max(shrink, 0);
+    const panelGrow = Math.max(pricing.offsetHeight - panelHidden - panelBefore, 0);
+
+    animations = [
+      ...movers.flatMap((element) => {
+        const from = before.get(element);
+        const to = element.getBoundingClientRect();
+        const dy = from.top - to.top;
+        if (Math.abs(dy) < 0.5 || !onScreen(from, to)) return [];
+        return [element.animate({ transform: [`translateY(${dy}px)`, "translateY(0)"] }, timing)];
+      }),
+      ...folds.map(({ service, from, to }) =>
+        service.animate({ clipPath: [clip(from, cardRadius), clip(to, cardRadius)] }, timing),
+      ),
+      ...(panelRect.bottom - Math.max(panelGrow, panelHidden) < innerHeight && (panelGrow || panelHidden)
+        ? [pricing.animate({ clipPath: [clip(panelGrow, panelRadius), clip(panelHidden, panelRadius)] }, timing)]
+        : []),
+    ];
+    if (animations.length) animations[0].finished.then(finish, () => {});
+    else finish();
   };
 
   const syncPricingMode = () => {
@@ -1928,8 +1982,7 @@ if (pricing) {
     pricing.classList.toggle("is-split", split);
     pricing.classList.toggle("is-accordion", !split);
     if (pricingCard) pricingCard.hidden = !split;
-    pricingFolds.forEach((fold) => fold.cancel());
-    pricingFolds.clear();
+    pricingFold?.finish();
     // In split mode the text lives in the side card; the accordion starts with the first service open.
     pricingServices.forEach((service, index) => {
       const open = !split && index === 0;
