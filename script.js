@@ -1810,18 +1810,12 @@ if (pricing) {
   const pricingServices = Array.from(pricing.querySelectorAll(".pricing-service"));
   const pricingCard = pricing.querySelector("[data-pricing-card]");
   const pricingCardBody = pricing.querySelector("[data-pricing-card-body]");
-  const pricingControls = pricing.querySelector("[data-pricing-controls]");
-  const pricingPrev = pricing.querySelector("[data-pricing-prev]");
-  const pricingNext = pricing.querySelector("[data-pricing-next]");
-  const pricingCounter = pricing.querySelector("[data-pricing-counter]");
   const pricingField = (name) => pricing.querySelector(`[data-pricing-card-${name}]`);
   const pricingSplitQuery = window.matchMedia("(min-width: 901px)");
   const pricingHoverQuery = window.matchMedia("(hover: hover) and (pointer: fine)");
   let pricingPinned = false;
   const pricingNumber = (value) => String(value).padStart(2, "0");
   let pricingActiveIndex = -1;
-  let pricingDeckIndex = 0;
-  let pricingDeckFrame = 0;
 
   const isPricingSplit = () => Boolean(pricingCard && pricingCardBody) && pricingSplitQuery.matches;
 
@@ -1896,64 +1890,55 @@ if (pricing) {
     else fillPricingCard();
   };
 
-  // Deck: the card nearest to the left edge of the track is the current one.
-  const readPricingDeck = () => {
-    const origin = pricingServices[0].offsetLeft;
-    let nearest = 0;
-    pricingServices.forEach((service, index) => {
-      const distance = Math.abs(service.offsetLeft - origin - pricingList.scrollLeft);
-      if (distance < Math.abs(pricingServices[nearest].offsetLeft - origin - pricingList.scrollLeft)) nearest = index;
-    });
-    // The last cards can never reach the left edge once the track hits its end.
-    if (pricingList.scrollLeft >= pricingList.scrollWidth - pricingList.clientWidth - 2) {
-      nearest = Math.max(nearest, pricingServices.length - 1);
+  // Accordion (narrow screens): one service open at a time; opening another folds the open one.
+  // Height is animated by hand: a closed <details> has no content box to transition to.
+  const pricingFolds = new Map();
+  const foldPricingService = (service, open) => {
+    pricingFolds.get(service)?.cancel();
+    pricingFolds.delete(service);
+    const from = service.offsetHeight;
+    if (open) service.open = true;
+    const to = open ? service.scrollHeight : service.querySelector("summary").offsetHeight;
+    service.classList.toggle("is-open", open);
+    if (reduceMotion || !service.animate || from === to) {
+      service.open = open;
+      return;
     }
-    pricingDeckIndex = nearest;
-    if (pricingCounter) {
-      pricingCounter.textContent = `${pricingNumber(nearest + 1)} / ${pricingNumber(pricingServices.length)}`;
-    }
-    if (pricingPrev) pricingPrev.disabled = nearest === 0;
-    if (pricingNext) pricingNext.disabled = nearest === pricingServices.length - 1;
+    const fold = service.animate(
+      [{ height: `${from}px` }, { height: `${to}px` }],
+      { duration: 420, easing: open ? "cubic-bezier(0.22, 1, 0.36, 1)" : "cubic-bezier(0.4, 0, 0.2, 1)" },
+    );
+    pricingFolds.set(service, fold);
+    fold.onfinish = () => {
+      pricingFolds.delete(service);
+      if (!open) service.open = false;
+    };
   };
 
-  const showPricingDeckCard = (index) => {
-    const service = pricingServices[Math.min(Math.max(index, 0), pricingServices.length - 1)];
-    pricingList.scrollTo({
-      left: service.offsetLeft - pricingServices[0].offsetLeft,
-      behavior: reduceMotion ? "auto" : "smooth",
+  const togglePricingService = (index) => {
+    const opening = !pricingServices[index].classList.contains("is-open");
+    pricingServices.forEach((service, itemIndex) => {
+      const open = opening && itemIndex === index;
+      if (open !== service.classList.contains("is-open")) foldPricingService(service, open);
     });
   };
-
-  pricingList.addEventListener(
-    "scroll",
-    () => {
-      if (pricingDeckFrame || !pricing.classList.contains("is-deck")) return;
-      pricingDeckFrame = requestAnimationFrame(() => {
-        pricingDeckFrame = 0;
-        readPricingDeck();
-      });
-    },
-    { passive: true },
-  );
-  pricingPrev?.addEventListener("click", () => showPricingDeckCard(pricingDeckIndex - 1));
-  pricingNext?.addEventListener("click", () => showPricingDeckCard(pricingDeckIndex + 1));
 
   const syncPricingMode = () => {
     const split = isPricingSplit();
     pricing.classList.toggle("is-split", split);
-    pricing.classList.toggle("is-deck", !split);
+    pricing.classList.toggle("is-accordion", !split);
     if (pricingCard) pricingCard.hidden = !split;
-    if (pricingControls) pricingControls.hidden = split;
-    // Deck cards show everything at once; in split mode the text lives in the side card.
-    pricingServices.forEach((service) => {
-      service.open = !split;
+    pricingFolds.forEach((fold) => fold.cancel());
+    pricingFolds.clear();
+    // In split mode the text lives in the side card; the accordion starts with the first service open.
+    pricingServices.forEach((service, index) => {
+      const open = !split && index === 0;
+      service.open = open;
+      service.classList.toggle("is-open", open);
     });
     if (split) {
-      pricingList.scrollLeft = 0;
       if (pricingActiveIndex < 0) selectPricingService(0, false);
       movePricingMarker();
-    } else {
-      readPricingDeck();
     }
   };
 
@@ -1976,7 +1961,10 @@ if (pricing) {
     // The script owns open/closed in both modes, so a click never toggles the details.
     summary.addEventListener("click", (event) => {
       event.preventDefault();
-      if (!isPricingSplit()) return;
+      if (!isPricingSplit()) {
+        togglePricingService(index);
+        return;
+      }
       pricingPinned = !(pricingPinned && index === pricingActiveIndex);
       selectPricingService(index);
       pricing.classList.toggle("is-pinned", pricingPinned);
