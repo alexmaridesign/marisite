@@ -1949,7 +1949,8 @@ if (pricing) {
       return;
     }
 
-    const timing = { duration: 420, easing: "cubic-bezier(0.22, 1, 0.36, 1)" };
+    const token = (name) => getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+    const timing = { duration: parseFloat(token("--motion-fold")) || 620, easing: token("--motion-sheet-ease") || "ease-out" };
     const onScreen = (a, b) => Math.min(a.top, b.top) < innerHeight && Math.max(a.bottom, b.bottom) > 0;
     const clip = (bottom, radius) => `inset(0 0 ${bottom}px 0 round ${radius})`;
     const cardRadius = getComputedStyle(target).borderTopLeftRadius;
@@ -1969,12 +1970,29 @@ if (pricing) {
       ...folds.map(({ service, from, to }) =>
         service.animate({ clipPath: [clip(from, cardRadius), clip(to, cardRadius)] }, timing),
       ),
+      // The text follows the clip: it surfaces a beat after the card starts to open and fades
+      // out early when it folds, so nothing is cut mid-line at the edge.
+      ...folds.flatMap(({ service, to }) =>
+        Array.from(service.querySelectorAll(".pricing-caption, .pricing-details"), (part) =>
+          to === 0
+            ? part.animate(
+                { opacity: [0, 1], transform: ["translateY(-8px)", "translateY(0)"] },
+                { ...timing, delay: 90, duration: timing.duration - 90, fill: "backwards" },
+              )
+            : part.animate({ opacity: [1, 0] }, { duration: timing.duration * 0.45, easing: "ease-out", fill: "forwards" }),
+        ),
+      ),
       ...(panelRect.bottom - Math.max(panelGrow, panelHidden) < innerHeight && (panelGrow || panelHidden)
         ? [pricing.animate({ clipPath: [clip(panelGrow, panelRadius), clip(panelHidden, panelRadius)] }, timing)]
         : []),
     ];
-    if (animations.length) animations[0].finished.then(finish, () => {});
-    else finish();
+    if (!animations.length) {
+      finish();
+      return;
+    }
+    Promise.all(animations.map((animation) => animation.finished)).then(finish, () => {});
+    // A fold must never stay half-open, even if an animation is paused and never reports its end.
+    setTimeout(finish, timing.duration + 250);
   };
 
   const syncPricingMode = () => {

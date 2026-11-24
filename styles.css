@@ -53,6 +53,9 @@
   --motion-reveal: 600ms;
   --motion-ease: cubic-bezier(0.22, 1, 0.36, 1);
   --motion-exit-ease: cubic-bezier(0.4, 0, 1, 1);
+  /* iOS sheet curve: a soft start and a long settle. Sheets, folds, the dev notice. */
+  --motion-sheet-ease: cubic-bezier(0.32, 0.72, 0, 1);
+  --motion-fold: 620ms;
 }
 
 * {
@@ -2337,9 +2340,15 @@ body.case-dialog-is-open {
   display: none;
 }
 
+/* Name and price come first in both states; the caption goes under the price with the rest of
+   the text, so a folding card hides it with the clip instead of dropping it at the end. */
 .pricing.is-accordion .pricing-title {
-  gap: 6px;
+  display: contents;
+}
+
+.pricing.is-accordion .pricing-name {
   grid-column: 1;
+  grid-row: 1;
 }
 
 .pricing.is-accordion .pricing-name {
@@ -2352,6 +2361,9 @@ body.case-dialog-is-open {
   display: none;
   font-size: var(--text-body);
   font-weight: 600;
+  grid-column: 1 / -1;
+  grid-row: 3;
+  margin-top: 10px;
 }
 
 .pricing.is-accordion .pricing-service[open] .pricing-caption {
@@ -2378,7 +2390,7 @@ body.case-dialog-is-open {
   box-shadow: none;
   grid-column: 2;
   grid-row: 1 / 3;
-  transition: transform var(--motion-panel) var(--motion-ease), background var(--motion-ui) var(--motion-ease);
+  transition: transform var(--motion-fold) var(--motion-sheet-ease), background var(--motion-ui) var(--motion-ease);
 }
 
 .pricing.is-accordion .pricing-toggle::before,
@@ -4079,8 +4091,6 @@ body.case-dialog-is-open {
    Safari 26 paints the bar above the page in the flat colour of a fixed block at the top
    edge, so the highlight sits mid-sheet and the top edge stays exactly #f2f3ff: no seam. */
 .dev-notice {
-  --dev-sheet-ease: cubic-bezier(0.32, 0.72, 0, 1);
-
   background:
     radial-gradient(60% 90% at 50% 55%, rgba(255, 255, 255, 0.9), transparent 70%),
     #f2f3ff;
@@ -4099,7 +4109,7 @@ body.case-dialog-is-open {
   top: 0;
   touch-action: none;
   transform: translateY(calc(-100% - 40px));
-  transition: transform 500ms var(--dev-sheet-ease), height 500ms var(--dev-sheet-ease);
+  transition: transform 500ms var(--motion-sheet-ease), height 500ms var(--motion-sheet-ease);
   user-select: none;
   z-index: 40;
 }
@@ -4208,7 +4218,7 @@ body.case-dialog-is-open {
   inset: 0;
   opacity: 0;
   position: fixed;
-  transition: opacity 500ms var(--dev-sheet-ease, cubic-bezier(0.32, 0.72, 0, 1));
+  transition: opacity 500ms var(--motion-sheet-ease);
   z-index: 39;
 }
 
