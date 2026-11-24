@@ -89,14 +89,26 @@ document.addEventListener("click", (event) => {
   try { id = decodeURIComponent(url.hash.slice(1)); } catch { return; }
   const target = document.getElementById(id);
   if (!target || caseDialog?.open) return;
+  // Scroll only: a section hash left in the address bar gets shared and reopened, and the
+  // page then opens at that section instead of the top.
   event.preventDefault();
-  history.pushState(null, "", url.hash);
   if (!target.hasAttribute("tabindex")) {
     target.setAttribute("tabindex", "-1");
     target.addEventListener("blur", () => target.removeAttribute("tabindex"), { once: true });
   }
   target.focus({ preventScroll: true });
   scrollWithMotion(document.scrollingElement, target.getBoundingClientRect().top + window.scrollY);
+});
+
+// Arriving from another page at ./#contact: the browser scrolls there, then the hash goes,
+// so a copied or reopened address starts at the top again. Case links (#case/…) stay.
+window.addEventListener("load", () => {
+  if (location.hash.length < 2 || location.hash.startsWith("#case/")) return;
+  let id;
+  try { id = decodeURIComponent(location.hash.slice(1)); } catch { return; }
+  if (document.getElementById(id)?.matches("section")) {
+    history.replaceState(history.state, "", location.pathname + location.search);
+  }
 });
 
 window.addEventListener("wheel", cancelAllMotionScrolls, { passive: true });

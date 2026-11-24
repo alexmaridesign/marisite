@@ -4099,12 +4099,14 @@ body.case-dialog-is-open {
 
 /* The notice is a top sheet: full width, about a third of the screen, pinned to the top
    edge. Dragged up it moves with the finger (--dev-drag); dragged down it grows taller
-   (--dev-stretch) instead of leaving the edge. Motion uses the iOS sheet curve. */
+   (--dev-stretch) instead of leaving the edge. Motion uses the iOS sheet curve.
+   Safari 26 paints the bar above the page in the flat colour of a fixed block at the top
+   edge, so the highlight sits mid-sheet and the top edge stays exactly #f2f3ff: no seam. */
 .dev-notice {
   --dev-sheet-ease: cubic-bezier(0.32, 0.72, 0, 1);
 
   background:
-    radial-gradient(60% 120% at 50% 0%, rgba(255, 255, 255, 0.9), transparent 70%),
+    radial-gradient(60% 90% at 50% 55%, rgba(255, 255, 255, 0.9), transparent 70%),
     #f2f3ff;
   border-radius: 0 0 var(--radius-panel) var(--radius-panel);
   box-shadow: 0 24px 60px rgba(35, 38, 70, 0.22);
